@@ -1,0 +1,95 @@
+<div nz-row nzType="flex" nzJustify="center" nzAlign="middle"
+     [ngClass]="{'height-100': true, 'position-relative': true}">
+  <!-- loading component -->
+  <app-loading *ngIf="loading"></app-loading>
+  <!-- end loading component -->
+
+  <!-- register form -->
+  <form nz-form [formGroup]="registerForm" [ngClass]="{'register-form': true, 'opacity-loading': loading}"
+        (ngSubmit)="submitForm()">
+    <h1 align="center">Register Form</h1>
+    <nz-form-item>
+      <nz-form-control>
+        <nz-upload
+          class="avatar-uploader"
+          nzName="avatar"
+          nzAction=""
+          nzListType="picture-card"
+          [nzShowUploadList]="false"
+          [nzBeforeUpload]="beforeUpload"
+          (nzChange)="handleChange($event)"
+        >
+          <ng-container *ngIf="!avatarUrl">
+            <i class="upload-icon" nz-icon [nzType]="loading ? 'loading' : 'plus'"></i>
+            <div class="ant-upload-text">Upload</div>
+          </ng-container>
+          <img *ngIf="avatarUrl" [src]="avatarUrl" class="avatar"/>
+        </nz-upload>
+        <span>
+          (Click here to upload your avatar!)
+        </span>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-control>
+        <nz-input-group [nzPrefix]="prefixUser">
+          <input type="text" nz-input formControlName="fullName" placeholder="Name" (blur)="validateName()"/>
+        </nz-input-group>
+        <nz-form-explain
+          *ngIf="registerForm.get('fullName').touched && registerForm.get('fullName').hasError('required')"
+        >Please input your full name!
+        </nz-form-explain
+        >
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-control>
+        <nz-input-group [nzPrefix]="prefixUser">
+          <input type="text" nz-input formControlName="userName" placeholder="Username" (blur)="validateEmail()"/>
+        </nz-input-group>
+        <nz-form-explain
+          *ngIf="registerForm.get('userName').touched && (registerForm.get('userName').hasError('required') || registerForm.get('userName').hasError('invalidEmail'))"
+        >Please input your user's name! (e.g. abc@gmail.com)
+        </nz-form-explain
+        >
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-control>
+        <nz-input-group [nzPrefix]="prefixLock">
+          <input type="password" nz-input formControlName="password" placeholder="Password"
+                 (blur)="validatePassword()"/>
+        </nz-input-group>
+        <nz-form-explain
+          *ngIf="registerForm.get('password').touched && (registerForm.get('password').hasError('required') || registerForm.get('password').hasError('invalidPassword'))"
+        >Please input your Password!
+        </nz-form-explain
+        >
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-control>
+        <nz-input-group [nzPrefix]="prefixLock">
+          <input type="password" nz-input formControlName="confirmPassword" placeholder="Confirm Password"
+                 (blur)="validateConfirmPassword()" (keyup)="checkKeyUpValidateConfirmPassword()"/>
+        </nz-input-group>
+        <nz-form-explain
+          *ngIf="registerForm.get('confirmPassword').touched && (registerForm.get('confirmPassword').hasError('required') || registerForm.get('confirmPassword').hasError('invalidPassword'))"
+        >Please input your confirm password! Your confirm password must be equal to your password!
+        </nz-form-explain
+        >
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-control>
+        <label nz-checkbox formControlName="acceptTermsOfService">
+          <span>Accept Terms of Service</span>
+        </label>
+        <button nz-button class="register-form-button" [nzType]="'primary'">Register</button>
+      </nz-form-control>
+    </nz-form-item>
+  </form>
+  <ng-template #prefixUser><i nz-icon type="user"></i></ng-template>
+  <ng-template #prefixLock><i nz-icon type="lock"></i></ng-template>
+  <!-- end register form -->
+</div>

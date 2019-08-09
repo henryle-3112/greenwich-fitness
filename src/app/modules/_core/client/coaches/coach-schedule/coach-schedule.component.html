@@ -1,0 +1,37 @@
+<div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+     [ngClass]="{'opacity-loading': loading}">
+  <!-- loading component -->
+  <app-loading *ngIf="loading"></app-loading>
+  <!-- end loading component -->
+
+  <!-- custom list -->
+  <nz-list [nzDataSource]="trainings" [nzRenderItem]="item" [nzItemLayout]="'horizontal'" class="mg-bottom-24">
+    <ng-template #item let-item>
+      <nz-list-item (click)="goToScheduleDetail(item)">
+        <nz-list-item-meta
+          [nzTitle]="nzTitle"
+        >
+          <ng-template #nzTitle>
+            <span>Training - {{ item.trainingDate | date: 'MM/dd/yyyy'}}</span>
+          </ng-template>
+        </nz-list-item-meta>
+      </nz-list-item>
+    </ng-template>
+  </nz-list>
+  <!-- end custom list-->
+
+  <!-- pagination -->
+  <nz-pagination
+    *ngIf="trainings && trainings.length"
+    [nzPageIndex]="currentPage"
+    [nzPageSize]="nTrainingsPerPage"
+    [nzTotal]="totalTrainings"
+    [nzSize]="'small'"
+    (nzPageIndexChange)="trainingsPageChange($event)"></nz-pagination>
+  <!-- end pagination -->
+
+  <div id="expired-message" *ngIf="isExpired || selectedMembership.status == 0">
+    *(30 days is over, You need to pay for {{ selectedMembership.coach.userProfile.fullName }}.
+    Therefore, you cannot receive training schedule right now)
+  </div>
+</div>

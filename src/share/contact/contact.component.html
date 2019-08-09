@@ -1,0 +1,13 @@
+<div nz-row nzGutter="0" *ngIf="selectedContactContent" [ngClass]="{'opacity-loading': loading}">
+
+  <!-- loading component -->
+  <app-loading *ngIf="loading"></app-loading>
+  <!-- end loading component -->
+
+  <!-- contact's content-->
+  <div nz-col class="gutter-row" nzXs="24" nzSm="24" nzMd="24" nzLg="12" nzXl="12">
+    <h1>{{ selectedContactContent?.contactName }}</h1>
+    <p>{{ selectedContactContent?.contactContent }}</p>
+  </div>
+  <!-- end contact's content -->
+</div>

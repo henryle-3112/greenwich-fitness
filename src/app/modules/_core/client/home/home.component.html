@@ -1,0 +1,168 @@
+<nz-layout class="layout height-auto" [ngClass]="{'opacity-loading': loading}">
+  <!-- loading component -->
+  <app-loading *ngIf="loading"></app-loading>
+  <!-- end loading component -->
+
+  <!-- navbar -->
+  <nz-header ngClass="pd-left-72 header">
+    <div class="logo">
+      <p ngClass="logo-text">
+        Greenwich Fitness
+      </p>
+    </div>
+
+    <!-- welcome user -->
+    <div id="welcome-user">
+      <div id="user-avatar">
+        <nz-avatar [nzSize]="32" nzIcon="user" nzSrc="{{ selectedUserProfile?.avatar }}"></nz-avatar>
+      </div>
+      <div id="welcome-user-message">
+        <span class="mg-right-12">Welcome, {{ selectedUserProfile?.fullName }}</span>
+        <span>
+          <i nz-icon type="caret-down" nz-popover nzTitle="Options" nzTrigger="click"
+             [nzContent]="contentTemplate" nzPlacement="bottom"></i>
+          <ng-template #contentTemplate>
+            <div class="user-option" (click)="logout()">Logout</div>
+            <div class="user-option" (click)="goToUserProfile()">Profile</div>
+            <div class="user-option" (click)="goToNotification()">Notifications</div>
+          </ng-template>
+        </span>
+      </div>
+      <div class="clear-both"></div>
+    </div>
+    <!-- end welcome user -->
+
+    <!-- icon to open dropdown menu -->
+    <div class="menu-icon" (click)="openDropDownMenu($event)">
+      <span>
+        <i nz-icon type="align-right"></i>
+      </span>
+    </div>
+    <!-- end icon to open dropdown menu -->
+  </nz-header>
+  <!-- end navbar -->
+
+  <!-- content -->
+  <nz-content class="main-content">
+    <div class="gutter-example">
+      <div nz-row nzGutter="24">
+
+        <!-- col menu -->
+        <div nz-col class="gutter-row left-menu" nzXs="24" nzSm="24" nzMd="24" nzLg="7" nzXl="7" [@fadeInAnimation]
+             *ngIf="isMenuOpened">
+          <div class="gutter-box left-menu" style="background-color: #fff; min-height: 280px; padding: 24px;">
+            <h3>Menu</h3>
+            <nz-divider></nz-divider>
+            <!-- welcome user -->
+            <div id="welcome-user-mobile">
+              <div id="user-avatar-mobile">
+                <nz-avatar [nzSize]="32" nzIcon="user" nzSrc="{{ selectedUserProfile?.avatar }}"></nz-avatar>
+              </div>
+              <div id="welcome-user-message-mobile">
+                <span class="mg-right-12">Welcome, {{ selectedUserProfile?.fullName }}</span>
+                <span>
+                <i nz-icon type="caret-down" nz-popover nzTitle="Options" nzTrigger="click"
+                   [nzContent]="contentTemplate" nzPlacement="bottom"></i>
+                <ng-template #contentTemplate>
+                  <div class="user-option" (click)="logout()">Logout</div>
+                  <div class="user-option" (click)="goToUserProfile()">Profile</div>
+                  <div class="user-option" (click)="goToNotification()">Notifications</div>
+                </ng-template>
+              </span>
+              </div>
+              <div class="clear-both"></div>
+            </div>
+            <!-- end welcome user -->
+            <ul nz-menu ngClass="none-border">
+              <a routerLink="/client/feed" class="link-color">
+                <li nz-menu-item ngClass="pd-left-0"><span><i nz-icon type="home"></i><span
+                  class="nav-text">Feeds</span></span>
+                </li>
+              </a>
+              <a routerLink="/client/profile" class="link-color">
+                <li nz-menu-item ngClass="pd-left-0"><span><i nz-icon type="profile"></i><span
+                  class="nav-text">Profile</span></span></li>
+              </a>
+              <a routerLink="/client/exercise" class="link-color">
+                <li nz-menu-item ngClass="pd-left-0"><span><i nz-icon type="rocket"></i><span
+                  class="nav-text">Exercises</span></span></li>
+              </a>
+              <a routerLink="/client/workout" class="link-color">
+                <li nz-menu-item ngClass="pd-left-0"><span><i nz-icon type="ant-design"></i><span class="nav-text">Workouts</span></span>
+                </li>
+              </a>
+              <a routerLink="/client/coach" class="link-color">
+                <li nz-menu-item ngClass="pd-left-0"><span><i nz-icon type="team"></i><span
+                  class="nav-text">Coach</span></span>
+                </li>
+              </a>
+              <a routerLink="/blog" class="link-color">
+                <li nz-menu-item ngClass="pd-left-0"><span><i nz-icon type="read"></i><span
+                  class="nav-text">Blog</span></span></li>
+              </a>
+              <a routerLink="/shop" class="link-color">
+                <li nz-menu-item ngClass="pd-left-0"><span><i nz-icon type="shopping-cart"></i><span
+                  class="nav-text">Shop</span></span></li>
+              </a>
+              <a routerLink="/client/music" class="link-color">
+                <li nz-menu-item ngClass="pd-left-0"><span><i nz-icon type="customer-service"></i><span
+                  class="nav-text">Music</span></span>
+                </li>
+              </a>
+              <a routerLink="/client/gallery" class="link-color">
+                <li nz-menu-item ngClass="pd-left-0"><span><i nz-icon type="picture"></i><span
+                  class="nav-text">Gallery</span></span></li>
+              </a>
+              <li nz-menu-item ngClass="pd-left-0"><span><i nz-icon type="gift"></i><span
+                class="nav-text">Gift</span></span></li>
+            </ul>
+          </div>
+        </div>
+        <!-- end col menu -->
+
+        <!-- main content-->
+        <div nz-col class="gutter-row content" nzXs="24" nzSm="24" nzMd="24" nzLg="10" nzXl="10">
+          <!--
+            style="background-color: #fff; min-height: 280px; padding: 24px;"
+          -->
+          <div class="gutter-box">
+            <router-outlet></router-outlet>
+          </div>
+        </div>
+        <!-- end main content -->
+
+        <!-- other information (Leaderboard, top workouts, ...)-->
+        <div nz-col class="gutter-row leader-board-top-workouts" nzXs="24" nzSm="24" nzMd="24" nzLg="7" nzXl="7">
+          <div class="gutter-box mg-bottom-24" style="background-color: #fff; min-height: auto; padding: 24px;"
+               id="music-selection">
+            <h3 *ngIf="selectedMusic">{{ selectedMusic?.musicName }} - {{ selectedMusic?.musicAuthor }}</h3>
+            <h3 *ngIf="!selectedMusic">No Music Selection</h3>
+            <nz-divider></nz-divider>
+            <audio autoplay id="music-player" #audioOption class="mg-bottom-24" src='{{ selectedMusic?.musicLink }}'
+                   controls>
+            </audio>
+          </div>
+          <div class="gutter-box mg-bottom-24" style="background-color: #fff; min-height: 280px; padding: 24px;">
+            <h3>Recommended Coach</h3>
+            <nz-divider></nz-divider>
+          </div>
+          <!--<div class="gutter-box mg-bottom-24" style="background-color: #fff; min-height: 280px; padding: 24px;">-->
+          <!--<h3>Recommended Products</h3>-->
+          <!--<nz-divider></nz-divider>-->
+          <!--</div>-->
+          <!--<div class="gutter-box" style="background-color: #fff; min-height: 280px; padding: 24px;">-->
+          <!--<h3>Recommended Blogs</h3>-->
+          <!--<nz-divider></nz-divider>-->
+          <!--</div>-->
+        </div>
+        <!-- end other information -->
+
+      </div>
+    </div>
+  </nz-content>
+  <!-- end content -->
+
+  <!-- footer -->
+  <nz-footer style="text-align: center;">Greenwich Fitness ©2019 Implement By Henry Le</nz-footer>
+  <!-- end footer -->
+</nz-layout>

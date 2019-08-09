@@ -1,0 +1,202 @@
+<div *ngIf="selectedCoach" nz-row nzType="flex" nzJustify="center" nzAlign="middle"
+     [ngClass]="{'opacity-loading': loading}">
+
+  <!-- loading component -->
+  <app-loading *ngIf="loading"></app-loading>
+  <!-- end loading component -->
+
+  <!-- avatar -->
+  <div id="avatar">
+    <img src="{{ selectedCoach.userProfile.avatar}}" alt="{{ selectedCoach.userProfile.fullName}}" id="coach-avatar">
+  </div>
+  <!-- end avatar -->
+
+  <!-- name -->
+  <div id="coach-name">
+    <p>
+      {{ selectedCoach.userProfile.fullName }}
+    </p>
+  </div>
+  <!-- name -->
+
+  <!-- total membership rating -->
+  <div id="total-memberships-rating">
+    <p>
+      {{ nMemberships }} Memberships Enrolled - {{ rateAverage }} stars
+    </p>
+  </div>
+  <!-- end membership rating -->
+
+  <!-- average rate-->
+  <nz-rate class="mg-bottom-24" [ngModel]="rateAverage" nzDisabled></nz-rate>
+  <!-- end average rate -->
+
+  <!-- coach about -->
+  <div class="line mg-bottom-24"></div>
+  <div id="coach-about">
+    <p>{{ selectedCoach.about }}</p>
+  </div>
+  <div class="line mg-top-24"></div>
+  <!-- end coach about -->
+
+  <!-- customer reviews -->
+  <div nz-row nzGutter="0" style="width: 100%;" class="mg-top-24">
+    <div id="customer-reviews" nz-col class="gutter-row" nzXs="24" nzSm="24" nzMd="24" nzLg="24" nzXl="24">
+      <h3 id="title-customer-reviews">Customer Reviews</h3>
+      <button nz-button nzType="default" id="btn-write-reviews" (click)="toggleAddReviewForm()">Write Reviews</button>
+
+      <div class="clear-both"></div>
+
+      <!-- add reviews form -->
+      <div id="add-reviews-form" *ngIf="isReviewFormShown">
+        <nz-rate class="mg-top-24" [ngModel]="selectedCoachRateValue" (ngModelChange)="onRateChanged($event)"></nz-rate>
+        <br/>
+        <textarea class="mg-top-24" id="reviews-text-area" rows="4" nz-input [(ngModel)]="reviewContent"
+                  placeholder="Write Reviews..."></textarea> <br/>
+        <button nz-button nzType="primary" id="btn-add-reviews" (click)="addCoachReview()">Add Reviews</button>
+      </div>
+      <!-- end add reviews form -->
+
+      <!-- pagination list -->
+
+      <!-- reply comment template-->
+      <ng-template #commentTemplateReplyRef let-comment="comment">
+        <nz-comment [nzAuthor]="comment.userProfile.fullName"
+                    [nzDatetime]="comment.replyOnCoachFeedbackCreatedDate | date: 'yyyy-MM-dd HH:mm:ss'">
+          <nz-avatar nz-comment-avatar nzIcon="user" [nzSrc]="comment.userProfile.avatar"></nz-avatar>
+          <nz-comment-content>
+            <p>{{ comment.replyOnCoachFeedbackContent }}</p>
+          </nz-comment-content>
+          <nz-comment-action>
+            <i
+              nz-tooltip
+              nzTitle="Like"
+              nz-icon
+              type="like"
+              [theme]="comment.isLikeClicked == true ? 'twotone' : 'outline'"
+              (click)="likeReplyOnCoachFeedback(comment)"
+            ></i>
+            <span class="count like">{{ comment?.nLikes }}</span>
+          </nz-comment-action>
+          <nz-comment-action>
+            <i
+              nz-tooltip
+              nzTitle="Dislike"
+              nz-icon
+              type="dislike"
+              [theme]="comment.isLikeClicked == false ? 'twotone' : 'outline'"
+              (click)="dislikeReplyOnCoachFeedback(comment)"
+            ></i>
+            <span class="count dislike">{{ comment?.nDislikes }}</span>
+          </nz-comment-action>
+          <nz-comment-action>
+            <span (click)="showReplyReplyCoachFeedbackBox(comment)">Reply to</span>
+          </nz-comment-action>
+        </nz-comment>
+      </ng-template>
+      <!-- end reply comment template -->
+
+      <!-- comment template -->
+      <ng-template #commentTemplateRef let-comment="comment">
+
+        <!-- coach's feedback content -->
+        <nz-comment [nzAuthor]="comment.userProfile.fullName"
+                    [nzDatetime]="comment.coachFeedbackCreatedDate | date: 'yyyy-MM-dd HH:mm:ss'">
+          <nz-avatar nz-comment-avatar nzIcon="user" [nzSrc]="comment.userProfile.avatar"></nz-avatar>
+          <nz-comment-content>
+            <p>{{ comment.coachFeedbackContent }}</p>
+          </nz-comment-content>
+          <nz-comment-action>
+            <i
+              nz-tooltip
+              nzTitle="Like"
+              nz-icon
+              type="like"
+              [theme]="comment.isLikeClicked == true ? 'twotone' : 'outline'"
+              (click)="like(comment)"
+            ></i>
+            <span class="count like">{{ comment?.nLikes }}</span>
+          </nz-comment-action>
+          <nz-comment-action>
+            <i
+              nz-tooltip
+              nzTitle="Dislike"
+              nz-icon
+              type="dislike"
+              [theme]="comment.isLikeClicked == false ? 'twotone' : 'outline'"
+              (click)="dislike(comment)"
+            ></i>
+            <span class="count dislike">{{ comment?.nDislikes }}</span>
+          </nz-comment-action>
+          <nz-comment-action>
+            <span (click)="showReplyCoachFeedbackBox(comment)">Reply to</span>
+          </nz-comment-action>
+          <nz-comment-action>
+            <span (click)="viewRepliesOfSelectedCoachFeedback(comment)">View {{ comment?.nReplies }} replies</span>
+          </nz-comment-action>
+          <!-- end  coach's feedback content -->
+
+          <!-- relies of each coach's feedback -->
+          <ng-container *ngIf="comment.replies && comment.replies.length">
+            <ng-template ngFor let-child [ngForOf]="comment.replies">
+              <ng-template [ngTemplateOutlet]="commentTemplateReplyRef"
+                           [ngTemplateOutletContext]="{ comment: child }">
+              </ng-template>
+            </ng-template>
+          </ng-container>
+          <!-- end relies of each coach's feedback -->
+
+          <!-- reply box-->
+          <nz-input-group *ngIf="comment.isReplyBoxShown && comment.isReplyBoxShown == true"
+                          [nzSuffix]="suffixIconMessage"
+                          [ngClass]="{'mg-bottom-24': true}" style="width: 100%;">
+            <input type="text" nz-input placeholder="Reply..." #replyBox
+                   (keyup.enter)="replyToCoachFeedback(comment, replyBox.value); replyBox.value = ''"/>
+          </nz-input-group>
+          <ng-template #suffixIconMessage>
+            <i nz-icon type="message"></i>
+          </ng-template>
+          <!-- end reply box -->
+
+        </nz-comment>
+      </ng-template>
+      <!-- end comment template -->
+
+      <div *ngFor="let eachCoachFeedbackComment of coachFeedbacksPerPage">
+        <ng-template [ngTemplateOutlet]="commentTemplateRef"
+                     [ngTemplateOutletContext]="{ comment: eachCoachFeedbackComment }"></ng-template>
+      </div>
+
+      <!-- end pagination list -->
+
+      <!-- pagination -->
+      <nz-pagination
+        *ngIf="isCoachFeedbackAndPaginationShown"
+        [nzPageIndex]="currentPage"
+        [nzPageSize]="nCoachFeedbacksPerPage"
+        [nzTotal]="totalCoachFeedbacks"
+        nzSize="small"
+        (nzPageIndexChange)="coachFeedbacksPageChange($event)"></nz-pagination>
+      <!-- end pagination -->
+    </div>
+
+    <!-- end customer reviews -->
+
+    <!-- hire coach button -->
+    <button nz-button [nzType]="'primary'" class="hire-coach-btn" (click)="sendHireRequestToCoach();"
+            *ngIf="selectedCoach.userProfile.id != selectedUserProfile.id &&
+             !isRelationshipExisted && !isSentRequest"
+    >
+      Yes, I want {{ selectedCoach.userProfile.fullName }} to be my coach
+    </button>
+    <!-- end hire coach button -->
+
+    <!-- hire coach button -->
+    <button nz-button [nzType]="'primary'" class="processing-btn" disabled
+            *ngIf="selectedCoach.userProfile.id != selectedUserProfile.id && !isRelationshipBetweenCoachAndUserExisted && isSentRequest"
+    >
+      Your request is handling
+    </button>
+    <!-- end hire coach button -->
+  </div>
+</div>

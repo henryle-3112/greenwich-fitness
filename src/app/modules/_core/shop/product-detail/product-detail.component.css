@@ -1,0 +1,180 @@
+/* image product detail css */
+.img-product-detail {
+  width: 100%;
+}
+
+/* end image product detail css */
+
+/* product information css */
+#product-information {
+  padding-left: 50px !important;
+  padding-top: 100px;
+  padding-bottom: 100px;
+  background: #f7f7f7;
+  height: 674.5px;
+}
+
+/* end product information css */
+
+/* product quantity css */
+#product-quantity {
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+/* end product quantity css */
+
+/* add to cart button css */
+.buttons {
+  margin-bottom: 24px;
+}
+
+#btn-add-to-cart {
+  margin-right: 12px;
+}
+
+/* end add to cart button css */
+
+/* description css */
+#product-description {
+  width: 60%;
+}
+
+.line {
+  width: 100%;
+  height: 1px;
+  background: #ccc;
+}
+
+#product-description p {
+  margin-top: 24px;
+  margin-bottom: 24px;
+  text-align: justify;
+}
+
+/* end description css */
+
+/* customer reviews */
+
+#title-customer-reviews {
+  display: inline;
+  float: left;
+}
+
+#btn-write-reviews {
+  float: right;
+  font-weight: bold;
+  color: black;
+  border-color: black;
+  background: none;
+}
+
+#btn-write-reviews:hover {
+  color: #1890ff;
+  border-color: #1890ff;
+}
+
+#customer-reviews {
+  padding: 50px !important;
+  background: #f7f7f7;
+}
+
+#reviews-text-area {
+  width: 500px;
+}
+
+#btn-add-reviews {
+  margin-top: 24px;
+}
+/* end customer reviews */
+
+
+
+/* responsive css */
+
+
+@media (min-width:320px)  {
+  /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
+
+  #customer-reviews {
+    padding: 0 !important;
+  }
+
+  #btn-write-reviews {
+    margin-top: 4px;
+  }
+}
+
+@media (min-width:480px)  {
+  /* smartphones, Android phones, landscape iPhone */
+
+  #customer-reviews {
+    padding: 0 !important;
+  }
+
+  #btn-write-reviews {
+    margin-top: 4px;
+  }
+
+}
+
+/*@media screen and (min-width: 600px) , screen and (max-width: 800px) {*/
+/*...*/
+/*}*/
+
+@media (min-width:600px)  {
+  /* portrait tablets, portrait iPad, e-readers (Nook/Kindle), landscape 800x480 phones (Android) */
+
+  #customer-reviews {
+    padding: 0 !important;
+  }
+
+  #btn-write-reviews {
+    margin-top: 4px;
+  }
+
+}
+@media (min-width:801px)  {
+  /* tablet, landscape iPad, lo-res laptops ands desktops */
+
+  #customer-reviews {
+    padding: 0 !important;
+  }
+
+  #btn-write-reviews {
+    margin-top: 4px;
+  }
+
+}
+@media (min-width:1025px) {
+  /* big landscape tablets, laptops, and desktops */
+
+  #customer-reviews {
+    padding: 50px !important;
+  }
+
+  #btn-write-reviews {
+    margin-top: 0;
+  }
+
+}
+@media (min-width:1281px) {
+  /* hi-res laptops and desktops */
+
+  #customer-reviews {
+    padding: 50px !important;
+  }
+
+  #btn-write-reviews {
+    margin-top: 0;
+  }
+}
+
+/* end responsive css */
+
+::ng-deep .twitter-share-button {
+  position: relative !important;
+  top: 6px;
+  margin-right: 4px;
+  z-index: 2;
+  margin-left: 4px;
+}

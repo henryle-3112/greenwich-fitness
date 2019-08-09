@@ -1,0 +1,37 @@
+.status-pending {
+  font-weight: bold;
+  color: #1890ff;
+}
+
+.status-declined {
+  font-weight: bold;
+  color: red;
+}
+
+.status-accepted {
+  font-weight: bold;
+  color: green;
+}
+
+.notification-description {
+  margin-top: 12px;
+}
+
+.decline-button {
+  margin-left: 12px;
+  background: indianred;
+  border-color: indianred;
+}
+
+.decline-button:hover {
+  opacity: 0.75;
+}
+
+.notify-message {
+  margin-top: 8px;
+}
+
+.notification-created-date {
+  color: #ccc;
+  font-size: 12px;
+}

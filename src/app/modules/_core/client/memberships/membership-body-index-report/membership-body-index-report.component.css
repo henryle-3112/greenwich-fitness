@@ -1,0 +1,25 @@
+/* current weight css */
+#current-weight {
+  width: 100%;
+  margin-top: 24px;
+}
+
+
+/* end current weight css */
+
+/* line css */
+.line {
+  width: 100%;
+  height: 1px;
+  background: #ccc;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+/* end line css */
+
+/* body index css */
+#body-index {
+  width: 100%;
+}
+/* end body index css*/
+

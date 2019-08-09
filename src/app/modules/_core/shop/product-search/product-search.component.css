@@ -1,0 +1,76 @@
+
+.title {
+  padding-left: 24px;
+}
+
+.title h2 {
+  padding-top: 24px;
+  padding-bottom: 24px;
+}
+
+.product-search-list {
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+#pagination {
+  padding-left: 24px;
+}
+
+/* responsive css */
+
+
+@media (min-width:320px)  {
+  /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
+
+  .product-item {
+    margin-bottom: 24px;
+  }
+}
+
+@media (min-width:480px)  {
+  /* smartphones, Android phones, landscape iPhone */
+
+  .product-item {
+    margin-bottom: 24px;
+  }
+
+}
+
+/*@media screen and (min-width: 600px) , screen and (max-width: 800px) {*/
+/*...*/
+/*}*/
+
+@media (min-width:600px)  {
+  /* portrait tablets, portrait iPad, e-readers (Nook/Kindle), landscape 800x480 phones (Android) */
+
+  .product-item {
+    margin-bottom: 24px;
+  }
+
+}
+@media (min-width:801px)  {
+  /* tablet, landscape iPad, lo-res laptops ands desktops */
+
+  .product-item {
+    margin-bottom: 24px;
+  }
+
+}
+@media (min-width:1025px) {
+  /* big landscape tablets, laptops, and desktops */
+
+  .product-item {
+    margin-bottom: 0;
+  }
+
+}
+@media (min-width:1281px) {
+  /* hi-res laptops and desktops */
+
+  .product-item {
+    margin-bottom: 0;
+  }
+}
+
+/* end responsive css */

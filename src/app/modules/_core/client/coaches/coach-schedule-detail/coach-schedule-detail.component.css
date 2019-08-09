@@ -1,0 +1,32 @@
+.line {
+  width: 100%;
+  height: 1px;
+  background: #ccc;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+#title {
+  margin-top: 24px;
+}
+
+.done-button {
+  border-color: green;
+  color: green;
+}
+
+
+.not-done-button {
+  border-color: indianred;
+  color: indianred;
+}
+
+.training-result {
+  font-weight: bold;
+  color: #1890ff;
+  margin-left: 12px;
+}
+
+.training-title {
+  font-weight: bold;
+}

@@ -1,0 +1,56 @@
+<div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;">
+  <!-- loading component -->
+  <app-loading *ngIf="loading"></app-loading>
+  <!-- end loading component -->
+
+  <!--month picker -->
+  <nz-month-picker
+    [(ngModel)]="selectedDateToViewRevenue"
+    (ngModelChange)="onMonthChanged($event)"
+    nzPlaceHolder="Select Month"
+  ></nz-month-picker>
+  <!-- end month picker -->
+
+  <!-- custom list -->
+  <nz-list class="mg-top-24" [nzDataSource]="coachPayments" [nzRenderItem]="item" [nzItemLayout]="'horizontal'"
+           *ngIf="coachPayments && coachPayments.length && !loading">
+    <ng-template #item let-item>
+      <nz-list-item>
+        <nz-list-item-meta
+          [nzTitle]="nzTitle"
+          nzAvatar="{{ item.membership.userProfile.avatar }}"
+        >
+          <ng-template #nzTitle>
+            <span>{{ item.membership.userProfile.fullName }} has pay {{ item.sum }}$ for you</span>
+          </ng-template>
+        </nz-list-item-meta>
+      </nz-list-item>
+    </ng-template>
+  </nz-list>
+  <!-- end custom list-->
+
+  <!-- pagination -->
+  <div id="pagination">
+    <nz-pagination
+      *ngIf="coachPayments && coachPayments.length && !loading"
+      [nzPageIndex]="currentPage"
+      [nzPageSize]="nCoachPaymentsPerPage"
+      [nzTotal]="totalCoachPayments"
+      [nzSize]="'small'"
+      (nzPageIndexChange)="coachPaymentsPageChange($event)"></nz-pagination>
+  </div>
+  <!-- end pagination -->
+
+  <!-- total coach revenue -->
+  <div id="total-revenue-by-selected-month-and-by-selected-year"
+       *ngIf="coachPayments
+        && coachPayments.length
+        && !loading
+        && totalPaymentByCoachIdAndMonthAndYear">
+    <h3 id="total-revenue-by-selected-month-and-by-selected-year-title">Total Revenue in {{ selectedMonthToViewRevenue }}
+      /{{ selectedYearToViewRevenue }}: </h3>
+    <h3 id="total-revenue-by-selected-month-and-by-selected-year-result">{{ totalPaymentByCoachIdAndMonthAndYear }}$</h3>
+  </div>
+  <!-- end total coach revenue-->
+
+</div>

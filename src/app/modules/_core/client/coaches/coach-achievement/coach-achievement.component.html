@@ -1,0 +1,33 @@
+<div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;">
+  <!-- loading component -->
+  <app-loading *ngIf="loading"></app-loading>
+  <!-- end loading component -->
+
+  <!-- custom list -->
+  <nz-list [nzDataSource]="userAchievements" [nzRenderItem]="item" [nzItemLayout]="'horizontal'"
+           [ngClass]="{'opacity-loading': loading, 'mg-bottom-24': true}">
+    <ng-template #item let-item>
+      <nz-list-item>
+        <nz-list-item-meta
+          [nzTitle]="nzTitle"
+          nzDescription="{{ item.time }} minutes"
+        >
+          <ng-template #nzTitle>
+            <a href="{{ item.title }}" target="_blank">{{ item.title }}</a>
+          </ng-template>
+        </nz-list-item-meta>
+      </nz-list-item>
+    </ng-template>
+  </nz-list>
+  <!-- end custom list -->
+
+  <!-- pagination -->
+  <nz-pagination
+    *ngIf="!isHidePagination"
+    [nzPageIndex]="currentPage"
+    [nzPageSize]="nUserAchievementsPerPage"
+    [nzTotal]="totalUserAchievements"
+    [nzSize]="'small'"
+    (nzPageIndexChange)="userAchievementsPageChange($event)"></nz-pagination>
+  <!-- end pagination -->
+</div>

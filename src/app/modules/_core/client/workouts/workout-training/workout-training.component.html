@@ -1,0 +1,183 @@
+<div nz-row style="width: 100%; height: 100%;" [ngClass]="{'opacity-loading': loading}">
+  <!-- loading component -->
+  <app-loading *ngIf="loading"></app-loading>
+  <!-- end loading component -->
+
+  <!-- training -->
+  <div id="training" nz-col nzSpan="24"
+       [ngStyle]="{ 'background-image': 'url(' + selectedWorkoutSingleExercise?.exercise.loopVideoUrl + ')'}">
+    <!-- actions -->
+    <div id="actions">
+      <img class="image-action" src="./assets/images/ic_cancel.png" alt="Cancel"
+           (click)="openConfirmCancelExerciseModal()">
+      <img class="image-action" id="action-play" src="./assets/images/ic_play_large.png" alt="Play"
+           (click)="goToExerciseVideo()">
+      <img class="image-action" id="action-show-music" src="./assets/images/ic_music_large.png" alt="Music"
+           (click)="openMusicListModal()">
+    </div>
+    <!-- end actions -->
+    <div class="clear"></div>
+
+    <!-- time and exercise info -->
+    <div nz-row nzType="flex" style="width: 100%; height: 100%;" nzJustify="center">
+      <div style="margin-top: 128px;">
+        <span id="current-exercise-time">{{ currentWorkoutTime }}</span><br/>
+        <span id="current-exercise">{{ selectedWorkoutSingleExercise?.quantity }}
+          x {{ selectedWorkoutSingleExercise?.exercise.title }}</span><br/>
+        <audio autoplay id="music-player" #audioOption class="mg-bottom-24"
+               src='{{ selectedMusic?.musicLink }}' controls>
+        </audio>
+        <button nz-button nzType="primary" nzBlock id="btn-finish"
+                (click)="nextAndFinishWorkout()">{{ nextFinishContent }}</button>
+      </div>
+    </div>
+    <!-- end time and exercise info-->
+  </div>
+  <!-- end training -->
+
+  <!-- count down -->
+  <div id="countdown" nz-col nzSpan="24" *ngIf="isCountDown"
+       [ngStyle]="{ 'background-image': 'url(' + backgroundImage + ')'}">
+    <div nz-row nzType="flex" style="width: 100%; height: 100%;" nzAlign="middle" nzJustify="center">
+      <h1>{{ currentSeconds }}</h1>
+    </div>
+  </div>
+  <!-- end count down -->
+
+  <!-- modal to show music list -->
+  <nz-modal [(nzVisible)]="isMusicModalShown"
+            nzTitle="Music"
+            (nzOnCancel)="handleCancelMusicListModal()"
+            nzFooter="null">
+    <!-- search box-->
+    <nz-input-group [nzSuffix]="suffixIconSearch" [ngClass]="{'mg-bottom-24': true, 'width-50': true}">
+      <input type="text" nz-input placeholder="Name..." #searchBox (keyup.enter)="searchMusic(searchBox.value)"/>
+    </nz-input-group>
+    <ng-template #suffixIconSearch>
+      <i nz-icon type="search"></i>
+    </ng-template>
+    <!-- end search box -->
+
+    <!-- custom list -->
+    <nz-list [nzDataSource]="musicsPerPage" [nzRenderItem]="item" [nzItemLayout]="'horizontal'" class="mg-bottom-24">
+      <ng-template #item let-item>
+        <nz-list-item>
+          <nz-list-item-meta
+            [nzTitle]="nzTitle"
+            nzAvatar="{{ item.musicImage }}"
+            nzDescription="{{ item.musicAuthor }}"
+          >
+            <ng-template #nzTitle>
+              <span (click)="changeSong(item)">{{ item.musicName }}</span>
+            </ng-template>
+          </nz-list-item-meta>
+        </nz-list-item>
+      </ng-template>
+    </nz-list>
+    <!-- end custom list-->
+
+    <!-- pagination -->
+    <nz-pagination
+      [nzPageIndex]="currentPage"
+      [nzPageSize]="nMusicPerPage"
+      [nzTotal]="totalMusic"
+      [nzSize]="'small'"
+      (nzPageIndexChange)="musicPageChange($event)"></nz-pagination>
+    <!-- end pagination -->
+  </nz-modal>
+  <!-- end modal to show music list -->
+
+  <!-- modal to ask user to write status -->
+  <nz-modal [(nzVisible)]="isStatusModalShown"
+            nzTitle="Status"
+            (nzOnOk)="handleSubmitStatusModal()"
+            (nzOnCancel)="handleCancelStatusModal()">
+
+    <div class="title">
+      <p>Achievement</p>
+    </div>
+
+    <div id="user-achievement">
+      <div id="exercise-title">{{ trainingName }}</div>
+      <div id="exercise-time">{{ currentWorkoutTime }}</div>
+      <div class="clear-both"></div>
+    </div>
+
+    <div class="title" id="status">
+      <p>Status</p>
+    </div>
+
+    <div id="user-status">
+      <textarea rows="4" nz-input [(ngModel)]="userStatus" placeholder="What's on your mind?"></textarea>
+    </div>
+
+    <div class="title">
+      <p>Image</p>
+    </div>
+
+    <div id="user-status-image">
+      <nz-upload
+        class="avatar-uploader"
+        nzName="avatar"
+        nzAction=""
+        nzListType="picture-card"
+        [nzShowUploadList]="false"
+        [nzBeforeUpload]="beforeUpload"
+        (nzChange)="handleChange($event)"
+      >
+        <ng-container *ngIf="!statusImageUrl">
+          <i class="upload-icon" nz-icon [nzType]="isUploadImageLoading ? 'loading' : 'plus'"></i>
+          <div class="ant-upload-text">Upload</div>
+        </ng-container>
+        <img *ngIf="statusImageUrl" [src]="statusImageUrl" class="avatar"/>
+      </nz-upload>
+      <span>
+          (Click here to upload your status' image!)
+      </span>
+    </div>
+  </nz-modal>
+  <!-- end modal to ask user to write status -->
+
+
+  <!-- modal to ask user write log and current health after finishing the exercise -->
+  <nz-modal [(nzVisible)]="isLogModalShown"
+            nzTitle="Log"
+            (nzOnOk)="handleSubmitLogModal()"
+            (nzOnCancel)="handleCancelLogModal()">
+
+    <div class="title">
+      <p>Achievement</p>
+    </div>
+
+    <div class="user-achievement">
+      <div class="exercise-title">{{ trainingName }}</div>
+      <div class="exercise-time">{{ currentWorkoutTime }}</div>
+      <div class="clear-both"></div>
+    </div>
+
+    <div class="title" id="grade-current-health">
+      <p>Grade your current health (1 - 10): </p>
+    </div>
+
+    <div id="current-health">
+      <nz-slider [(ngModel)]="currentHealth" nzMax="10" nzMin="1"></nz-slider>
+    </div>
+
+    <div class="title">
+      <p>Number of reps: </p>
+    </div>
+
+    <div id="number-of-reps">
+      <nz-input-number [(ngModel)]="nReps" [nzMin]="1" [nzMax]="nMaxReps" [nzStep]="1"></nz-input-number>
+    </div>
+
+    <div class="title">
+      <p>Log</p>
+    </div>
+
+    <div id="log">
+      <textarea rows="4" nz-input [(ngModel)]="trainingLog" placeholder="What's on your mind?"></textarea>
+    </div>
+  </nz-modal>
+  <!-- end modal to ask user to write status -->
+</div>

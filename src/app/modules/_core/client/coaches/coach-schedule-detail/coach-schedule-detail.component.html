@@ -1,0 +1,41 @@
+<div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+     [ngClass]="{'opacity-loading': loading}">
+
+  <div id="title">
+    <h3>Training - {{ selectedMembershipSchedule?.trainingDate }}</h3>
+  </div>
+
+  <div class="line"></div>
+
+  <!-- loading component -->
+  <app-loading *ngIf="loading"></app-loading>
+  <!-- end loading component -->
+
+  <!-- custom list -->
+  <nz-list [nzDataSource]="trainings" [nzRenderItem]="item" [nzItemLayout]="'horizontal'" class="mg-bottom-24">
+    <ng-template #item let-item>
+      <nz-list-item>
+        <nz-list-item-meta
+          [nzTitle]="nzTitle"
+          [nzDescription]="nzDescription"
+        >
+          <ng-template #nzTitle>
+            <span class="training-title">{{ item.name }}</span>
+          </ng-template>
+          <ng-template #nzDescription>
+            <div class="mg-top-12">
+              <div *ngIf="item.time"><span>Achievement Time:</span> <span class="training-result">{{ item?.time }} minutes</span></div>
+              <div *ngIf="item.nreps"><span>Number of reps:</span> <span class="training-result">{{ item?.nreps }}</span></div>
+              <div *ngIf="item.currentHealth"><span>Health after finishing:</span> <span class="training-result">{{ item?.currentHealth }} / 10</span></div>
+              <div *ngIf="item.log" class="mg-bottom-12"><span>Log:</span> <span class="training-result">{{ item.log }}</span></div>
+              <button nz-button [nzType]="'primary'" *ngIf="item.statusButton == 0" (click)="startTraining(item);">Start</button>
+              <button nz-button [nzType]="'primary'" *ngIf="item.statusButton == 1" disabled class="done-button">Done</button>
+              <button nz-button [nzType]="'primary'" *ngIf="item.statusButton == -1" disabled class="not-done-button">Not Done</button>
+            </div>
+          </ng-template>
+        </nz-list-item-meta>
+      </nz-list-item>
+    </ng-template>
+  </nz-list>
+  <!-- end custom list-->
+</div>

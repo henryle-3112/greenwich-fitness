@@ -1,0 +1,28 @@
+/* login form css */
+.login-form {
+  max-width: 300px;
+}
+
+.login-form-button {
+  width: 100%;
+}
+
+.facebook-background {
+  background-color: #3b5999;
+  border-color: #3b5999;
+}
+
+.facebook-background:hover {
+  opacity: 0.5;
+}
+
+.google-background {
+  background-color: #cd201f;
+  border-color: #cd201f;
+}
+
+.google-background:hover {
+  opacity: 0.5;
+}
+
+/* end login form css */

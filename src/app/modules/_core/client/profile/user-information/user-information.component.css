@@ -1,0 +1,49 @@
+/* user-account information css */
+.user-information-form {
+  width: 300px;
+}
+
+.user-information-form-button {
+  width: 100%;
+}
+
+.avatar {
+  width: 128px;
+  height: 128px;
+}
+
+.upload-icon {
+  font-size: 32px;
+  color: #999;
+}
+
+.ant-upload-text {
+  margin-top: 8px;
+  color: #666;
+}
+
+/* end user-account information css */
+
+/* change password css */
+.line {
+  width: 100%;
+  height: 1px;
+  background: #ccc;
+}
+
+#change-password {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+#change-password a {
+  color: rgba(0, 0, 0, 0.65);
+  padding-left: 16px;
+}
+
+#change-password a:hover {
+  color: #1890ff;
+}
+
+
+/* end change password css */

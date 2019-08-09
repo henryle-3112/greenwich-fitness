@@ -1,0 +1,425 @@
+.logo {
+  width: 120px;
+  height: 31px;
+  /*background: rgba(255, 255, 255, 0.2);*/
+  /*margin: 16px 24px 16px 0;*/
+  float: left;
+}
+
+.menu-icon {
+  color: #fff;
+  float: right;
+  display: none;
+}
+
+.logo-text {
+  width: 120px;
+  height: 31px;
+  color: hsla(0, 0%, 100%, 0.65);
+}
+
+.logo-text:hover {
+  color: #fff;
+}
+
+/* main content css */
+.main-content {
+  padding: 24px 72px;
+}
+
+/* content css */
+.content {
+  margin-top: 0;
+}
+
+
+@media (min-width:320px)  {
+  /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
+
+  .leader-board-top-workouts {
+    display: block;
+  }
+
+  #music-selection {
+    margin-top: 24px;
+  }
+
+  /* header css */
+  .header {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  /* main content css */
+  .main-content {
+    padding: 0;
+  }
+
+  /* content css */
+  .content {
+    margin-top: 12px;
+  }
+
+  /* menu icon css */
+  .menu-icon {
+    display: inline-block;
+  }
+
+  /* welcome user css */
+  #welcome-user-mobile {
+    display: inline;
+    margin-left: 12px;
+  }
+
+  #user-avatar-mobile {
+    display: inline;
+    margin-right: 12px;
+  }
+
+  #welcome-user-message-mobile {
+    display: inline;
+    color: black;
+  }
+
+  .user-option {
+    color: black;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+
+  .user-option:hover {
+    cursor: pointer;
+  }
+
+  #welcome-user {
+    display: none;
+  }
+  /* end welcome user css */
+}
+@media (min-width:480px)  {
+  /* smartphones, Android phones, landscape iPhone */
+
+  .leader-board-top-workouts {
+    display: block;
+  }
+
+  #music-selection {
+    margin-top: 24px;
+  }
+
+  /* header css */
+  .header {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  /* main content css */
+  .main-content {
+    padding: 0;
+  }
+
+  /* content css */
+  .content {
+    margin-top: 12px;
+  }
+
+  /* menu icon css */
+  .menu-icon {
+    display: inline-block;
+  }
+
+  /* welcome user css */
+  #welcome-user-mobile {
+    display: inline;
+    margin-left: 12px;
+  }
+
+  #user-avatar-mobile {
+    display: inline;
+    margin-right: 12px;
+  }
+
+  #welcome-user-message-mobile {
+    display: inline;
+    color: black;
+  }
+
+  .user-option {
+    color: black;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+
+  .user-option:hover {
+    cursor: pointer;
+  }
+
+  #welcome-user {
+    display: none;
+  }
+  /* end welcome user css */
+
+}
+
+/*@media screen and (min-width: 600px) , screen and (max-width: 800px) {*/
+  /*...*/
+/*}*/
+
+@media (min-width:600px)  {
+  /* portrait tablets, portrait iPad, e-readers (Nook/Kindle), landscape 800x480 phones (Android) */
+  .leader-board-top-workouts {
+    display: block;
+  }
+
+  #music-selection {
+    margin-top: 24px;
+  }
+
+  /* main content css */
+  .main-content {
+    padding: 0;
+  }
+
+  /* header css */
+  .header {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  /* content css */
+  .content {
+    margin-top: 12px;
+  }
+
+  /* menu icon css */
+  .menu-icon {
+    display: inline-block;
+  }
+
+  /* welcome user css */
+  #welcome-user-mobile {
+    display: inline;
+    margin-left: 12px;
+  }
+
+  #user-avatar-mobile {
+    display: inline;
+    margin-right: 12px;
+  }
+
+  #welcome-user-message-mobile {
+    display: inline;
+    color: black;
+  }
+
+  .user-option {
+    color: black;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+
+  .user-option:hover {
+    cursor: pointer;
+  }
+
+  #welcome-user {
+    display: none;
+  }
+  /* end welcome user css */
+
+}
+@media (min-width:801px)  {
+  /* tablet, landscape iPad, lo-res laptops ands desktops */
+
+  .leader-board-top-workouts {
+    display: block;
+  }
+
+  #music-selection {
+    margin-top: 24px;
+  }
+
+  /* header css */
+  .header {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  /* main content css */
+  .main-content {
+    padding: 0;
+  }
+
+  /* content css */
+  .content {
+    margin-top: 12px;
+  }
+
+  /* menu icon css */
+  .menu-icon {
+    display: inline-block;
+  }
+
+  /* welcome user css */
+
+  #welcome-user-mobile {
+    display: inline;
+    margin-left: 12px;
+  }
+
+  #user-avatar-mobile {
+    display: inline;
+    margin-right: 12px;
+  }
+
+  #welcome-user-message-mobile {
+    display: inline;
+    color: black;
+  }
+
+  .user-option {
+    color: black;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+
+  .user-option:hover {
+    cursor: pointer;
+  }
+
+  #welcome-user {
+    display: none;
+  }
+  /* end welcome user css */
+
+}
+@media (min-width:1025px) {
+  /* big landscape tablets, laptops, and desktops */
+  .leader-board-top-workouts {
+    display: block;
+  }
+
+  #music-selection {
+    margin-top: 0;
+  }
+
+  .header {
+    padding-left: 72px;
+    padding-right: 72px;
+  }
+
+  /* main content css */
+  .main-content {
+    padding: 24px 72px;
+  }
+
+  /* content css */
+  .content {
+    margin-top: 0;
+  }
+
+  /* menu icon css */
+  .menu-icon {
+    display: none;
+  }
+
+  /* welcome user css */
+  #welcome-user {
+    display: inline;
+    float: right;
+  }
+
+  #user-avatar {
+    display: inline;
+    margin-right: 12px;
+  }
+
+  #welcome-user-message {
+    display: inline;
+    color: white;
+  }
+
+  .user-option {
+    color: black;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+
+  .user-option:hover {
+    cursor: pointer;
+  }
+
+  #welcome-user-mobile {
+    display: none;
+  }
+
+  /* end welcome user css */
+
+}
+@media (min-width:1281px) {
+  /* hi-res laptops and desktops */
+  .leader-board-top-workouts {
+    display: block;
+  }
+
+  #music-selection {
+    margin-top: 0;
+  }
+
+  /* header css */
+  .header {
+    padding-left: 72px;
+    padding-right: 72px;
+  }
+
+  /* main content css */
+  .main-content {
+    padding: 24px 72px;
+  }
+
+  /* content css */
+  .content {
+    margin-top: 0;
+  }
+
+  /* menu icon css */
+  .menu-icon {
+    display: none;
+  }
+
+  /* welcome user css */
+  #welcome-user {
+    display: inline;
+    float: right;
+  }
+
+  #user-avatar {
+    display: inline;
+    margin-right: 12px;
+  }
+
+  #welcome-user-message {
+    display: inline;
+    color: white;
+  }
+
+  .user-option {
+    color: black;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+
+  .user-option:hover {
+    cursor: pointer;
+  }
+
+  #welcome-user-mobile {
+    display: none;
+  }
+
+  /* end welcome user css */
+
+}
+
+
+

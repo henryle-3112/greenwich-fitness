@@ -1,0 +1,79 @@
+<div [ngClass]="{'opacity-loading': loading}">
+
+  <!-- loading component -->
+  <app-loading *ngIf="loading"></app-loading>
+  <!-- end loading component -->
+
+  <div nz-row nzGutter="16" [ngClass]="{'mg-bottom-24': true}">
+    <div nz-col class="gutter-row" nzXs="24" nzSm="24" nzMd="24"
+         nzLg="24" nzXl="24">
+      <!-- no data -->
+      <nz-empty *ngIf="isNoData" class="pd-top-100 pd-bottom-100"></nz-empty>
+      <!-- end no data -->
+
+      <!-- shopping cart detail -->
+      <div id="shoping-cart-detail" *ngIf="!isNoData">
+        <nz-table #shoppingCartTable [nzData]="shoppingCartProducts" nzShowPagination="false">
+          <thead>
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+            <th>Action</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let eachShoppingCartProduct of shoppingCartProducts">
+            <td class="shopping-cart-row">
+              <img class="product-image" src="{{ eachShoppingCartProduct?.product.productImage }}"
+                   alt="{{ eachShoppingCartProduct?.product.productName }}">
+            </td>
+            <td class="shopping-cart-row">{{ eachShoppingCartProduct?.product.productName }}</td>
+            <td class="shopping-cart-row">{{ eachShoppingCartProduct?.product.productPrice }}$</td>
+            <td class="shopping-cart-row">
+              <div id="product-quantity">
+                <nz-input-number style="z-index: 2;"
+                                 [(ngModel)]="eachShoppingCartProduct.quantity" [nzMin]="1"
+                                 (ngModelChange)="changeProductQuantity(eachShoppingCartProduct, $event);"
+                                 [nzStep]="1"></nz-input-number>
+              </div>
+            </td>
+            <td
+              class="shopping-cart-row">{{ eachShoppingCartProduct?.quantity * eachShoppingCartProduct?.product.productPrice }}
+              $
+            </td>
+            <td class="shopping-cart-row">
+              <a (click)="deleteSelectedShoppingCartProduct(eachShoppingCartProduct);">Delete</a>
+            </td>
+          </tr>
+          </tbody>
+        </nz-table>
+        <!-- total price -->
+        <div id="total-price">
+          <h2 id="total-price-title">Total: </h2>
+          <h2 id="total-price-value">{{ totalPrice }}$</h2>
+          <div class="clear-both"></div>
+        </div>
+        <!-- end total price-->
+        <!-- shopping cart action buttons -->
+        <div id="shopping-cart-action" nz-row nzType="flex" nzJustify="center" nzAlign="middle">
+          <button nz-button nzType="primary" id="payment-button" nz-popover nzTitle="Payment" nzTrigger="click"
+                  [nzContent]="contentTemplate" nzPlacement="bottom">Payment
+          </button>
+          <ng-template #contentTemplate>
+            <button nz-button nzType="primary" id="paypal" (click)="payWithPaypal();">Paypal</button>
+            <button nz-button nzType="primary" id="cash" (click)="payByCash();">Cash</button>
+          </ng-template>
+          <button nz-button nzType="primary" id="clear-shopping-cart-button" (click)="clearShoppingCart();">Clear
+            Shopping Cart
+          </button>
+        </div>
+        <!-- end shopping cart action buttons -->
+        <!-- end shopping cart detail -->
+      </div>
+    </div>
+  </div>
+
+</div>

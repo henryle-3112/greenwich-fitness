@@ -1,0 +1,94 @@
+<div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;">
+  <!-- loading component -->
+  <app-loading *ngIf="loading"></app-loading>
+  <!-- end loading component -->
+
+  <!-- search box-->
+  <nz-input-group [nzSuffix]="suffixIconSearch" [ngClass]="{'mg-bottom-24': true, 'width-50': true}">
+    <input type="text" nz-input placeholder="Name..." #searchBox (keyup.enter)="searchWorkouts(searchBox.value)"/>
+  </nz-input-group>
+  <ng-template #suffixIconSearch>
+    <i nz-icon type="search"></i>
+  </ng-template>
+  <!-- end search box -->
+
+  <!-- tag to filter the list -->
+  <div>
+    <nz-tag class="mg-bottom-12 workout-tag"
+            (click)="handleTagActive('beginner')"
+            [ngClass]="{'tag-active': isBeginnerActive, 'tag-unactive': !isBeginnerActive}">Beginner
+    </nz-tag>
+    <nz-tag class="mg-bottom-12 workout-tag"
+            (click)="handleTagActive('intermediate')"
+            [ngClass]="{'tag-active': isIntermediateActive, 'tag-unactive': !isIntermediateActive}">Intermediate
+    </nz-tag>
+    <nz-tag class="mg-bottom-12 workout-tag"
+            (click)="handleTagActive('advanced')"
+            [ngClass]="{'tag-active': isAdvancedActive, 'tag-unactive': !isAdvancedActive}">Advanced
+    </nz-tag>
+    <nz-tag class="mg-bottom-12 workout-tag"
+            (click)="handleTagActive('short')"
+            [ngClass]="{'tag-active': isShortActive, 'tag-unactive': !isShortActive}">Short
+    </nz-tag>
+    <nz-tag class="mg-bottom-12 workout-tag"
+            (click)="handleTagActive('medium')"
+            [ngClass]="{'tag-active': isMediumActive, 'tag-unactive': !isMediumActive}">Medium
+    </nz-tag>
+    <nz-tag class="mg-bottom-12 workout-tag"
+            (click)="handleTagActive('long')"
+            [ngClass]="{'tag-active': isLongActive, 'tag-unactive': !isLongActive}">Long
+    </nz-tag>
+    <nz-tag class="mg-bottom-12 workout-tag"
+            (click)="handleTagActive('full_body')"
+            [ngClass]="{'tag-active': isFullBodyActive, 'tag-unactive': !isFullBodyActive}">Full Body
+    </nz-tag>
+    <nz-tag class="mg-bottom-12 workout-tag"
+            (click)="handleTagActive('upper')"
+            [ngClass]="{'tag-active': isUpperActive, 'tag-unactive': !isUpperActive}">Upper
+    </nz-tag>
+    <nz-tag class="mg-bottom-12 workout-tag"
+            (click)="handleTagActive('core')"
+            [ngClass]="{'tag-active': isCoreActive, 'tag-unactive': !isCoreActive}">Core
+    </nz-tag>
+    <nz-tag class="mg-bottom-12 workout-tag"
+            (click)="handleTagActive('lower')"
+            [ngClass]="{'tag-active': isLowerActive, 'tag-unactive': !isLowerActive}">Lower
+    </nz-tag>
+    <nz-tag class="mg-bottom-12 workout-tag"
+            (click)="handleTagActive('no_distance')"
+            [ngClass]="{'tag-active': isNoDistanceActive, 'tag-unactive': !isNoDistanceActive}">No Distance
+    </nz-tag>
+    <nz-tag class="mg-bottom-12 workout-tag"
+            (click)="handleTagActive('no_equipment')"
+            [ngClass]="{'tag-active': isNoEquipmentActive, 'tag-unactive': !isNoEquipmentActive}">No Equipment
+    </nz-tag>
+  </div>
+  <!-- end tag filter -->
+
+  <!-- custom list -->
+  <nz-list [nzDataSource]="workoutsPerPage" [nzRenderItem]="item" [nzItemLayout]="'horizontal'"
+           [ngClass]="{'opacity-loading': loading, 'mg-bottom-24': true}">
+    <ng-template #item let-item>
+      <nz-list-item>
+        <nz-list-item-meta
+          [nzTitle]="nzTitle"
+          nzAvatar="{{ item.smallMobileRetinaPictureUrl }}"
+        >
+          <ng-template #nzTitle>
+            <span (click)="goToWorkoutDetail(item)">{{ item.title }}</span>
+          </ng-template>
+        </nz-list-item-meta>
+      </nz-list-item>
+    </ng-template>
+  </nz-list>
+  <!-- end custom list -->
+
+  <!-- pagination -->
+  <nz-pagination
+    [nzPageIndex]="currentPage"
+    [nzPageSize]="nWorkoutPerPage"
+    [nzTotal]="totalWorkouts"
+    [nzSize]="'small'"
+    (nzPageIndexChange)="workoutPageChange($event)"></nz-pagination>
+  <!-- end pagination -->
+</div>
