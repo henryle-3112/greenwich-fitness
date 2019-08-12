@@ -43,6 +43,7 @@ import { TrainingNotificationComponent } from './notification/training-notificat
 import { NotificationComponent } from './notification/notification/notification.component';
 import { RevenueComponent } from './profile/revenue/revenue.component';
 import { CoachPaymentHistoryComponent } from './profile/coach-payment-history/coach-payment-history.component';
+import { NotificationContainerComponent } from './notification/notification-container/notification-container.component';
 
 @NgModule({
   declarations: [
@@ -81,7 +82,8 @@ import { CoachPaymentHistoryComponent } from './profile/coach-payment-history/co
     TrainingNotificationComponent,
     NotificationComponent,
     RevenueComponent,
-    CoachPaymentHistoryComponent
+    CoachPaymentHistoryComponent,
+    NotificationContainerComponent
   ],
   imports: [
     CommonModule,

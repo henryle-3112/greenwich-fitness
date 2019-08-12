@@ -5,7 +5,7 @@
 
   <!--month picker -->
   <nz-month-picker
-    [(ngModel)]="selectedDateToViewCoachPaymentHistories"
+    [(ngModel)]="selectedDateCoachPaymentHistories"
     (ngModelChange)="onMonthChanged($event)"
     nzPlaceHolder="Select Month"
   ></nz-month-picker>
@@ -33,7 +33,7 @@
     <nz-pagination
       *ngIf="coachPaymentHistories && coachPaymentHistories.length && !loading"
       [nzPageIndex]="currentPage"
-      [nzPageSize]="nCoachPaymentHistoriesByPage"
+      [nzPageSize]="nCoachPaymentHistories"
       [nzTotal]="totalCoachPaymentHistories"
       [nzSize]="'small'"
       (nzPageIndexChange)="coachPaymentHistoriesPageChanged($event)"></nz-pagination>
@@ -41,16 +41,16 @@
   <!-- end pagination -->
 
   <!-- total coach revenue -->
-  <div id="total-revenue-by-selected-month-and-by-selected-year"
+  <div id="total-coach-payment-histories-by-selected-month-and-by-selected-year"
        *ngIf="coachPaymentHistories
         && coachPaymentHistories.length
         && !loading
-        && totalCoachPaymentHistoriesByUserProfileIdAndByMonthAndByYear">
-    <h3 id="total-revenue-by-selected-month-and-by-selected-year-title">Total Revenue
-      in {{ selectedMonthToViewCoachPaymentHistories }}
-      /{{ selectedYearToViewCoachPaymentHistories }}: </h3>
+        && totalCoachPaymentVal">
+    <h3 id="total-coach-payment-histories-by-selected-month-and-by-selected-year-title">Total Coach Payment Histories
+      in {{ selectedMonthCoachPaymentHistories }}
+      /{{ selectedYearCoachPaymentHistories }}: </h3>
     <h3
-      id="total-revenue-by-selected-month-and-by-selected-year-result">{{ totalCoachPaymentHistoriesByUserProfileIdAndByMonthAndByYear }}
+      id="total-coach-payment-histories-by-selected-month-and-by-selected-year-result">{{ totalCoachPaymentVal }}
       $</h3>
   </div>
   <!-- end total coach revenue-->

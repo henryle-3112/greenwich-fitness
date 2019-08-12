@@ -1,13 +1,13 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {BodyIndex, UserProfile} from '@gw-models/core';
 import {FormBuilder} from '@angular/forms';
-import {BodyIndexService} from '../../../../../../services/_core/api/user/body-index.service';
-import {AuthenticationService} from '../../../../../../services/_core/authentication/authentication.service';
+import {BodyIndexService} from '@gw-services/core/api/user/body-index.service';
+import {AuthenticationService} from '@gw-services/core/authentication/authentication.service';
 import {NzNotificationService} from 'ng-zorro-antd';
 import {Utils} from '@gw-helpers/core';
 import {Config} from '@gw-config/core';
 import {Chart} from 'chart.js';
-import {ShareMembershipService} from '../../../../../../services/_core/shared/membership/share-membership.service';
+import {ShareMembershipService} from '@gw-services/core/shared/membership/share-membership.service';
 import {Router} from '@angular/router';
 
 @Component({

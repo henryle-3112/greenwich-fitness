@@ -22,6 +22,7 @@ import {NewFeedComponent} from './new-feed/new-feed.component';
 import {PaymentAlertComponent} from './payment-alert/payment-alert.component';
 import {BuyingHistoryDetailComponent} from './profile/buying-history-detail/buying-history-detail.component';
 import {TrainingNotificationComponent} from './notification/training-notification/training-notification.component';
+import {NotificationContainerComponent} from './notification/notification-container/notification-container.component';
 
 const routes: Routes = [
   {
@@ -43,7 +44,7 @@ const routes: Routes = [
       {path: 'coach/schedule/detail', component: CoachScheduleDetailComponent},
       {path: 'buying/history/detail', component: BuyingHistoryDetailComponent},
       {path: 'feed', component: NewFeedComponent},
-      {path: 'notification', component: TrainingNotificationComponent},
+      {path: 'notification', component: NotificationContainerComponent},
       {
         path: 'music',
         component: MusicComponent

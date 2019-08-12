@@ -82,6 +82,7 @@ export class CoachPaymentHistoryComponent implements OnInit {
       .subscribe((nCoachPaymentHistories: ResponseMessage) => {
         if (nCoachPaymentHistories) {
           this.totalCoachPaymentHistories = Number(nCoachPaymentHistories.message);
+          console.log(this.totalCoachPaymentHistories);
         }
         this.loading = false;
       });
@@ -102,7 +103,7 @@ export class CoachPaymentHistoryComponent implements OnInit {
         if (coachPayments) {
           this.coachPaymentHistories = coachPayments;
         }
-        this.loading = true;
+        this.loading = false;
       });
   }
 
@@ -139,9 +140,11 @@ export class CoachPaymentHistoryComponent implements OnInit {
    * @param event - month that was selected by users to view their coach payment history
    */
   private onMonthChanged(event) {
+    console.log(event);
     if (this.selectedDateCoachPaymentHistories) {
+      console.log(this.selectedDateCoachPaymentHistories);
       this.selectedMonthCoachPaymentHistories = this.selectedDateCoachPaymentHistories.getMonth() + 1;
-      this.selectedMonthCoachPaymentHistories = this.selectedDateCoachPaymentHistories.getFullYear();
+      this.selectedYearCoachPaymentHistories = this.selectedDateCoachPaymentHistories.getFullYear();
       this.getNumberOfCoachPaymentHistories();
       this.getCoachPaymentHistories();
       this.getTotalPaymentByUserProfileIdAndByMonthAndByYear();

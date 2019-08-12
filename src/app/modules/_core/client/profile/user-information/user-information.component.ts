@@ -123,11 +123,12 @@ export class UserInformationComponent implements OnInit {
     // update user-account's name and user-account's fullname
     if (this.loginType.localeCompare('normal') === 0) {
       this.changeNormalAccountInformation();
-    } else if (this.loginType.localeCompare('facebook') === 0) {
-      this.changeFacebookAccountInformation();
-    } else if (this.loginType.localeCompare('google') === 0) {
-      this.changeGoogleAccountInformation();
     }
+    // else if (this.loginType.localeCompare('facebook') === 0) {
+    //   this.changeFacebookAccountInformation();
+    // } else if (this.loginType.localeCompare('google') === 0) {
+    //   this.changeGoogleAccountInformation();
+    // }
   }
 
   /**
@@ -277,16 +278,16 @@ export class UserInformationComponent implements OnInit {
   /**
    * change facebook account information
    */
-  private changeFacebookAccountInformation() {
-
-  }
-
-  /**
-   * change google account information
-   */
-  private changeGoogleAccountInformation() {
-
-  }
+  // private changeFacebookAccountInformation() {
+  //
+  // }
+  //
+  // /**
+  //  * change google account information
+  //  */
+  // private changeGoogleAccountInformation() {
+  //
+  // }
 
   /**
    * load current user-account's information
@@ -304,8 +305,12 @@ export class UserInformationComponent implements OnInit {
   private loadUserAccount() {
     this.shareUserAccountService.currentUserAccount
       .subscribe(selectedUserAccount => {
-        this.selectedUserAccount = selectedUserAccount;
-        this.f.userName.setValue(this.selectedUserAccount.userName);
+        if (selectedUserAccount) {
+          this.selectedUserAccount = selectedUserAccount;
+          this.f.userName.setValue(this.selectedUserAccount.userName);
+        } else {
+          this.router.navigate((['/client']));
+        }
       });
   }
 
@@ -315,9 +320,13 @@ export class UserInformationComponent implements OnInit {
   private loadUserProfile() {
     this.shareUserProfileService.currentUserProfile
       .subscribe(selectedUserProfile => {
-        this.selectedUserProfile = selectedUserProfile;
-        this.avatarUrl = this.selectedUserProfile.avatar;
-        this.f.fullName.setValue(this.selectedUserProfile.fullName);
+        if (selectedUserProfile) {
+          this.selectedUserProfile = selectedUserProfile;
+          this.avatarUrl = this.selectedUserProfile.avatar;
+          this.f.fullName.setValue(this.selectedUserProfile.fullName);
+        } else {
+          this.router.navigate(['/client']);
+        }
       });
   }
 }

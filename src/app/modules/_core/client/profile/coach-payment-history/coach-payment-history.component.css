@@ -1,0 +1,18 @@
+#pagination {
+  margin-top: 24px;
+}
+
+#total-coach-payment-histories-by-selected-month-and-by-selected-year {
+  margin-top: 24px;
+}
+
+#total-coach-payment-histories-by-selected-month-and-by-selected-year-result {
+  margin-left: 12px;
+  font-weight: bold;
+  color: #1890ff;
+  display: inline;
+}
+
+#total-coach-payment-histories-by-selected-month-and-by-selected-year-title {
+  display: inline;
+}

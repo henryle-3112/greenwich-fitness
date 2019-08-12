@@ -12,6 +12,7 @@ import {CustomValidator} from '@gw-services/core/validate/custom-validator';
 import {Utils} from '@gw-helpers/core';
 import {NzNotificationService} from 'ng-zorro-antd';
 import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-body-index-report',
@@ -73,6 +74,7 @@ export class BodyIndexReportComponent implements OnInit {
    * @param facebookAccountService - inject facebook account service (interact with facebook's account data)
    * @param googleAccountService - inject google account service (interact with google's account data)
    * @param fb - inject form builder - (is used to create change body index form)
+   * @param router - inject router
    * @param notification - inject notification to shown error or success message
    * @param shareUserProfileService - inject shareUserProfileService
    */
@@ -82,6 +84,7 @@ export class BodyIndexReportComponent implements OnInit {
               private facebookAccountService: FacebookAccountService,
               private googleAccountService: GoogleAccountService,
               private fb: FormBuilder,
+              private router: Router,
               private notification: NzNotificationService,
               private shareUserProfileService: ShareUserProfileService) {
   }
@@ -100,9 +103,13 @@ export class BodyIndexReportComponent implements OnInit {
     // load user-account's information to get user-account's id, then get body index
     this.shareUserProfileService.currentUserProfile
       .subscribe(userProfile => {
-        this.selectedUserProfile = userProfile;
-        this.selectedUserProfileId = userProfile.id;
-        this.loadBodyIndexByUserProfileId();
+        if (userProfile) {
+          this.selectedUserProfile = userProfile;
+          this.selectedUserProfileId = userProfile.id;
+          this.loadBodyIndexByUserProfileId();
+        } else {
+          this.router.navigate(['/client']);
+        }
       });
   }
 

@@ -32,12 +32,12 @@
 
   <!-- add schedule button -->
   <button nz-button [nzType]="'primary'" id="add-schedule-btn" (click)="goToAddScheduleComponent();"
-          *ngIf="!isExpired && selectedMembership.status != 0">
+          *ngIf="!isExpired && (selectedMembership && selectedMembership.status != 0)">
     Add Schedule for Today
   </button>
   <!--  end add schedule button -->
 
-  <div id="expired-message" *ngIf="isExpired || selectedMembership.status == 0">
+  <div id="expired-message" *ngIf="isExpired || (selectedMembership && selectedMembership.status == 0)">
     *(30 days is over, {{ selectedMembership.userProfile.fullName }} needs to do payment for you. Therefore,
     you cannot add training schedule right now)
   </div>
