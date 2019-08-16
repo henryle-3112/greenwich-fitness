@@ -9,6 +9,7 @@ import {CustomValidator} from '@gw-services/core/validate/custom-validator';
 import {NzNotificationService, UploadFile} from 'ng-zorro-antd';
 import {Observable, Observer} from 'rxjs';
 import {UserAccountStatus} from 'src/models/user/user-account-status';
+import {Config} from '@gw-config/core';
 
 @Component({
   selector: 'app-register',
@@ -16,24 +17,19 @@ import {UserAccountStatus} from 'src/models/user/user-account-status';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
-  // register form
   registerForm: FormGroup;
-  // check loading component is showing or not
-  loading = false;
-  // avatar url
+  isLoadingSpinnerShown = false;
   avatarUrl: string;
-  // check image upload the first time (ignoring nzAction)
-  isUploadImage = false;
-  // avatar url was returned from the server
+  isImageUploaded = false;
   savedAvatarUrl: string;
 
   /**
    *
-   * @param fb - inject form builder to create register form
-   * @param notification - inject notification to show message
-   * @param uploadImageService - inject upload image service to upload image
-   * @param signUpService - inject sign up service to register
-   * @param router - inject router for routing
+   * @param fb - inject fb
+   * @param notification - inject notification
+   * @param uploadImageService - inject uploadImageService
+   * @param signUpService - inject signUpService
+   * @param router - inject router
    */
   constructor(private fb: FormBuilder,
               private notification: NzNotificationService,
@@ -45,8 +41,7 @@ export class RegisterComponent implements OnInit {
   /**
    * init data
    */
-  ngOnInit() {
-    // set up validators for register form
+  ngOnInit(): void {
     this.registerForm = this.fb.group({
       fullName: [null, [Validators.required]],
       userName: [null, [Validators.required, CustomValidator.emailValidator]],
@@ -54,7 +49,6 @@ export class RegisterComponent implements OnInit {
       confirmPassword: [null, [Validators.required, CustomValidator.passwordValidator]],
       acceptTermsOfService: [true]
     });
-    // set current value to input fields when the form was loaded the first time to avoid null exception
     this.f.userName.setValue('');
     this.f.fullName.setValue('');
     this.f.password.setValue('');
@@ -86,40 +80,33 @@ export class RegisterComponent implements OnInit {
    * submit login form
    */
   submitForm(): void {
-    // stop here if form is invalid
     if (this.registerForm.invalid) {
       this.createNotification('error', 'Error', 'Cannot submit your form! Please check all fields');
       return;
     }
-    this.loading = true;
-    // create user-account's account's status for new account
-    // default is EMAIL_NOT_CONFIRMED
+    this.isLoadingSpinnerShown = true;
     const userAccountStatus = new UserAccountStatus();
     userAccountStatus.id = 2;
     userAccountStatus.name = 'EMAIL_NOT_CONFIRMED';
-    // create user-account's profile to save user-account's profile's information
     const userProfile = new UserProfile();
     userProfile.fullName = this.f.fullName.value;
     userProfile.acceptTermsOfService = 1;
     userProfile.avatar = this.savedAvatarUrl;
     userProfile.status = 1;
-    // get user-account's account's information to submit to the server
     const newUserAccount = new UserAccount();
     newUserAccount.userName = this.f.userName.value;
     newUserAccount.password = this.f.password.value;
     newUserAccount.userAccountStatus = userAccountStatus;
     newUserAccount.userProfile = userProfile;
-    // submit new user-account's account to the server
-    this.signUpService.signUp(newUserAccount).subscribe(
+    const signUpUrl = `${Config.apiBaseUrl}/${Config.apiUserManagementPrefix}/${Config.apiRegister}`;
+    this.signUpService.signUp(signUpUrl, newUserAccount).subscribe(
       (responseMessage: ResponseMessage) => {
         if (responseMessage.message.localeCompare('successfully') === 0) {
-          // redirect to the alert message page
           this.router.navigate(['/email-verify']);
         } else {
-          // show error message to user-account
           this.createNotification('error', 'Error', 'Cannot create your account! Please try again! Your user-account\'s may be existed');
         }
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       }
     );
   }
@@ -206,7 +193,7 @@ export class RegisterComponent implements OnInit {
         observer.complete();
       });
     });
-  };
+  }
 
   /**
    *
@@ -215,29 +202,28 @@ export class RegisterComponent implements OnInit {
   handleChange(info: { file: UploadFile }): void {
     switch (info.file.status) {
       case 'uploading':
-        this.loading = true;
+        this.isLoadingSpinnerShown = true;
         const formData = new FormData();
         formData.append('file', info.file.originFileObj);
         // if image was not uploaded
-        if (!this.isUploadImage) {
-          this.uploadImageService.uploadImage(formData, 'user').subscribe(
+        if (!this.isImageUploaded) {
+          const uploadRootLocation = 'user';
+          const uploadFileUrl = `${Config.apiBaseUrl}/${Config.apiUploadManagementPrefix}/${Config.apiUploads}/${uploadRootLocation}`;
+          this.uploadImageService.uploadFile(uploadFileUrl, formData).subscribe(
             (responseMessage: ResponseMessage) => {
               if (responseMessage.message.localeCompare('failure') !== 0) {
-                // save image url that was returned from the server
                 this.savedAvatarUrl = responseMessage.message;
-                // show successfull notification to users
                 this.createNotification('success', 'Success', 'Your avatar was uploaded successfully');
               } else if (responseMessage.message.localeCompare('failure') === 0) {
-                // if the image cannot be uploaded to the server. show notification to users
                 this.createNotification('error', 'Error', 'Cannot upload your avatar! Please try again!');
               }
               ImageValidator.getBase64(info.file.originFileObj, (img: string) => {
-                this.loading = false;
+                this.isLoadingSpinnerShown = false;
                 this.avatarUrl = img;
               });
             }
           );
-          this.isUploadImage = true;
+          this.isImageUploaded = true;
         }
         break;
     }

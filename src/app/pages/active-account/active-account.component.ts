@@ -2,7 +2,7 @@ import {Coffeti, ResponseMessage, UserAccount} from '@gw-models/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ActiveAccountService} from '@gw-services/core/api/user/active-account.service';
 import {Component, OnInit} from '@angular/core';
-import {BodyIndexService} from '@gw-services/core/api/user/body-index.service';
+import {Config} from '@gw-config/core';
 
 @Component({
   selector: 'app-active-account',
@@ -10,25 +10,17 @@ import {BodyIndexService} from '@gw-services/core/api/user/body-index.service';
   styleUrls: ['./active-account.component.css']
 })
 export class ActiveAccountComponent implements OnInit {
-
-  // check loading component is showing or not
-  loading = true;
-  // show message - account is activated or not
+  isLoadingSpinnerShown = true;
   isActivated = false;
-  // get email confirmation token
   emailConfirmationToken: string;
-
-  // background image
   backgroundImage: string;
-
-  // coffeti interval to show coffeti animation
-  coffetiInterval: any;
+  coffetiAnimationInterval: any;
 
   /**
    *
-   * @param activeAccountService - inject active account service to active account
-   * @param route - inject route to get url parameter
-   * @param router - inject router for routing
+   * @param activeAccountService - inject activeAccountService
+   * @param route - inject route
+   * @param router - inject router
    */
   constructor(private activeAccountService: ActiveAccountService,
               private route: ActivatedRoute,
@@ -38,18 +30,12 @@ export class ActiveAccountComponent implements OnInit {
   /**
    * init data
    */
-  ngOnInit() {
+  ngOnInit(): void {
     this.backgroundImage = './assets/images/rest.jpg';
-
-    // get emailConfirmationToken from route parameters.
     this.emailConfirmationToken = this.route.snapshot.queryParams['token'] || '';
-    // if password reminder token does not existed. Therefore, password cannot be changed
-    // customers will be redirected to login page
     if (this.emailConfirmationToken.localeCompare('') === 0) {
-      // redirect to login page
       this.router.navigate(['/login']);
     } else {
-      // active user-account's account
       this.activeUserAccount();
     }
   }
@@ -58,34 +44,34 @@ export class ActiveAccountComponent implements OnInit {
    * active user-account's account
    */
   activeUserAccount(): void {
-    // create updated user-account's account
     const updatedUserAccount = new UserAccount();
-    // set email confirmation token
     updatedUserAccount.emailConfirmationToken = this.emailConfirmationToken;
-    // call active account service to active user-account's account
-    this.activeAccountService.activeAccount(updatedUserAccount)
+    const activeUserAccountUrl = `${Config.apiBaseUrl}/${Config.apiUserManagementPrefix}/${Config.apiActiveUserAccount}`;
+    this.activeAccountService.activeAccount(activeUserAccountUrl, updatedUserAccount)
       .subscribe((responseMessage: ResponseMessage) => {
-        // show response message - user-account's account is activated or not
         this.isActivated = responseMessage.message.localeCompare('successfully') === 0;
         if (this.isActivated) {
-          // create coffeti object
-          const coffeti = new Coffeti();
-          // show coffeti animation after every one second
-          this.coffetiInterval = setInterval(() => {
-            coffeti.shoot();
-          }, 1000);
+          this.showCoffetiAnimation();
         }
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
+  }
+
+  /**
+   * show coffeti animation
+   */
+  private showCoffetiAnimation(): void {
+    const coffeti = new Coffeti();
+    this.coffetiAnimationInterval = setInterval(() => {
+      coffeti.shoot();
+    }, 1000);
   }
 
   /**
    * go to login page
    */
-  public goToLogin() {
-    // clear coffeti interval
-    clearInterval(this.coffetiInterval);
-    // redirect to login page
+  public goToLogin(): void {
+    clearInterval(this.coffetiAnimationInterval);
     this.router.navigate(['/login']);
   }
 }

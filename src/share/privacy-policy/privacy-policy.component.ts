@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {PrivacyPolicyService} from '@gw-services/core/api/policy/privacy-policy.service';
 import {PrivacyPolicy} from '@gw-models/core';
+import {Config} from '@gw-config/core';
 
 @Component({
   selector: 'app-privacy-policy',
@@ -8,12 +9,8 @@ import {PrivacyPolicy} from '@gw-models/core';
   styleUrls: ['./privacy-policy.component.css']
 })
 export class PrivacyPolicyComponent implements OnInit {
-
-  // selected privacy policy content
   selectedPrivacyPolicyContent: PrivacyPolicy;
-
-  // check loading component is showing or not
-  loading: boolean;
+  isLoadingSpinnerShown: boolean;
 
   /**
    *
@@ -23,7 +20,6 @@ export class PrivacyPolicyComponent implements OnInit {
   }
 
   ngOnInit() {
-    // get selected privacy policy content
     this.getSelectedPrivacyPolicyContent();
   }
 
@@ -31,16 +27,17 @@ export class PrivacyPolicyComponent implements OnInit {
    * get selected privacy policy content
    */
   private getSelectedPrivacyPolicyContent() {
-    // show loading component
-    this.loading = true;
-    // get selected privacy policy content
-    this.privacyPolicyService.getPrivacyPolicyById(1)
+    this.isLoadingSpinnerShown = true;
+    const privacyPolicyId = 1;
+    const privacyPolicyUrl = `${Config.apiBaseUrl}/
+${Config.apiPrivacyPolicyManagementPrefix}/
+${Config.apiPrivacyPolicies}/${privacyPolicyId}`;
+    this.privacyPolicyService.getPrivacyPolicy(privacyPolicyUrl)
       .subscribe((selectedPrivacyPolicyContent: PrivacyPolicy) => {
         if (selectedPrivacyPolicyContent) {
           this.selectedPrivacyPolicyContent = selectedPrivacyPolicyContent;
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 }

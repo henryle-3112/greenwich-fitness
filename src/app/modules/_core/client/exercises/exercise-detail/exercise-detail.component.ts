@@ -10,37 +10,25 @@ import {Config} from '@gw-config/core';
   styleUrls: ['./exercise-detail.component.css']
 })
 export class ExerciseDetailComponent implements OnInit {
-
-  // selected single exercise that user-account want to view detail
-  // get from ShareSingleExerciseService
   selectedSingleExercise: SingleExercise;
-
-  // check loading component is showing or not
-  loading: boolean;
-
-  // number of repetitions that user-account want to do
+  isLoadingSpinnerShown: boolean;
   currentRepetitions: number;
-
-  // check change exercise's repetitions modal is showing or not
   isChangeRepetitionsModalShown = false;
-
-  // radio repetitions value of change exercise's repetitions modal
   radioRepetitionValue: string;
 
   /**
    *
    * @param shareSingleExercise - inject shareSingleExericse service to get single exercise that user-account want to view detail
-   * @param route - inject Router for routing
+   * @param router - inject Router for routing
    */
   constructor(private shareSingleExercise: ShareSingleExerciseService,
-              private route: Router) {
+              private router: Router) {
   }
 
   /**
    * init current data
    */
   ngOnInit() {
-    // get selected single exercise
     this.getSelectedSingleExercise();
   }
 
@@ -48,49 +36,33 @@ export class ExerciseDetailComponent implements OnInit {
    * get selected single exercise from share single exercise service
    */
   private getSelectedSingleExercise() {
-    // show loading component
-    this.loading = true;
-    // get selected single exercise from share single exercise service
-    this.shareSingleExercise
-      .currentSingleExercise.subscribe(selectedSingleExercise => {
-      // get selected single exericse
-      this.selectedSingleExercise = selectedSingleExercise;
-      // hide loading component
-      this.loading = false;
-      // check selected single exercise existed or not
-      // if selected single exercise not existed - redirect to list of single exercises
-      this.checkSelectedSingleExerciseExistedOrNot();
-      // init data
-      this.initData();
-    });
-  }
-
-  /**
-   * check selected single exericis existed or not
-   * if not, redirect to list of single exercises and let user-account choose again
-   */
-  private checkSelectedSingleExerciseExistedOrNot() {
-    if (this.selectedSingleExercise == null) {
-      this.route.navigate(['/client/exercise']);
-    }
+    this.isLoadingSpinnerShown = true;
+    this.shareSingleExercise.currentSingleExercise
+      .subscribe(selectedSingleExercise => {
+        if (selectedSingleExercise) {
+          this.selectedSingleExercise = selectedSingleExercise;
+          this.isLoadingSpinnerShown = false;
+          this.initData();
+        } else {
+          this.router.navigate(['/client/exercise']);
+        }
+      });
   }
 
   /**
    * init current data
    */
   private initData() {
-    if (localStorage.getItem(Config.checkUserGoToExerciseVideo)
-      && localStorage.getItem(Config.checkUserGoToExerciseVideo).localeCompare('true') === 0) {
+    // get saved instance state, when user go to video component and comeback
+    const isUserViewedTutorVideo = localStorage.getItem(Config.checkUserGoToExerciseVideo)
+      && localStorage.getItem(Config.checkUserGoToExerciseVideo).localeCompare('true') === 0;
+    if (isUserViewedTutorVideo) {
       this.currentRepetitions = Number(localStorage.getItem(Config.currentRepetitions));
       this.radioRepetitionValue = String(this.currentRepetitions);
-      // change state of check user go to exercise video
       localStorage.setItem(Config.checkUserGoToExerciseVideo, 'false');
     } else {
-      // init current repetitions
       this.currentRepetitions = 10;
-      // init current radio value of change exericse's repetitions modal
       this.radioRepetitionValue = String(this.currentRepetitions);
-      // reset current repetitions by saving to localStorage for each single exercise
       localStorage.setItem(`${Config.currentRepetitions}`, String(this.currentRepetitions));
     }
   }
@@ -114,10 +86,8 @@ export class ExerciseDetailComponent implements OnInit {
    */
   public handleConfirmChangeRepetitionsModal() {
     this.isChangeRepetitionsModalShown = false;
-    // change current repetitions
-    this.currentRepetitions = +this.radioRepetitionValue;
+    this.currentRepetitions = Number(this.radioRepetitionValue);
     this.radioRepetitionValue = String(this.currentRepetitions);
-    // save current repetitions
     localStorage.setItem(Config.currentRepetitions, String(this.currentRepetitions));
   }
 
@@ -125,17 +95,14 @@ export class ExerciseDetailComponent implements OnInit {
    * go to view exercise video component to view exercise tutorial
    */
   public goToExerciseVideo() {
-    // set checkUserGoToExerciseVideo
     localStorage.setItem(Config.checkUserGoToExerciseVideo, 'true');
-    // go to exercise video component
-    this.route.navigate([`/client/exercise/tutorial/${this.selectedSingleExercise.slug}`]);
+    this.router.navigate([`/client/exercise/tutorial/${this.selectedSingleExercise.slug}`]);
   }
 
   /**
    * go to exercise training fragment
    */
   public startTraining() {
-    // start training single exercise
-    this.route.navigate([`/client/exercise/training/${this.selectedSingleExercise.slug}`]);
+    this.router.navigate([`/client/exercise/training/${this.selectedSingleExercise.slug}`]);
   }
 }

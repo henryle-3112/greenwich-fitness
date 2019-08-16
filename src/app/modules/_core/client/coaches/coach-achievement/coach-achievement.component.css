@@ -1,0 +1,9 @@
+.achievement-title {
+  font-weight: bold;
+}
+
+.achievement-result {
+  font-weight: bold;
+  color: #1890ff;
+  margin-left: 12px;
+}

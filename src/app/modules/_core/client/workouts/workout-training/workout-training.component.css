@@ -95,12 +95,6 @@
 
 /* end music player css */
 
-/* footer modal css */
-::ng-deep .ant-modal-footer.ng-star-inserted {
-  display: none;
-}
-
-/* end footer modal css */
 
 /* status modal css */
 .line {

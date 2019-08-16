@@ -1,11 +1,9 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Coach, CoachFeedback} from '@gw-models/core';
+import {CoachFeedback} from '@gw-models/core';
 import {Observable} from 'rxjs';
-import {Config} from '@gw-config/core';
 import {tap} from 'rxjs/operators';
 
-// httpOptions to change content-type to application/json
 const httpOptions = {
   headers: new HttpHeaders({'Content-Type': 'application/json'})
 };
@@ -18,17 +16,35 @@ export class CoachFeedbackService {
   constructor(private http: HttpClient) {
   }
 
-  /** POST: get coach's feedbacks by coach */
-  public getCoachFeedbacksByCoach(coach: Coach, status: number): Observable<CoachFeedback[]> {
-    return this.http.post<CoachFeedback[]>(`${Config.api}/${Config.apiGetCoachFeedback}/${status}`, coach, httpOptions).pipe(
+  /**
+   *
+   * @param url - url that will be used to get coach's feedbacks
+   */
+  public getCoachFeedbacks(url): Observable<CoachFeedback[]> {
+    return this.http.get<CoachFeedback[]>(url, httpOptions).pipe(
       tap((coachFeedbacks: CoachFeedback[]) => console.log(JSON.stringify(coachFeedbacks)))
     );
   }
 
-  /** POST: add new coach's feedback */
-  public addCoachFeedback(coachFeedback: CoachFeedback): Observable<CoachFeedback> {
-    return this.http.post<CoachFeedback>(`${Config.api}/${Config.apiAddCoachFeedback}`, coachFeedback, httpOptions).pipe(
+  /**
+   *
+   * @param url - url that will be used to add coach's feedback
+   * @param coachFeedback - coach's feedback that will be added
+   */
+  public addCoachFeedback(url: string, coachFeedback: CoachFeedback): Observable<CoachFeedback> {
+    return this.http.post<CoachFeedback>(url, coachFeedback, httpOptions).pipe(
       tap((insertedCoachFeedback: CoachFeedback) => console.log(JSON.stringify(insertedCoachFeedback)))
+    );
+  }
+
+  /**
+   *
+   * @param url - url that will be used to update coach's feedback
+   * @param coachFeedback - coach's feedback that will be updated
+   */
+  public updateCoachFeedback(url: string, coachFeedback: CoachFeedback): Observable<CoachFeedback> {
+    return this.http.put<CoachFeedback>(url, coachFeedback, httpOptions).pipe(
+      tap((updatedCoachFeedback: CoachFeedback) => console.log(JSON.stringify(updatedCoachFeedback)))
     );
   }
 }

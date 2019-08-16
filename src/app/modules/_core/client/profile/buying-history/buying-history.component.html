@@ -1,6 +1,6 @@
 <div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;">
   <!-- loading component -->
-  <app-loading *ngIf="loading"></app-loading>
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- select product order status -->
@@ -17,7 +17,7 @@
 
   <!-- custom list -->
   <nz-list [nzDataSource]="productOrders" [nzRenderItem]="item" [nzItemLayout]="'horizontal'"
-           [ngClass]="{'opacity-loading': loading, 'mg-bottom-24': true, 'mg-top-24': true}">
+           [ngClass]="{'opacity-loading': isLoadingSpinnerShown, 'mg-bottom-24': true, 'mg-top-24': true}">
     <ng-template #item let-item>
       <nz-list-item (click)="goToBuyingHistoryDetail(item)">
         <nz-list-item-meta
@@ -34,8 +34,8 @@
 
   <!-- pagination -->
   <nz-pagination
-    *ngIf="!isHidePagination"
-    [nzPageIndex]="currentPage"
+    *ngIf="productOrders && productOrders.length"
+    [nzPageIndex]="currentProductOrdersPage"
     [nzPageSize]="nProductOrdersPerPage"
     [nzTotal]="totalProductOrders"
     [nzSize]="'small'"

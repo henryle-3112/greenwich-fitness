@@ -1,11 +1,9 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {ProductFeedback, ReplyOnProductFeedback, ResponseMessage} from '@gw-models/core';
+import {ReplyOnProductFeedback} from '@gw-models/core';
 import {Observable} from 'rxjs';
-import {Config} from '@gw-config/core';
 import {tap} from 'rxjs/operators';
 
-// httpOptions to change content-type to application/json
 const httpOptions = {
   headers: new HttpHeaders({'Content-Type': 'application/json'})
 };
@@ -18,27 +16,35 @@ export class ReplyOnProductFeedbackService {
   constructor(private http: HttpClient) {
   }
 
-  /** POST: get number of product's feedback replies */
-  public countNumberOfProductFeedbackReplies(productFeedback: ProductFeedback, status: number): Observable<ResponseMessage> {
-    return this.http.post<ResponseMessage>(
-      `${Config.api}/${Config.apiCountNumberOfProductFeedbackReplies}/${status}`, productFeedback, httpOptions).pipe(
-      tap((responseMessage: ResponseMessage) => console.log(JSON.stringify(responseMessage)))
-    );
-  }
-
-  /** POST: get replies on selected product's feedback */
-  public getRepliesOnSelectedProductFeedback(productFeedback: ProductFeedback, status: number): Observable<ReplyOnProductFeedback[]> {
-    return this.http.post<ReplyOnProductFeedback[]>(
-      `${Config.api}/${Config.apiGetRepliesOnSelectedProductFeedback}/${status}`, productFeedback, httpOptions).pipe(
+  /**
+   *
+   * @param url - url that will be used to get replies on product's feedback
+   */
+  public getRepliesOnProductFeedback(url: string): Observable<ReplyOnProductFeedback[]> {
+    return this.http.get<ReplyOnProductFeedback[]>(url, httpOptions).pipe(
       tap((repliesOnProductFeedback: ReplyOnProductFeedback[]) => console.log(JSON.stringify(repliesOnProductFeedback)))
     );
   }
 
-  /** POST: add new reply on product's feedback */
-  public addReplyOnProductFeedback(replyOnProductFeedback: ReplyOnProductFeedback): Observable<ReplyOnProductFeedback> {
-    return this.http.post<ReplyOnProductFeedback>(
-      `${Config.api}/${Config.apiAddNewReplyOnProductFeedback}`, replyOnProductFeedback, httpOptions).pipe(
+  /**
+   *
+   * @param url - url that will be used to add reply on product's feedback
+   * @param replyOnProductFeedback - reply on product's feedback that will be added
+   */
+  public addReplyOnProductFeedback(url: string, replyOnProductFeedback: ReplyOnProductFeedback): Observable<ReplyOnProductFeedback> {
+    return this.http.post<ReplyOnProductFeedback>(url, replyOnProductFeedback, httpOptions).pipe(
       tap((insertedReplyOnProductFeedback: ReplyOnProductFeedback) => console.log(JSON.stringify(insertedReplyOnProductFeedback)))
+    );
+  }
+
+  /**
+   *
+   * @param url - url that will be used to update reply on product's feedback
+   * @param replyOnProductFeedback - reply on product's feedback that will be updated
+   */
+  public updateReplyOnProductFeedback(url: string, replyOnProductFeedback: ReplyOnProductFeedback): Observable<ReplyOnProductFeedback> {
+    return this.http.put<ReplyOnProductFeedback>(url, replyOnProductFeedback, httpOptions).pipe(
+      tap((updatedReplyOnProductFeedback: ReplyOnProductFeedback) => console.log(JSON.stringify(updatedReplyOnProductFeedback)))
     );
   }
 }

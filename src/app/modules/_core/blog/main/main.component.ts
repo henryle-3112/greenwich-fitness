@@ -4,6 +4,7 @@ import {Post, PostCategory} from '@gw-models/core';
 import {SharePostCategoryService} from '@gw-services/core/shared/post-category/share-post-category.service';
 import {PostService} from '@gw-services/core/api/post/post.service';
 import {SharePostService} from '@gw-services/core/shared/post/share-post.service';
+import {Config} from '@gw-config/core';
 
 @Component({
   selector: 'app-main',
@@ -11,23 +12,11 @@ import {SharePostService} from '@gw-services/core/shared/post/share-post.service
   styleUrls: ['./main.component.css']
 })
 export class MainComponent implements OnInit {
-
-  // top training posts
   topTrainingPosts: Post[];
-
-  // top nutrition posts
   topNutritionPosts: Post[];
-
-  // top science posts
   topSciencePosts: Post[];
-
-  // show loading component
-  loading: boolean;
-
-  // selected post's category
+  isLoadingSpinnerShown: boolean;
   selectedPostCategory: PostCategory;
-
-  // all post's categories
   postCategories: PostCategory[];
 
   /**
@@ -43,80 +32,91 @@ export class MainComponent implements OnInit {
               private sharePostCategoryService: SharePostCategoryService) {
   }
 
-  ngOnInit() {
-    // get top training's posts
+  ngOnInit(): void {
     this.getTopTrainingPosts();
-    // get top nutrition's posts
     this.getTopNutritionPosts();
-    // get top science's posts
     this.getTopSciencePosts();
-    // get all post's categories
     this.getAllPostCategories();
   }
 
   /**
    * get top training's posts
    */
-  private getTopTrainingPosts() {
-    // show loading component
-    this.loading = true;
-    // get top men's posts
-    this.postService.getTopPosts(4, 2, 1)
-      .subscribe(posts => {
-        // hide loading component
-        this.loading = false;
-        // get top training's posts
-        this.topTrainingPosts = posts;
+  private getTopTrainingPosts(): void {
+    this.isLoadingSpinnerShown = true;
+    const trainingPostCategory = 2;
+    const postStatus = 1;
+    const topLimit = 4;
+    const getTopTrainingPostsUrl = `${Config.apiBaseUrl}/
+${Config.apiPostManagementPrefix}/
+${Config.apiPosts}?
+${Config.categoryIdParameter}=${trainingPostCategory}&
+${Config.statusParameter}=${postStatus}&
+${Config.topParameter}=${topLimit}`;
+    this.postService.getPosts(getTopTrainingPostsUrl)
+      .subscribe(response => {
+        this.topTrainingPosts = response.body;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * get top nutrition's posts
    */
-  private getTopNutritionPosts() {
-    // show loading component
-    this.loading = true;
-    // get top nutrition's posts
-    this.postService.getTopPosts(4, 3, 1)
-      .subscribe(posts => {
-        // hide loading component
-        this.loading = false;
-        // get top nutrition's posts
-        this.topNutritionPosts = posts;
+  private getTopNutritionPosts(): void {
+    this.isLoadingSpinnerShown = true;
+    const nutritionPostCategory = 3;
+    const postStatus = 1;
+    const topLimit = 4;
+    const getTopNutritionPostsUrl = `${Config.apiBaseUrl}/
+${Config.apiPostManagementPrefix}/
+${Config.apiPosts}?
+${Config.categoryIdParameter}=${nutritionPostCategory}&
+${Config.statusParameter}=${postStatus}&
+${Config.topParameter}=${topLimit}`;
+    this.postService.getPosts(getTopNutritionPostsUrl)
+      .subscribe(response => {
+        this.topNutritionPosts = response.body;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * get top science's posts
    */
-  private getTopSciencePosts() {
-    // show loading component
-    this.loading = true;
-    // get top science posts
-    this.postService.getTopPosts(4, 4, 1)
-      .subscribe(posts => {
-        // hide loading component
-        this.loading = false;
-        // get top science's posts
-        this.topSciencePosts = posts;
+  private getTopSciencePosts(): void {
+    this.isLoadingSpinnerShown = true;
+    const sciencePostCategory = 4;
+    const postStatus = 1;
+    const topLimit = 4;
+    const getTopSciencePostsUrl = `${Config.apiBaseUrl}/
+${Config.apiPostManagementPrefix}/
+${Config.apiPosts}?
+${Config.categoryIdParameter}=${sciencePostCategory}&
+${Config.statusParameter}=${postStatus}&
+${Config.topParameter}=${topLimit}`;
+    this.postService.getPosts(getTopSciencePostsUrl)
+      .subscribe(response => {
+        this.topSciencePosts = response.body;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    *
-   * @param selectedPost - selected post
+   * @param selectedPost - selected post that user want to view
    */
-  public goToPostDetail(selectedPost) {
+  public goToPostDetail(selectedPost: Post): void {
     // share post to other components
     this.sharePostService.changePost(selectedPost);
-    // go to post's detail page
     this.router.navigate([`/blog/post/${selectedPost.postMetaTitle}`]);
   }
 
   /**
-   * go to post's category
+   *
+   * @param selectedPostCategoryName - category that user want to view
    */
-  public goToPostCategory(selectedPostCategoryName: string) {
+  public goToPostCategory(selectedPostCategoryName: string): void {
     for (const eachPostCategory of this.postCategories) {
       if (eachPostCategory.postCategoryName.localeCompare(selectedPostCategoryName) === 0) {
         this.selectedPostCategory = eachPostCategory;
@@ -125,18 +125,17 @@ export class MainComponent implements OnInit {
     }
     // share selected post's category
     this.sharePostCategoryService.changePostCategory(this.selectedPostCategory);
-    // go to post's category
     this.router.navigate([`/blog/category/${this.selectedPostCategory.postCategoryMetaTitle}`]);
   }
 
   /**
    * get all post's categories
    */
-  private getAllPostCategories() {
+  private getAllPostCategories(): void {
     this.sharePostCategoryService.currentPostCategories
-      .subscribe((postCateggories: PostCategory[]) => {
-        if (postCateggories) {
-          this.postCategories = postCateggories;
+      .subscribe((postCategories: PostCategory[]) => {
+        if (postCategories) {
+          this.postCategories = postCategories;
         }
       });
   }

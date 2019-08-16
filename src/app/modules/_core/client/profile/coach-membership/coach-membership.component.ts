@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Coach, Membership, ResponseMessage, UserProfile} from '@gw-models/core';
+import {Coach, Membership} from '@gw-models/core';
 import {Router} from '@angular/router';
 import {Config} from '@gw-config/core';
 import {MembershipService} from '@gw-services/core/api/coach/membership.service';
@@ -14,36 +14,19 @@ import {ShareCoachService} from '@gw-services/core/shared/coach/share-coach.serv
 })
 
 export class CoachMembershipComponent implements OnInit {
-
-  // list of memberships
   memberships: Membership[];
-
-  // currentPage
-  currentPage = 1;
-
-  // loading component is show ot not
-  loading = true;
-
-  // search value - return memberships and change pagination based on keywords
-  searchValue: string;
-
-  // number membership per page
+  currentMembershipsPage;
+  isLoadingSpinnerShown = true;
+  membershipFullNameKeywords: string;
   nMembershipsPerPage: number;
-
-  // total memberships
   totalMemberships: number;
-
-  // selected coach
   selectedCoach: Coach;
-
-  // check pagination is showing or not
-  isHidePagination: boolean;
 
   /**
    *
-   * @param membershipService - inject membership service to interact with membership's data
-   * @param shareMembershipService - inject share membership service to share selected membership to other component
-   * @param shareUserProfileService - inject share user profile service
+   * @param membershipService - inject membershipService
+   * @param shareMembershipService - inject shareMembershipService
+   * @param shareUserProfileService - inject shareUserProfileService
    * @param shareCoachService - inject shareCoachService
    * @param router - inject router
    */
@@ -57,29 +40,23 @@ export class CoachMembershipComponent implements OnInit {
   /**
    * init data
    */
-  ngOnInit() {
-    // init number of memberships per page
-    this.nMembershipsPerPage = 8;
-    // init current search value
-    this.searchValue = '';
-    // get selected coach
+  ngOnInit(): void {
+    this.nMembershipsPerPage = Config.numberItemsPerPage;
+    this.currentMembershipsPage = Config.currentPage;
+    this.membershipFullNameKeywords = '';
     this.getSelectedCoach();
   }
 
   /**
    * get selected coach
    */
-  private getSelectedCoach() {
+  private getSelectedCoach(): void {
     this.shareCoachService.currentCoach
       .subscribe(selectedCoach => {
         if (selectedCoach) {
           this.selectedCoach = selectedCoach;
-          // get total number of memberships
-          this.getNumberOfMemberships();
-          // get memberships by page
-          this.getMembershipsByPage();
+          this.getMemberships();
         } else {
-          // redirect to client page
           this.router.navigate(['/client']);
         }
       });
@@ -88,28 +65,22 @@ export class CoachMembershipComponent implements OnInit {
   /**
    * get memberships by current's page
    */
-  private getMembershipsByPage() {
-    // create url to get memberships by current page
-    let currentGetMembershipsByPageUrl = `${Config.api}/${Config.apiGetMembershipsByPage}/${this.selectedCoach.id}/${this.currentPage}`;
-    // if search value is not equal to '', then include keywords to the url
-    if (this.searchValue.localeCompare('') !== 0) {
-      currentGetMembershipsByPageUrl += `?keyword=${this.searchValue.toLowerCase()}`;
+  private getMemberships(): void {
+    this.isLoadingSpinnerShown = true;
+    const selectedCoachId = this.selectedCoach.id;
+    let getMembershipsUrl = `${Config.apiBaseUrl}/
+${Config.apiMembershipManagementPrefix}/
+${Config.apiMemberships}?
+${Config.coachIdParameter}=${selectedCoachId}&
+${Config.pageParameter}=${this.currentMembershipsPage}`;
+    if (this.membershipFullNameKeywords.localeCompare('') !== 0) {
+      getMembershipsUrl += `&${Config.searchParameter}=${this.membershipFullNameKeywords.toLowerCase()}`;
     }
-    // show loading component
-    this.loading = true;
-    // get memberships by page and keywords (if existed)
-    this.membershipService.getMembershipsByPage(currentGetMembershipsByPageUrl)
-      .subscribe((response: Membership[]) => {
-        if (response) {
-          this.memberships = [];
-          // assign data to memberships
-          this.memberships = response;
-          if (this.memberships.length === 0) {
-            this.isHidePagination = true;
-          }
-        }
-        // hide loading component
-        this.loading = false;
+    this.membershipService.getMemberships(getMembershipsUrl)
+      .subscribe(response => {
+        this.memberships = response.body;
+        this.totalMemberships = Number(response.headers.get(Config.headerXTotalCount));
+        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -117,57 +88,28 @@ export class CoachMembershipComponent implements OnInit {
    *
    * @param event - selected page
    */
-  public membershipsPageChange(event) {
-    // get current's page
-    this.currentPage = event;
-    // get memberships by page
-    this.getMembershipsByPage();
+  public membershipsPageChange(event): void {
+    this.currentMembershipsPage = event;
+    this.getMemberships();
   }
 
   /**
    *
    * @param keyword - keyword that user-account type on the search box
    */
-  public searchMembership(keyword) {
-    // set current search keyword - user-account search memberships by name and change pagination based on keyword
-    this.searchValue = keyword;
-    // reset current page
-    this.currentPage = 1;
-    // change pagination
-    this.getNumberOfMemberships();
-    this.getMembershipsByPage();
-  }
-
-  /**
-   * get total number of memberships
-   */
-  private getNumberOfMemberships() {
-    // create url to get total number of memberships
-    let currentGetNumberOfMembershipsUrl = `${Config.api}/${Config.apiGetNumberOfMemberships}/${this.selectedCoach.id}`;
-    // if search value is not equal to '', then include keywords to the url
-    if (this.searchValue.localeCompare('') !== 0) {
-      currentGetNumberOfMembershipsUrl += `?keyword=${this.searchValue.toLowerCase()}`;
-    }
-    // showing loading component
-    this.loading = true;
-    // get total number of memberships
-    this.membershipService.getTotalMemberships(currentGetNumberOfMembershipsUrl)
-      .subscribe((responseMessage: ResponseMessage) => {
-        if (responseMessage) {
-          // assign total number of galleries to totalGallery
-          this.totalMemberships = Number(responseMessage.message);
-        }
-      });
+  public searchMembership(keyword): void {
+    this.membershipFullNameKeywords = keyword;
+    this.currentMembershipsPage = 1;
+    this.getMemberships();
   }
 
   /**
    *
    * @param selectedMembership - selectedMembership that coach want to view information
    */
-  public goToMembershipDetail(selectedMembership) {
+  public goToMembershipDetail(selectedMembership): void {
     // pass selected membership to membership detail component
     this.shareMembershipService.changeMembership(selectedMembership);
-    // go to membership detail component
     this.router.navigate(['/client/membership/detail']);
   }
 }

@@ -7,7 +7,8 @@ export class ReplyOnNewFeedComment {
   userProfile?: UserProfile;
   replyOnNewFeedCommentStatus?: number;
   replyOnNewFeedCommentCreatedDate?: Date;
-  nLikes?: number;
-  nDislikes?: number;
+  numberOfLikes?: number;
+  numberOfDislikes?: number;
   isLikeClicked?: boolean;
+  isReacted: boolean;
 }

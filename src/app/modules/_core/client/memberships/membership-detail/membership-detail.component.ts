@@ -9,7 +9,7 @@ export class MembershipDetailComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {
+  ngOnInit(): void {
   }
 
 }

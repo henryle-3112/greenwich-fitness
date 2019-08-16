@@ -7,9 +7,9 @@ export class PostComment {
   userProfile?: UserProfile;
   postCommentStatus?: number;
   postCommentCreatedDate?: Date;
-  nLikes?: number;
-  nDislikes?: number;
-  nReplies?: number;
+  numberOfLikes?: number;
+  numberOfDislikes?: number;
+  numberOfReplies?: number;
   isLikeClicked?: boolean;
   replies: ReplyOnPostComment[];
   isReplyBoxShown?: boolean;

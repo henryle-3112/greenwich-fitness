@@ -18,25 +18,26 @@ import {ShareTrainingService} from '@gw-services/core/shared/training/share-trai
   styleUrls: ['./coach-schedule-detail.component.css']
 })
 export class CoachScheduleDetailComponent implements OnInit {
-
-  // selected membership schedule
   selectedMembershipSchedule: Training;
-
-  // selected membership
-  selectedMembership: UserProfile;
-
-  // selected coach
+  selectedUserProfile: UserProfile;
   selectedCoach: Coach;
-
-  // trainings
   trainings: Training[];
-
-  // check loading component is showing or not
-  loading = true;
-
-  // list of single exercises
+  isLoadingSpinnerShown = true;
   singleExercises: SingleExercise[];
 
+  /**
+   *
+   * @param shareMembershipScheduleService - inject shareMembershipScheduleService
+   * @param shareSingleExerciseService - inject shareSingleExerciseService
+   * @param shareWorkoutService - inject shareWorkoutService
+   * @param readLocalJson - inject readLocalJson
+   * @param shareCoachService - inject shareCoachService
+   * @param shareUserProfileService - inject shareUserProfileService
+   * @param trainingService - inject trainingService
+   * @param notification - inject notification
+   * @param shareTrainingService - inject notification
+   * @param router - inject router
+   */
   constructor(private shareMembershipScheduleService: ShareMembershipScheduleService,
               private shareSingleExerciseService: ShareSingleExerciseService,
               private shareWorkoutService: ShareWorkoutService,
@@ -49,42 +50,36 @@ export class CoachScheduleDetailComponent implements OnInit {
               private router: Router) {
   }
 
-  ngOnInit() {
-    // init single exercises
+  ngOnInit(): void {
     this.singleExercises = [];
-    // get selected membership
-    this.getSelectedMembership();
+    this.getSelectedUserProfile();
   }
 
   /**
-   * get selected membership
+   * get selected user profile
    */
-  private getSelectedMembership() {
-    // show loading component
-    this.loading = true;
+  private getSelectedUserProfile(): void {
+    this.isLoadingSpinnerShown = true;
     this.shareUserProfileService.currentUserProfile
       .subscribe(selectedUserProfile => {
         if (selectedUserProfile) {
-          this.selectedMembership = selectedUserProfile;
-          // get selected coach
+          this.selectedUserProfile = selectedUserProfile;
           this.getSelectedCoach();
         } else {
           this.router.navigate(['/client']);
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * get selected coach
    */
-  private getSelectedCoach() {
+  private getSelectedCoach(): void {
     this.shareCoachService.currentCoach
       .subscribe(selectedCoach => {
         if (selectedCoach) {
           this.selectedCoach = selectedCoach;
-          // get selected membership schedule
           this.getSelectedMembershipSchedule();
         } else {
           this.router.navigate(['/client']);
@@ -95,157 +90,162 @@ export class CoachScheduleDetailComponent implements OnInit {
   /**
    * get selected membership schedule
    */
-  private getSelectedMembershipSchedule() {
-    // show loading component
-    this.loading = true;
+  private getSelectedMembershipSchedule(): void {
+    this.isLoadingSpinnerShown = true;
     this.shareMembershipScheduleService.currentMembershipSchedule
       .subscribe(selectedMembershipSchedule => {
         if (selectedMembershipSchedule) {
           this.selectedMembershipSchedule = selectedMembershipSchedule;
-          // get trainings by user's profile and coach and training's date
-          this.getTrainingsByUserProfileIdAndCoachIdAndTrainingDate();
+          this.getTrainings();
         } else {
           this.router.navigate(['/client']);
         }
-        // hide loading component
-        this.loading = false;
+        // hide isLoadingSpinnerShown component
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
-   * get trainings by user's profile and coach
+   * get trainings by user's profile and coach and training date
    */
-  private getTrainingsByUserProfileIdAndCoachIdAndTrainingDate() {
-    // show loading component
-    this.loading = true;
-    this.trainingService.getTrainingsByUserProfileIdAndCoachIdAndTrainingDate(
-      this.selectedMembership.id,
-      this.selectedCoach.id,
-      this.selectedMembershipSchedule.trainingDate
-    ).subscribe((trainings: Training[]) => {
-      if (trainings) {
-        // check start button start should be activated or not
-        // assume all exercises are not done
-        let isAllNotDone = true, isAllDone = true;
-        let i = 0;
-        while (i < trainings.length) {
-          if (i !== trainings.length - 1 && trainings[i].status === 1 && trainings[i + 1].status === -1) {
-            isAllNotDone = false;
-            trainings[i].statusButton = 1;
-            trainings[i + 1].statusButton = 0;
-            i = i + 2;
-          } else if (trainings[i].status === -1) {
-            trainings[i].statusButton = -1;
-            isAllDone = false;
-            i = i + 1;
-          } else if (trainings[i].status === 1) {
-            isAllNotDone = false;
-            trainings[i].statusButton = 1;
-            i = i + 1;
-          }
+  private getTrainings(): void {
+    this.isLoadingSpinnerShown = true;
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const selectedCoachId = this.selectedCoach.id;
+    const trainingDate = this.selectedMembershipSchedule.trainingDate;
+    const getTrainingsUrl = `${Config.apiBaseUrl}/
+${Config.apiTrainingManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiCoaches}/
+${selectedCoachId}?
+${Config.trainingDateParameter}=${trainingDate}`;
+    this.trainingService.getTrainings(getTrainingsUrl)
+      .subscribe(response => {
+        console.log(response);
+        if (response) {
+          // this.showStatusButtonForEachTraining();
+          // this.trainings = trainings;
+        } else {
+          this.router.navigate(['/client']);
         }
-        if (isAllNotDone || !isAllDone) {
-          trainings[0].statusButton = 0;
-        }
-        // assign trainings data
-        this.trainings = trainings;
-      } else {
-        this.router.navigate(['/client']);
+        this.isLoadingSpinnerShown = false;
+      });
+  }
+
+  /**
+   *
+   * @param trainings - trainings that will be set status button (1 is start, -1 is not done)
+   */
+  private showStatusButtonForEachTraining(trainings: Training[]): void {
+    // check start button start should be activated or not
+    // assume all exercises are not done
+    let isAllNotDone = true, isAllDone = true;
+    let i = 0;
+    while (i < trainings.length) {
+      if (i !== trainings.length - 1 && trainings[i].status === 1 && trainings[i + 1].status === -1) {
+        isAllNotDone = false;
+        trainings[i].statusButton = 1;
+        trainings[i + 1].statusButton = 0;
+        i = i + 2;
+      } else if (trainings[i].status === -1) {
+        trainings[i].statusButton = -1;
+        isAllDone = false;
+        i = i + 1;
+      } else if (trainings[i].status === 1) {
+        isAllNotDone = false;
+        trainings[i].statusButton = 1;
+        i = i + 1;
       }
-      // hide loading component
-      this.loading = false;
-    });
+    }
+    if (isAllNotDone || !isAllDone) {
+      trainings[0].statusButton = 0;
+    }
   }
 
   /**
    *
    * @param selectedTraining - selected training that user want to start
    */
-  public startTraining(selectedTraining: Training) {
-    // find position of 'x' character
+  public startTraining(selectedTraining: Training): void {
     const xPostition = selectedTraining.name.indexOf('x');
-    // get number of repetitons (volume)
     const nRepetitions = selectedTraining.name.substring(0, xPostition - 1);
-    // get name of exercise or workout
     const trainingName = selectedTraining.name.substring(xPostition + 2);
-    // find selected exercise or selected workout by training's name
     this.loadSingExercises(nRepetitions, trainingName, selectedTraining);
   }
 
-  private loadSingExercises(nRepetitions: string, trainingName: string, selectedTraining: Training) {
-    // show loading component
-    this.loading = true;
-    // load local json
+  /**
+   *
+   * @param nRepetitions - number of repetitions that user want to do
+   * @param trainingName - training name that user want to do
+   * @param selectedTraining - selected training that user want to do
+   */
+  private loadSingExercises(nRepetitions: string, trainingName: string, selectedTraining: Training): void {
+    this.isLoadingSpinnerShown = true;
     this.readLocalJson.getJSON('./assets/workouts.json')
       .subscribe(data => {
-        // check training is found or not
         let isTrainingFound = false;
-        // get single exericses
         const exercises = data.exercises;
-        const selectedSingleExercise = new SingleExercise();
-        // read exercises
+        let selectedSingleExercise;
         for (const eachExercise of exercises) {
           if (eachExercise.title.localeCompare(trainingName) === 0) {
-            // found exercise
             isTrainingFound = true;
-            selectedSingleExercise.slug = eachExercise.slug;
-            selectedSingleExercise.title = eachExercise.title;
-            selectedSingleExercise.smallMobileRetinaPictureUrl = eachExercise.picture_urls.small_mobile_retina;
-            selectedSingleExercise.largeMobileRetinaPictureUrl = eachExercise.picture_urls.large_mobile_retina;
-            selectedSingleExercise.loopVideoUrl = eachExercise.loop_video_urls.webp;
-            selectedSingleExercise.videoUrl = eachExercise.video_urls.mp4;
+            selectedSingleExercise = this.createSingleExerciseFromJsonObject(eachExercise);
             this.singleExercises.push(selectedSingleExercise);
-            console.log(`selected single exercise`);
-            console.log(selectedSingleExercise);
           } else {
-            const eachSingleExercise = new SingleExercise();
-            eachSingleExercise.slug = eachExercise.slug;
-            eachSingleExercise.title = eachExercise.title;
-            eachSingleExercise.smallMobileRetinaPictureUrl = eachExercise.picture_urls.small_mobile_retina;
-            eachSingleExercise.largeMobileRetinaPictureUrl = eachExercise.picture_urls.large_mobile_retina;
-            eachSingleExercise.loopVideoUrl = eachExercise.loop_video_urls.webp;
-            eachSingleExercise.videoUrl = eachExercise.video_urls.mp4;
+            const eachSingleExercise = this.createSingleExerciseFromJsonObject(eachExercise);
             this.singleExercises.push(eachSingleExercise);
           }
         }
         if (isTrainingFound) {
-          // set current repetitions
-          localStorage.setItem(Config.currentRepetitions, nRepetitions);
-          // share selected single exercise
-          this.shareSingleExerciseService.changeSingleExercise(selectedSingleExercise);
-          // pass selected training to single exercise training component
-          this.shareTrainingService.changeTraining(selectedTraining);
-          // start training single exercise
-          this.router.navigate([`/client/exercise/training/${selectedSingleExercise.slug}`]);
+          this.startSingleExercise(nRepetitions, selectedSingleExercise, selectedTraining);
         } else {
-          // load workouts if training is not found in single exercises list
-          this.loadWorkouts(nRepetitions, trainingName);
+          this.loadWorkouts(nRepetitions, trainingName, selectedTraining);
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
+  }
+
+  /**
+   *
+   * @param eachExercise - json object that will be converted to single exercise object
+   */
+  private createSingleExerciseFromJsonObject(eachExercise: any): SingleExercise {
+    const singleExercise = new SingleExercise();
+    singleExercise.slug = eachExercise.slug;
+    singleExercise.title = eachExercise.title;
+    singleExercise.smallMobileRetinaPictureUrl = eachExercise.picture_urls.small_mobile_retina;
+    singleExercise.largeMobileRetinaPictureUrl = eachExercise.picture_urls.large_mobile_retina;
+    singleExercise.loopVideoUrl = eachExercise.loop_video_urls.webp;
+    singleExercise.videoUrl = eachExercise.video_urls.mp4;
+    return singleExercise;
+  }
+
+  /**
+   *
+   * @param nRepetitons - number of repetitions that user want to do
+   * @param selectedSingleExercise - selected single exercise that user want to do
+   * @param selectedTraining - selected training that user want to do
+   */
+  private startSingleExercise(nRepetitons: string, selectedSingleExercise: SingleExercise, selectedTraining: Training): void {
+    localStorage.setItem(Config.currentRepetitions, nRepetitons);
+    this.shareSingleExerciseService.changeSingleExercise(selectedSingleExercise);
+    this.shareTrainingService.changeTraining(selectedTraining);
+    this.router.navigate([`/client/exercise/training/${selectedSingleExercise.slug}`]);
   }
 
   /**
    * load workouts
    */
-  private loadWorkouts(nRepetitions: string, trainingName: string) {
-    console.log(`List of exercises: `);
-    console.log(this.singleExercises);
-    // check training is found or not
+  private loadWorkouts(nRepetitions: string, trainingName: string, selectedTraining: Training): void {
     let isTrainingFound = false;
-    // show loading component
-    this.loading = true;
+    this.isLoadingSpinnerShown = true;
     this.readLocalJson.getJSON('./assets/workouts.json')
       .subscribe(data => {
-        // create selected workout if its title is equal to training's name
-        const selectedSingleWorkout = new Workout();
-        // list of workouts
+        let selectedSingleWorkout;
         const listWorkouts = [];
-        // read workouts data from json
         const workouts = data.workouts;
         for (const eachWorkout of workouts) {
-          // check current workout existed in the list or not
           let isExisted = false;
           for (const selectedWorkout of listWorkouts) {
             if (selectedWorkout.localeCompare(eachWorkout.title) === 0) {
@@ -254,79 +254,83 @@ export class CoachScheduleDetailComponent implements OnInit {
             }
           }
           if (!isExisted) {
-            // add to list workouts
             listWorkouts.push(eachWorkout.title);
-            // check training's name is equal to workout's title or not
             if (trainingName.localeCompare(eachWorkout.title) === 0) {
-              // training is found
               isTrainingFound = true;
-
-              selectedSingleWorkout.slug = eachWorkout.slug;
-              selectedSingleWorkout.title = eachWorkout.title;
-              selectedSingleWorkout.roundsCount = Number(eachWorkout.rounds_count);
-              selectedSingleWorkout.volumeDescription = eachWorkout.volume_description;
-
-              const focus = eachWorkout.focus;
-              selectedSingleWorkout.focus = focus[0];
-
-              selectedSingleWorkout.smallMobileRetinaPictureUrl = eachWorkout.picture_urls.small_mobile_retina;
-              selectedSingleWorkout.largeMobileRetinaPictureUrl = eachWorkout.picture_urls.large_mobile_retina;
-
-              selectedSingleWorkout.detailedRounds = [];
-              const detailedRounds = eachWorkout.detailed_rounds;
-
-              detailedRounds.map(eachDetailedRound => {
-                // create detailed round object
-                const selectedDetailedRound = new DetailedRounds();
-                selectedDetailedRound.exercises = [];
-
-                const exercises = eachDetailedRound.exercises;
-                exercises.map(eachExercise => {
-                  // get quantity
-                  const dimensions = eachExercise.dimensions;
-                  const quantity = dimensions[0].quantity;
-
-                  // get exercise
-                  const exerciseSlugs = eachExercise.exercise_slug;
-                  // create workout exercise object
-                  const workoutExercise = new WorkoutExercise();
-                  for (const eachSingleExercise of this.singleExercises) {
-                    if (eachSingleExercise.slug.localeCompare(exerciseSlugs) === 0) {
-                      workoutExercise.exercise = eachSingleExercise;
-                      workoutExercise.quantity = quantity;
-                      break;
-                    }
-                  }
-                  selectedDetailedRound.exercises.push(workoutExercise);
-                });
-
-                selectedSingleWorkout.detailedRounds.push(selectedDetailedRound);
-              });
+              selectedSingleWorkout = this.createWorkoutFromJsonObject(eachWorkout);
+              break;
             }
           }
-          if (!isTrainingFound) {
-            // show error message to user
-            this.createNotification('error', 'Error', 'Your training is not found! Please try again!');
-            break;
-          } else {
-            // go to workout training component
-            this.shareWorkoutService.changeWorkout(selectedSingleWorkout);
-            // save current volume
-            // create current workout volume
-            const currentWorkoutVolume = 'x' + nRepetitions;
-            localStorage.setItem(Config.currentWorkoutVolume, currentWorkoutVolume);
-            // go to workout training component
-            this.router.navigate([`/client/workout/training/${selectedSingleWorkout.slug}`]);
-            console.log(`Current volume: ${currentWorkoutVolume}`);
-            console.log(selectedSingleWorkout);
+        }
+        if (!isTrainingFound) {
+          this.createNotification('error', 'Error', 'Your training is not found! Please try again!');
+        } else {
+          this.startWorkout(selectedSingleWorkout, nRepetitions, selectedTraining);
+        }
+        this.isLoadingSpinnerShown = false;
+      });
+  }
+
+  /**
+   *
+   * @param eachWorkout - json object that will be converted to wokrout object
+   */
+  private createWorkoutFromJsonObject(eachWorkout: any): Workout {
+    const workout = new Workout();
+    workout.slug = eachWorkout.slug;
+    workout.title = eachWorkout.title;
+    workout.roundsCount = Number(eachWorkout.rounds_count);
+    workout.volumeDescription = eachWorkout.volume_description;
+    const focus = eachWorkout.focus;
+    workout.focus = focus[0];
+    workout.smallMobileRetinaPictureUrl = eachWorkout.picture_urls.small_mobile_retina;
+    workout.largeMobileRetinaPictureUrl = eachWorkout.picture_urls.large_mobile_retina;
+    workout.detailedRounds = [];
+    const detailedRounds = eachWorkout.detailed_rounds;
+    this.setDetailedRoundsForEachWorkout(workout, detailedRounds);
+    return workout;
+  }
+
+  /**
+   *
+   * @param workout - workout that will be set detailed rounds
+   * @param detailedRounds - detailed rounds that will be set to workouts
+   */
+  private setDetailedRoundsForEachWorkout(workout: Workout, detailedRounds: any): void {
+    detailedRounds.map(eachDetailedRound => {
+      const selectedDetailedRound = new DetailedRounds();
+      selectedDetailedRound.exercises = [];
+      const exercises = eachDetailedRound.exercises;
+      exercises.map(eachExercise => {
+        const dimensions = eachExercise.dimensions;
+        const quantity = dimensions[0].quantity;
+        const exerciseSlugs = eachExercise.exercise_slug;
+        const workoutExercise = new WorkoutExercise();
+        for (const eachSingleExercise of this.singleExercises) {
+          if (eachSingleExercise.slug.localeCompare(exerciseSlugs) === 0) {
+            workoutExercise.exercise = eachSingleExercise;
+            workoutExercise.quantity = quantity;
             break;
           }
         }
-        // hide loading component
-        this.loading = false;
-        // get trainings by training's date and user's profile and coach
-        this.getTrainingsByUserProfileIdAndCoachIdAndTrainingDate();
+        selectedDetailedRound.exercises.push(workoutExercise);
       });
+      workout.detailedRounds.push(selectedDetailedRound);
+    });
+  }
+
+  /**
+   *
+   * @param selectedSingleWorkout - single workout that user want to do
+   * @param nRepetitions - number of repetitons that user want to do
+   * @param selectedTraining - selected training that user want to do
+   */
+  private startWorkout(selectedSingleWorkout: Workout, nRepetitions: string, selectedTraining: Training): void {
+    this.shareWorkoutService.changeWorkout(selectedSingleWorkout);
+    const currentWorkoutVolume = 'x' + nRepetitions;
+    localStorage.setItem(Config.currentWorkoutVolume, currentWorkoutVolume);
+    this.shareTrainingService.changeTraining(selectedTraining);
+    this.router.navigate([`/client/workout/training/${selectedSingleWorkout.slug}`]);
   }
 
   /**
@@ -335,7 +339,7 @@ export class CoachScheduleDetailComponent implements OnInit {
    * @param title - title of notification
    * @param content - content of notification
    */
-  createNotification(type: string, title: string, content: string) {
+  createNotification(type: string, title: string, content: string): void {
     this.notification.create(
       type,
       title,

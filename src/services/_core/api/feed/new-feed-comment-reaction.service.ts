@@ -1,11 +1,8 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {UserProfile, NewFeedCommentReaction, NewFeedComment, ResponseMessage} from '@gw-models/core';
+import {NewFeedCommentReaction} from '@gw-models/core';
 import {Observable} from 'rxjs';
-import {Config} from '@gw-config/core';
-import {tap} from 'rxjs/operators';
 
-// httpOptions to change content-type to application/json
 const httpOptions = {
   headers: new HttpHeaders({'Content-Type': 'application/json'})
 };
@@ -18,29 +15,20 @@ export class NewFeedCommentReactionService {
   constructor(private http: HttpClient) {
   }
 
-  /** POST: get new feed comment reactions by user profile */
-  public getNewFeedCommentReactionsByUserProfile(userProfile: UserProfile): Observable<NewFeedCommentReaction[]> {
-    return this.http.post<NewFeedCommentReaction[]>(
-      `${Config.api}/${Config.apiGetNewFeedCommentReactionsByUserProfile}`, userProfile, httpOptions).pipe(
-      tap((newFeedCommentReactions: NewFeedCommentReaction[]) => console.log(JSON.stringify(newFeedCommentReactions)))
-    );
+  /**
+   *
+   * @param url - url that will be used to get reactions of newfeed's comments
+   */
+  public getNewFeedCommentReactions(url: string): Observable<NewFeedCommentReaction[]> {
+    return this.http.get<NewFeedCommentReaction[]>(url, httpOptions);
   }
 
-  /** POST: add new feed comment reaction */
-  public addNewFeedCommentReaction(newFeedCommentReaction: NewFeedCommentReaction): Observable<NewFeedCommentReaction> {
-    return this.http.post<NewFeedCommentReaction>(
-      `${Config.api}/${Config.apiAddNewFeedCommentReaction}`, newFeedCommentReaction, httpOptions).pipe(
-      tap((insertedNewFeedCommentReaction: NewFeedCommentReaction) => console.log(JSON.stringify(insertedNewFeedCommentReaction)))
-    );
-  }
-
-  /** POST: count number of reactions by new feed comment and reaction */
-  public countNumberOfNewFeedCommentReactionsByNewFeedCommentAndReaction(
-    newFeedComment: NewFeedComment, reaction: number): Observable<ResponseMessage> {
-    return this.http.post<ResponseMessage>(
-      `${Config.api}/${Config.apiCountNumberOfNewFeedCommentReactionsByNewFeedCommentAndReaction}/${reaction}`,
-      newFeedComment, httpOptions).pipe(
-      tap((responseMessage: ResponseMessage) => console.log(JSON.stringify(responseMessage)))
-    );
+  /**
+   *
+   * @param url - url that will be used to add reaction of newfeed's comment
+   * @param newFeedCommentReaction - reaction of newfeed's comment that will be added
+   */
+  public addNewFeedCommentReaction(url: string, newFeedCommentReaction: NewFeedCommentReaction): Observable<NewFeedCommentReaction> {
+    return this.http.post<NewFeedCommentReaction>(url, newFeedCommentReaction, httpOptions);
   }
 }

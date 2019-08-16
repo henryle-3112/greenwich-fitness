@@ -20,62 +20,38 @@ import {Router} from '@angular/router';
   styleUrls: ['./body-index-report.component.css']
 })
 export class BodyIndexReportComponent implements OnInit {
-  // check login type
   loginType: string;
-
-  // selected user-account's profile's id
   selectedUserProfileId: number;
-
-  // selected user profile
   selectedUserProfile: UserProfile;
-
-  // check loading component
-  loading = false;
-
-  // get body index data ( to show on weight chart )
-  bodyIndex: BodyIndex[];
-
-  // check chart is showing or not
-  isShowingChart: boolean;
-
-  // create chart
+  isLoadingSpinnerShown = false;
+  bodyIndexes: BodyIndex[];
+  isShowingBodyIndexChart: boolean;
   bodyIndexChart: any;
-
-  // create labels and data for chart
-  weightDate: string[];
-  weightData: number[];
-
-  // current user-account body index
-  currentWeight: number;
-  heaviestWeight: number;
-  lightestWeight: number;
-  currentHeight: number;
-  currentBMIResult: number;
-
-  // check body index modal is showing or not
+  weightDateLabels: string[];
+  weightDataChart: number[];
+  currentUserWeight: number;
+  heaviestUserWeight: number;
+  lightestUserWeight: number;
+  currentUserHeight: number;
+  currentUserBMIResult: number;
   isChangeBodyIndexModalShown: boolean;
-
-  // form change body index
   bodyIndexForm: FormGroup;
-
   // get current date to update user-account body index to server
   // if current date and user-account's id existed in the database
   // just update, if not, create new one
   currentDate: string;
-
-  // refer to canvas (chart)
   @ViewChild('canvas') canvas: ElementRef;
 
   /**
    *
-   * @param bodyIndexService - inject bodyIndexService (interact with body index data)
-   * @param authentication - inject authentication service (get current user-account's information)
-   * @param userAccountService - inject user-account account service (interact with user-account's account data)
-   * @param facebookAccountService - inject facebook account service (interact with facebook's account data)
-   * @param googleAccountService - inject google account service (interact with google's account data)
-   * @param fb - inject form builder - (is used to create change body index form)
+   * @param bodyIndexService - inject bodyIndexService
+   * @param authentication - inject authentication
+   * @param userAccountService - inject userAccountService
+   * @param facebookAccountService - inject facebookAccountService
+   * @param googleAccountService - inject googleAccountService
+   * @param fb - inject fb
    * @param router - inject router
-   * @param notification - inject notification to shown error or success message
+   * @param notification - inject notification
    * @param shareUserProfileService - inject shareUserProfileService
    */
   constructor(private bodyIndexService: BodyIndexService,
@@ -92,21 +68,24 @@ export class BodyIndexReportComponent implements OnInit {
   /**
    * init current data
    */
-  ngOnInit() {
-    this.isShowingChart = true;
-    // get current date
+  ngOnInit(): void {
+    this.isShowingBodyIndexChart = true;
     this.currentDate = Utils.getCurrentDate();
-    // init form
-    this.initForm();
-    // get login type
+    this.initBodyIndexForm();
     this.loginType = localStorage.getItem(Config.loginType);
-    // load user-account's information to get user-account's id, then get body index
+    this.getSelectedUserProfile();
+  }
+
+  /**
+   * get selected user's profile
+   */
+  private getSelectedUserProfile(): void {
     this.shareUserProfileService.currentUserProfile
       .subscribe(userProfile => {
         if (userProfile) {
           this.selectedUserProfile = userProfile;
           this.selectedUserProfileId = userProfile.id;
-          this.loadBodyIndexByUserProfileId();
+          this.getBodyIndexes();
         } else {
           this.router.navigate(['/client']);
         }
@@ -115,59 +94,51 @@ export class BodyIndexReportComponent implements OnInit {
 
   /**
    * Load body index by using user-account's profile's id,
-   * then creating weightDate (labels) and weightData (data) for weight chart,
+   * then creating weightDateLabels (labels) and weightDataChart (data) for weight chart,
    * then creating chart and init current body index
    */
-  private loadBodyIndexByUserProfileId() {
-    // showing loading component
-    this.loading = true;
-    // create url to get body index
-    const getBodyIndexByUserProfileIdUrl = `${Config.api}/${Config.apiGetBodyIndexByUserProfileId}/${this.selectedUserProfileId}`;
-    // call service to get body index by user-account's profile's id
-    this.bodyIndexService.getBodyIndexByUserProfileId(getBodyIndexByUserProfileIdUrl)
-      .subscribe((bodyIndex: BodyIndex[]) => {
-        this.bodyIndex = bodyIndex;
-        if (this.bodyIndex.length > 0) {
-          // show chart if data existed
-          this.isShowingChart = true;
-          // init labels and data
-          this.weightDate = [];
-          this.weightData = [];
-          this.bodyIndex.map(eachBodyIndex => {
-            this.weightDate.push(eachBodyIndex.currentDate);
-            this.weightData.push(eachBodyIndex.weight);
+  private getBodyIndexes(): void {
+    this.isLoadingSpinnerShown = true;
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const getBodyIndexesUrl = `${Config.apiBaseUrl}/
+${Config.apiUserManagementPrefix}/
+${Config.apiUserBodyIndexes}?
+${Config.userProfileIdParameter}=${selectedUserProfileId}`;
+    this.bodyIndexService.getBodyIndexes(getBodyIndexesUrl)
+      .subscribe((bodyIndexes: BodyIndex[]) => {
+        this.bodyIndexes = bodyIndexes;
+        if (this.bodyIndexes.length > 0) {
+          this.isShowingBodyIndexChart = true;
+          this.weightDateLabels = [];
+          this.weightDataChart = [];
+          this.bodyIndexes.map(eachBodyIndex => {
+            this.weightDateLabels.push(eachBodyIndex.currentDate);
+            this.weightDataChart.push(eachBodyIndex.weight);
           });
-          // create chart
-          this.createChart();
-          // init current body index
+          this.createBodyIndexChart();
           this.getCurrentBodyIndex();
         } else {
-          // init body index the first time
           this.initBodyIndexTheFirstTime();
-          // hide chart if data is not existed
-          this.isShowingChart = false;
+          this.isShowingBodyIndexChart = false;
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * init body index the first time
    */
-  private initBodyIndexTheFirstTime() {
-    // create body index object
-    const bodyIndex = new BodyIndex();
-    bodyIndex.weight = 70;
-    bodyIndex.height = 170;
-    bodyIndex.currentDate = this.currentDate;
-    bodyIndex.userProfile = this.selectedUserProfile;
-    // add init body index to server
-    this.bodyIndexService.updateOrCreateBodyIndex(bodyIndex)
+  private initBodyIndexTheFirstTime(): void {
+    const bodyIndexes = new BodyIndex();
+    bodyIndexes.weight = 70;
+    bodyIndexes.height = 170;
+    bodyIndexes.currentDate = this.currentDate;
+    bodyIndexes.userProfile = this.selectedUserProfile;
+    const updateOrCreateBodyIndexUrl = `${Config.apiBaseUrl}/${Config.apiUserManagementPrefix}/${Config.apiUserBodyIndexes}`;
+    this.bodyIndexService.updateOrCreateBodyIndex(updateOrCreateBodyIndexUrl, bodyIndexes)
       .subscribe(insertedBodyIndex => {
         if (insertedBodyIndex) {
-          // load chart and data again
-          this.loadBodyIndexByUserProfileId();
+          this.getBodyIndexes();
         }
       });
   }
@@ -175,15 +146,15 @@ export class BodyIndexReportComponent implements OnInit {
   /**
    * create weight chart by using chart.js
    */
-  private createChart() {
+  private createBodyIndexChart(): void {
     this.bodyIndexChart = new Chart(this.canvas.nativeElement.getContext('2d'), {
       type: 'line',
       data: {
-        labels: this.weightDate,
+        labels: this.weightDateLabels,
         datasets: [
           {
             label: 'Weight',
-            data: this.weightData,
+            data: this.weightDataChart,
             backgroundColor: '#1890ff',
             borderColor: '#1890ff',
             borderWidth: 1,
@@ -216,83 +187,75 @@ export class BodyIndexReportComponent implements OnInit {
   /**
    * get current body index
    */
-  private getCurrentBodyIndex() {
-    // find heaviest weight and lightest weight from data
-    this.heaviestWeight = this.weightData[0];
-    this.lightestWeight = this.weightData[0];
-    for (let i = 1; i < this.weightData.length; i++) {
-      if (this.weightData[i] > this.heaviestWeight) {
-        this.heaviestWeight = this.weightData[i];
-      } else if (this.weightData[i] < this.lightestWeight) {
-        this.lightestWeight = this.weightData[i];
+  private getCurrentBodyIndex(): void {
+    this.heaviestUserWeight = this.weightDataChart[0];
+    this.lightestUserWeight = this.weightDataChart[0];
+    for (let i = 1; i < this.weightDataChart.length; i++) {
+      if (this.weightDataChart[i] > this.heaviestUserWeight) {
+        this.heaviestUserWeight = this.weightDataChart[i];
+      } else if (this.weightDataChart[i] < this.lightestUserWeight) {
+        this.lightestUserWeight = this.weightDataChart[i];
       }
     }
-    // get current weight and current height
-    this.currentWeight = this.bodyIndex[this.bodyIndex.length - 1].weight;
-    this.currentHeight = this.bodyIndex[this.bodyIndex.length - 1].height;
-    // calculate BMI result
+    this.currentUserWeight = this.bodyIndexes[this.bodyIndexes.length - 1].weight;
+    this.currentUserHeight = this.bodyIndexes[this.bodyIndexes.length - 1].height;
     this.calculateBMIResult();
-    // hide loading component
-    this.loading = false;
+    this.isLoadingSpinnerShown = false;
   }
 
   /**
    * calculate BMI result
    */
-  private calculateBMIResult() {
-    // if currentHeight is not equal to 0, then calcualte BMI result
+  private calculateBMIResult(): void {
+    // if currentUserHeight is not equal to 0, then calcualte BMI result
     // BMI = weight / (height * height)
-    // if currentHeight is equal to 0, then assign BMI result to 0
-    if (this.currentHeight !== 0) {
-      const heightMeter = Number(Number(this.currentHeight / 100).toFixed(2));
-      this.currentBMIResult = Number(Number(this.currentWeight / (heightMeter * heightMeter)).toFixed(2));
+    // if currentUserHeight is equal to 0, then assign BMI result to 0
+    if (this.currentUserHeight !== 0) {
+      const heightMeter = Number(Number(this.currentUserHeight / 100).toFixed(2));
+      this.currentUserBMIResult = Number(Number(this.currentUserWeight / (heightMeter * heightMeter)).toFixed(2));
     } else {
-      this.currentBMIResult = 0;
+      this.currentUserBMIResult = 0;
     }
   }
 
   /**
    * handle event when user-account press on 'cancel' button on change body index modal
    */
-  public handleCancelChangeBodyIndexModal() {
-    // close change body index modal
+  public handleCancelChangeBodyIndexModal(): void {
     this.isChangeBodyIndexModalShown = false;
   }
 
   /**
    * handle event when user-account press on 'ok' button on change body index modal
    */
-  public handleConfirmChangeBodyIndexModal() {
-    // close change body index modal
+  public handleConfirmChangeBodyIndexModal(): void {
     this.isChangeBodyIndexModalShown = false;
-    // submit form
     this.submitForm();
   }
 
   /**
    * show body index modal when user-account clicked on 'edit' icon
    */
-  public showChangeBodyIndexModal() {
-    // show change body index modal
+  public showChangeBodyIndexModal(): void {
     this.isChangeBodyIndexModalShown = true;
   }
 
-  // convenience getter for easy access to form fields
-  get f() {
+  /**
+   * convenience getter for easy access to form fields
+   */
+  get f(): any {
     return this.bodyIndexForm.controls;
   }
 
   /**
    * init change body index form
    */
-  private initForm() {
-    // set up validators for register form
+  private initBodyIndexForm(): void {
     this.bodyIndexForm = this.fb.group({
       weight: [null, [Validators.required]],
       height: [null, [Validators.required, CustomValidator.numberValidator]]
     });
 
-    // current value for all fields to avoid null
     this.f.weight.setValue('');
     this.f.height.setValue('');
   }
@@ -301,7 +264,6 @@ export class BodyIndexReportComponent implements OnInit {
    * Validate weight field
    */
   public validateWeight(): void {
-    // if value is empty, the error message will be shown
     if (this.f.weight.value.toString().localeCompare('') === 0) {
       this.f.weight.markAsTouched();
       this.f.weight.setErrors({'required': true});
@@ -312,7 +274,6 @@ export class BodyIndexReportComponent implements OnInit {
    * Validate height field
    */
   public validateHeight(): void {
-    // if value is empty, the error message will be shown
     if (this.f.height.value.toString().localeCompare('') === 0) {
       this.f.height.markAsTouched();
       this.f.height.setErrors({'required': true});
@@ -325,7 +286,7 @@ export class BodyIndexReportComponent implements OnInit {
    * @param title - title of notification
    * @param content - content of notification
    */
-  createNotification(type: string, title: string, content: string) {
+  createNotification(type: string, title: string, content: string): void {
     this.notification.create(
       type,
       title,
@@ -337,30 +298,26 @@ export class BodyIndexReportComponent implements OnInit {
    * submit change body index form when user-account clicked on 'ok' button on change body index modal
    */
   submitForm(): void {
-    // stop here if form is invalid
     if (this.bodyIndexForm.invalid) {
       this.createNotification('error', 'Error', 'Cannot submit your form! Please check all fields');
       return;
     }
-
-    // change current weight and current height and bmi
-    this.currentWeight = this.f.weight.value;
-    this.currentHeight = this.f.height.value;
+    this.currentUserWeight = this.f.weight.value;
+    this.currentUserHeight = this.f.height.value;
     this.calculateBMIResult();
-
     // create body index then submit to the server
     // if current date existed in the database, just update
     // if not, just create
-    const bodyIndex = new BodyIndex();
-    bodyIndex.currentDate = this.currentDate;
-    bodyIndex.weight = this.currentWeight;
-    bodyIndex.height = this.currentHeight;
-    bodyIndex.userProfile = this.bodyIndex[this.bodyIndex.length - 1].userProfile;
-    // update if body index existed or create new one
-    this.bodyIndexService.updateOrCreateBodyIndex(bodyIndex)
+    const bodyIndexes = new BodyIndex();
+    bodyIndexes.currentDate = this.currentDate;
+    bodyIndexes.weight = this.currentUserWeight;
+    bodyIndexes.height = this.currentUserHeight;
+    bodyIndexes.userProfile = this.bodyIndexes[this.bodyIndexes.length - 1].userProfile;
+    const updateOrCreateBodyIndexUrl = `${Config.apiBaseUrl}/${Config.apiUserManagementPrefix}/${Config.apiUserBodyIndexes}`;
+    this.bodyIndexService.updateOrCreateBodyIndex(updateOrCreateBodyIndexUrl, bodyIndexes)
       .subscribe((selectedBodyIndex: BodyIndex) => {
         if (selectedBodyIndex != null) {
-          this.loadBodyIndexByUserProfileId();
+          this.getBodyIndexes();
         }
       });
   }

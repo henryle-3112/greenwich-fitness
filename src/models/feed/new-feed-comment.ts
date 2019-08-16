@@ -7,11 +7,11 @@ export class NewFeedComment {
   newFeed?: NewFeed;
   userProfile?: UserProfile;
   newFeedCommentStatus?: number;
-  //
-  nLikes?: number;
-  nDislikes?: number;
-  nReplies?: number;
+  numberOfLikes?: number;
+  numberOfDislikes?: number;
+  numberOfReplies?: number;
   isLikeClicked?: boolean;
   replies: ReplyOnNewFeedComment[];
   isReplyBoxShown?: boolean;
+  isReacted: boolean;
 }

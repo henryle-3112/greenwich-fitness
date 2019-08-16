@@ -3,6 +3,7 @@ import {ReadLocalJsonService} from '@gw-services/core/api/read-local-json/read-l
 import {SingleExercise} from '@gw-models/core';
 import {Router} from '@angular/router';
 import {ShareSingleExerciseService} from '@gw-services/core/shared/single-exercise/share-single-exercise.service';
+import {Config} from '@gw-config/core';
 
 @Component({
   selector: 'app-single-exercise',
@@ -10,24 +11,14 @@ import {ShareSingleExerciseService} from '@gw-services/core/shared/single-exerci
   styleUrls: ['./single-exercise.component.css']
 })
 export class SingleExerciseComponent implements OnInit {
-  // all single exercises data
   singleExercises: SingleExercise[];
-  // single exercises data per page
   singleExercisesPerPage: SingleExercise[];
-  // need to create single exercises temp to load data base on current page and keywords
   singleExercisesTemp: SingleExercise[];
-  // currentPage
-  currentPage = 1;
-  // loading component is show ot not
-  loading = true;
-  // search value - return exercises and change pagination based on keywords
-  searchValue: string;
-  // number of single exercise per page
+  currentSingleExercisesPage = 1;
+  isLoadingSpinnerShown = true;
+  singleExerciseTitleKeywords: string;
   nSingleExercisesPerPage: number;
-  // total exercises;
-  totalExercises: number;
-  // startIndex to get single exercises per page
-  startIndex: number;
+  totalSingleExercises: number;
 
   /**
    *
@@ -43,116 +34,100 @@ export class SingleExerciseComponent implements OnInit {
   /**
    * init data
    */
-  ngOnInit() {
-    // init searchValue
-    this.searchValue = '';
-    // init number exercises per page
-    this.nSingleExercisesPerPage = 8;
-    // load single exercises
+  ngOnInit(): void {
+    this.singleExerciseTitleKeywords = '';
+    this.nSingleExercisesPerPage = Config.numberItemsPerPage;
     this.loadSingExercises();
   }
 
   /**
    * load single exercises
    */
-  private loadSingExercises() {
-    // load local json
+  private loadSingExercises(): void {
     this.readLocalJson.getJSON('./assets/workouts.json')
       .subscribe(data => {
-        // init single exercises
         this.singleExercises = [];
-        // get single exericses
         const exercises = data.exercises;
-        // read exercises
         exercises.map(eachExercise => {
-          const eachSingleExercise = new SingleExercise();
-          eachSingleExercise.slug = eachExercise.slug;
-          eachSingleExercise.title = eachExercise.title;
-          eachSingleExercise.smallMobileRetinaPictureUrl = eachExercise.picture_urls.small_mobile_retina;
-          eachSingleExercise.largeMobileRetinaPictureUrl = eachExercise.picture_urls.large_mobile_retina;
-          eachSingleExercise.loopVideoUrl = eachExercise.loop_video_urls.webp;
-          eachSingleExercise.videoUrl = eachExercise.video_urls.mp4;
+          const eachSingleExercise = this.createSingleExerciseFromJsonObject(eachExercise);
           this.singleExercises.push(eachSingleExercise);
         });
-        // assign all data to single exercises temp the first time
         this.singleExercisesTemp = this.singleExercises;
-        // calculate current total exercises
-        this.totalExercises = this.singleExercisesTemp.length;
-        // load single exercises per page
-        this.loadSingleExercisesPerPage();
+        this.totalSingleExercises = this.singleExercisesTemp.length;
+        this.getSingleExercisesPerPage();
       });
+  }
+
+  /**
+   *
+   * @param eachExercise - json object that will be converted to single exercise object
+   */
+  private createSingleExerciseFromJsonObject(eachExercise: any): SingleExercise {
+    const singleExercise = new SingleExercise();
+    singleExercise.slug = eachExercise.slug;
+    singleExercise.title = eachExercise.title;
+    singleExercise.smallMobileRetinaPictureUrl = eachExercise.picture_urls.small_mobile_retina;
+    singleExercise.largeMobileRetinaPictureUrl = eachExercise.picture_urls.large_mobile_retina;
+    singleExercise.loopVideoUrl = eachExercise.loop_video_urls.webp;
+    singleExercise.videoUrl = eachExercise.video_urls.mp4;
+    return singleExercise;
   }
 
   /**
    *
    * @param event - current page
    */
-  public exercisePageChange(event) {
-    // change current page
-    this.currentPage = event;
-    // show loading
-    this.loading = true;
-    // reload data based on keywords
+  public exercisePageChange(event): void {
+    this.currentSingleExercisesPage = event;
+    this.isLoadingSpinnerShown = true;
     this.reloadSingleExercisesTemp();
-    // load data for new page
-    this.loadSingleExercisesPerPage();
+    this.getSingleExercisesPerPage();
   }
 
   /**
    *
    * @param keyword - keyword to search data
    */
-  public searchExercise(keyword) {
-    // reset current page
-    this.currentPage = 1;
-    // change search value
-    this.searchValue = keyword;
-    // reload data based on keywords
+  public searchExercise(keyword): void {
+    this.currentSingleExercisesPage = 1;
+    this.singleExerciseTitleKeywords = keyword;
     this.reloadSingleExercisesTemp();
-    // load data for new page
-    this.loadSingleExercisesPerPage();
+    this.getSingleExercisesPerPage();
   }
 
   /**
    * load single exercises per page
    */
-  private loadSingleExercisesPerPage() {
-    // init startIndex
-    this.startIndex = ((this.currentPage - 1) * 8) + 1;
-    // get single exercises data per page
-    this.singleExercisesPerPage = this.singleExercisesTemp.slice(this.startIndex - 1, this.startIndex + 7);
-    this.loading = false;
+  private getSingleExercisesPerPage(): void {
+    const startIndex = ((this.currentSingleExercisesPage - 1) * 8) + 1;
+    this.singleExercisesPerPage = this.singleExercisesTemp.slice(startIndex - 1, startIndex + 7);
+    this.isLoadingSpinnerShown = false;
   }
 
   /**
    * reload single exercises temp based on keywords
    */
-  private reloadSingleExercisesTemp() {
-    // if search value is equal to '', get all single exercises
-    if (this.searchValue.localeCompare('') === 0) {
+  private reloadSingleExercisesTemp(): void {
+    if (this.singleExerciseTitleKeywords.localeCompare('') === 0) {
       this.singleExercisesTemp = this.singleExercises;
     } else {
-      // assign single exericses temp is empty
       this.singleExercisesTemp = [];
-      // push each single exercise to exercises temp based on keywords
       this.singleExercises.map(eachSingleExercise => {
-        if (eachSingleExercise.title.includes(this.searchValue)) {
+        if (eachSingleExercise.title.includes(this.singleExerciseTitleKeywords)) {
           this.singleExercisesTemp.push(eachSingleExercise);
         }
       });
     }
-    // calculate current total exercises
-    this.totalExercises = this.singleExercisesTemp.length;
+    this.totalSingleExercises = this.singleExercisesTemp.length;
   }
 
   /**
    *
    * @param selectedSingleExercise - set selected single exercise and use share single exercise service to pass to other components
    */
-  public goToExerciseDetail(selectedSingleExercise) {
+  public goToExerciseDetail(selectedSingleExercise): void {
     // pass selected single exercise to exercise detail component
     this.shareSingleExercise.changeSingleExercise(selectedSingleExercise);
-    // go to exercise detail component
     const exerciseDetailUrl = `/client/exercise/${selectedSingleExercise.slug}`;
     this.router.navigate([exerciseDetailUrl]);
   }

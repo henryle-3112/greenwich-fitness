@@ -1,12 +1,9 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {NewFeedComment, ReplyOnNewFeedComment, ResponseMessage} from '@gw-models/core';
+import {ReplyOnNewFeedComment} from '@gw-models/core';
 import {Observable} from 'rxjs';
-import {Config} from '@gw-config/core';
-import {tap} from 'rxjs/operators';
 
 
-// httpOptions to change content-type to application/json
 const httpOptions = {
   headers: new HttpHeaders({'Content-Type': 'application/json'})
 };
@@ -19,31 +16,29 @@ export class ReplyOnNewFeedCommentService {
   constructor(private http: HttpClient) {
   }
 
-  /** POST: get replies on new feed comment by new feed comment and status */
-  public getRepliesOnNewFeedCommentByNewFeedCommentAndStatus(
-    newFeedComment: NewFeedComment, status: number): Observable<ReplyOnNewFeedComment[]> {
-    return this.http.post<ReplyOnNewFeedComment[]>(
-      `${Config.api}/${Config.apiGetRepliesOnNewFeedCommentByNewFeedCommentAndStatus}/${status}`, newFeedComment, httpOptions).pipe(
-      tap((repliesOnNewFeedComment: ReplyOnNewFeedComment[]) => console.log(JSON.stringify(repliesOnNewFeedComment)))
-    );
+  /**
+   *
+   * @param url - url that will be used to get replies on newfeed's comment
+   */
+  public getRepliesOnNewFeedComment(url: string): Observable<ReplyOnNewFeedComment[]> {
+    return this.http.get<ReplyOnNewFeedComment[]>(url, httpOptions);
   }
 
-  /** POST: add new reply on new feed comment */
-  public addReplyOnNewFeedComment(
-    replyOnNewFeedComment: ReplyOnNewFeedComment): Observable<ReplyOnNewFeedComment> {
-    return this.http.post<ReplyOnNewFeedComment>(
-      `${Config.api}/${Config.apiCreateReplyOnNewFeedComment}`, replyOnNewFeedComment, httpOptions).pipe(
-      tap((insertedReplyOnNewFeedComment: ReplyOnNewFeedComment) => console.log(JSON.stringify(insertedReplyOnNewFeedComment)))
-    );
+  /**
+   *
+   * @param url - url that will be used to add reply on newfeed's comment
+   * @param replyOnNewFeedComment - reply on newfeed's comment that will be added
+   */
+  public addReplyOnNewFeedComment(url: string, replyOnNewFeedComment: ReplyOnNewFeedComment): Observable<ReplyOnNewFeedComment> {
+    return this.http.post<ReplyOnNewFeedComment>(url, replyOnNewFeedComment, httpOptions);
   }
 
-  /** POST: count number of replies on new feed comment by new feed comment and status */
-  public countNumberOfRepliesOnNewFeedCommentByNewFeedCommentAndStatus(
-    newFeedComment: NewFeedComment, status: number): Observable<ResponseMessage> {
-    return this.http.post<ResponseMessage>(
-      `${Config.api}/${Config.apiCountNumberOfRepliesOnNewFeedCommentByNewFeedCommentAndStatus}/${status}`,
-      newFeedComment, httpOptions).pipe(
-      tap((responseMessage: ResponseMessage) => console.log(JSON.stringify(responseMessage)))
-    );
+  /**
+   *
+   * @param url - url that will be used to update reply on newfeed's comment
+   * @param replyOnNewFeedComment - reply on newfeed's comment that will be updated
+   */
+  public updateReplyOnNewFeedComment(url: string, replyOnNewFeedComment: ReplyOnNewFeedComment): Observable<ReplyOnNewFeedComment> {
+    return this.http.put<ReplyOnNewFeedComment>(url, replyOnNewFeedComment, httpOptions);
   }
 }

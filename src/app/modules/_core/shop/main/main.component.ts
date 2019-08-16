@@ -4,6 +4,7 @@ import {ProductService} from '@gw-services/core/api/product/product.service';
 import {ShareProductService} from '@gw-services/core/shared/product/share-product.service';
 import {Router} from '@angular/router';
 import {ShareProductCategoryService} from '@gw-services/core/shared/product-category/share-product-category.service';
+import {Config} from '@gw-config/core';
 
 @Component({
   selector: 'app-main',
@@ -11,22 +12,10 @@ import {ShareProductCategoryService} from '@gw-services/core/shared/product-cate
   styleUrls: ['./main.component.css']
 })
 export class MainComponent implements OnInit {
-  // top men products
   topMenProducts: Product[];
-
-  // top women products
   topWomenProducts: Product[];
-
-  // top gear products
   topGearProducts: Product[];
-
-  // show loading component
-  loading: boolean;
-
-  // selected product's category
-  selectedProductCategory: ProductCategory;
-
-  // all product's categories
+  isLoadingSpinnerShown: boolean;
   productCategories: ProductCategory[];
 
   /**
@@ -42,62 +31,73 @@ export class MainComponent implements OnInit {
               private shareProductCategoryService: ShareProductCategoryService) {
   }
 
-  ngOnInit() {
-    // get top men's products
+  ngOnInit(): void {
     this.getTopMenProducts();
-    // get top women's products
     this.getTopWomenProducts();
-    // get top gear's products
     this.getTopGearProducts();
-    // get all product's category
-    this.getAllProductCategories();
+    this.getProductCategories();
   }
 
   /**
    * get top men's products
    */
-  private getTopMenProducts() {
-    // show loading component
-    this.loading = true;
-    // get top men's products
-    this.productService.getTopProducts(4, 2, 1)
-      .subscribe(products => {
-        // hide loading component
-        this.loading = false;
-        // get top men's products
-        this.topMenProducts = products;
+  private getTopMenProducts(): void {
+    this.isLoadingSpinnerShown = true;
+    const menProductCategory = 2;
+    const productStatus = 1;
+    const topLimit = 4;
+    const getTopMenProductsUrl = `${Config.apiBaseUrl}/
+${Config.apiProductManagementPrefix}/
+${Config.apiProducts}?
+${Config.categoryIdParameter}=${menProductCategory}&
+${Config.statusParameter}=${productStatus}&
+${Config.topParameter}=${topLimit}`;
+    this.productService.getProducts(getTopMenProductsUrl)
+      .subscribe(response => {
+        this.topMenProducts = response.body;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * get top women's products
    */
-  private getTopWomenProducts() {
-    // show loading component
-    this.loading = true;
-    // get top women's products
-    this.productService.getTopProducts(4, 3, 1)
-      .subscribe(products => {
-        // hide loading component
-        this.loading = false;
-        // get top women's products
-        this.topWomenProducts = products;
+  private getTopWomenProducts(): void {
+    this.isLoadingSpinnerShown = true;
+    const womenProductCategory = 3;
+    const productStatus = 1;
+    const topLimit = 4;
+    const getTopWomenProductsUrl = `${Config.apiBaseUrl}/
+${Config.apiProductManagementPrefix}/
+${Config.apiProducts}?
+${Config.categoryIdParameter}=${womenProductCategory}&
+${Config.statusParameter}=${productStatus}&
+${Config.topParameter}=${topLimit}`;
+    this.productService.getProducts(getTopWomenProductsUrl)
+      .subscribe(response => {
+        this.topWomenProducts = response.body;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * get top gear products
    */
-  private getTopGearProducts() {
-    // show loading component
-    this.loading = true;
-    // get top gear's products
-    this.productService.getTopProducts(4, 4, 1)
-      .subscribe(products => {
-        // hide loading component
-        this.loading = false;
-        // get top gear's products
-        this.topGearProducts = products;
+  private getTopGearProducts(): void {
+    this.isLoadingSpinnerShown = true;
+    const gearProductCategory = 4;
+    const productStatus = 1;
+    const topLimit = 4;
+    const getTopGearProductsUrl = `${Config.apiBaseUrl}/
+${Config.apiProductManagementPrefix}/
+${Config.apiProducts}?
+${Config.categoryIdParameter}=${gearProductCategory}&
+${Config.statusParameter}=${productStatus}&
+${Config.topParameter}=${topLimit}`;
+    this.productService.getProducts(getTopGearProductsUrl)
+      .subscribe(response => {
+        this.topGearProducts = response.body;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -105,33 +105,31 @@ export class MainComponent implements OnInit {
    *
    * @param selectedProduct - selected product
    */
-  public goToProductDetail(selectedProduct) {
-    // share product to other components
+  public goToProductDetail(selectedProduct): void {
     this.shareProductService.changeProduct(selectedProduct);
-    // go to product's detail page
     this.router.navigate([`/shop/product/${selectedProduct.productMetaTitle}`]);
   }
 
   /**
-   * go to product's category
+   *
+   * @param selectedProductCategoryName - category that user want to view
    */
-  public goToProductCategory(selectedProductCategoryName: string) {
+  public goToProductCategory(selectedProductCategoryName: string): void {
+    let selectedProductCategory = new ProductCategory();
     for (const eachProductCategory of this.productCategories) {
       if (eachProductCategory.productCategoryName.localeCompare(selectedProductCategoryName) === 0) {
-        this.selectedProductCategory = eachProductCategory;
+        selectedProductCategory = eachProductCategory;
         break;
       }
     }
-    // share selected product's category
-    this.shareProductCategoryService.changeProductCategory(this.selectedProductCategory);
-    // go to product's category
-    this.router.navigate([`/shop/category/${this.selectedProductCategory.productCategoryMetaTitle}`]);
+    this.shareProductCategoryService.changeProductCategory(selectedProductCategory);
+    this.router.navigate([`/shop/category/${selectedProductCategory.productCategoryMetaTitle}`]);
   }
 
   /**
    * get all product's categories
    */
-  private getAllProductCategories() {
+  private getProductCategories(): void {
     this.shareProductCategoryService.currentProductCategories
       .subscribe((productCategories: ProductCategory[]) => {
         if (productCategories) {

@@ -5,4 +5,6 @@ export class Coach {
   userProfile?: UserProfile;
   about?: string;
   status?: number;
+  ratingAverage?: number;
+  numberOfMemberships?: number;
 }

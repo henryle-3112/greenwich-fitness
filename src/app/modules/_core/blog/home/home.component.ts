@@ -33,37 +33,16 @@ import {SharePostCategoryService} from '@gw-services/core/shared/post-category/s
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-
-  // check when width of the browser changed
-  private innerWidth: any;
-
-  // check loading component is showing or not
-  loading: boolean;
-
-  // list of post's slides
+  browserInnerWidth: any;
+  isLoadingSpinnerShown: boolean;
   postSlides: PostSlide[];
-
-  // list of post's categories
   postCategories: PostCategory[];
-
-  // check dropdown menu is opened or not
-  isMenuOpened: boolean;
-
-  // check is search post modal is showing or not
+  isDropDownMenuOpened: boolean;
   isSearchPostModalShown: boolean;
-
-  // selected post's category's id (for searching)
-  selectedPostCategoryId: number;
-
-  // selected post's category's name (for searching)
-  selectedPostName: string;
-
-  // post's category selection
+  selectedPostCategoryForSearching: number;
+  selectedPostNameForSearching: string;
   postCategoriesSelection: PostCategory[];
-
-  // not post's category selection
   notPostCategoriesSelection: PostCategory[];
-
   // check login type (login by facebook, google or normal account)
   loginType: string;
 
@@ -94,56 +73,50 @@ export class HomeComponent implements OnInit {
               private shareUserProfileService: ShareUserProfileService) {
   }
 
-  ngOnInit() {
-    // get login type
+  ngOnInit(): void {
     this.loginType = localStorage.getItem(Config.loginType);
-    // load current user-account's information
     this.loadCurrentUserInformation();
-    // init selected post's name (for searching)
-    this.selectedPostName = '';
-    // init innerWidth to check when window's size changes
-    this.innerWidth = window.innerWidth;
-    // get all post's categories
+    this.selectedPostNameForSearching = '';
+    this.browserInnerWidth = window.innerWidth;
     this.getAllPostCategories();
-    // get all post's slides
     this.getAllPostSlides();
   }
 
   /**
    * get all post's slides
    */
-  private getAllPostSlides() {
-    // show loading component
-    this.loading = true;
-    // get all post's slides
-    this.postSlideService.getAllPostSlides(1)
+  private getAllPostSlides(): void {
+    this.isLoadingSpinnerShown = true;
+    const postSlideStatus = 1;
+    const getPostSlidesUrl = `${Config.apiBaseUrl}/
+${Config.apiPostManagementPrefix}/
+${Config.apiPostSlides}?
+${Config.statusParameter}=${postSlideStatus}`;
+    this.postSlideService.getPostSlides(getPostSlidesUrl)
       .subscribe(postSlides => {
         if (postSlides) {
           this.postSlides = postSlides;
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * get all post's categories
    */
-  private getAllPostCategories() {
-    // show loading component
-    this.loading = true;
-    // get all post's categories
-    this.postCategoryService.getAllPostCategories(1)
+  private getAllPostCategories(): void {
+    this.isLoadingSpinnerShown = true;
+    const postCategoryStatus = 1;
+    const getPostCategoriesUrl = `${Config.apiBaseUrl}/
+${Config.apiPostManagementPrefix}/
+${Config.apiPostCategories}?
+${Config.statusParameter}=${postCategoryStatus}`;
+    this.postCategoryService.getPostCategories(getPostCategoriesUrl)
       .subscribe(postCategories => {
-        // get all post's categories
         this.postCategories = postCategories;
-        // share to main component
         this.sharePostCategoryService.changePostCategories(postCategories);
-        // init post's categories selection
         this.postCategoriesSelection = [];
-        // init not post's categories selection
         this.notPostCategoriesSelection = [];
-        // get post's categories selection and not post's categories selection
         this.postCategories.map(eachPostCategory => {
           if (eachPostCategory.postCategoryName.localeCompare('Home') !== 0 &&
             eachPostCategory.postCategoryName.localeCompare('Contact') !== 0 &&
@@ -154,15 +127,14 @@ export class HomeComponent implements OnInit {
             this.notPostCategoriesSelection.push(eachPostCategory);
           }
         });
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * go to post's category
    */
-  public goToCategory(selectedPostCategory: PostCategory) {
+  public goToCategory(selectedPostCategory: PostCategory): void {
     if (selectedPostCategory.postCategoryName.localeCompare('About') === 0) {
       this.router.navigate(['/blog/about']);
     } else if (selectedPostCategory.postCategoryName.localeCompare('Privacy Policy') === 0) {
@@ -172,9 +144,7 @@ export class HomeComponent implements OnInit {
     } else if (selectedPostCategory.postCategoryName.localeCompare('Home') === 0) {
       this.router.navigate([`/blog/home`]);
     } else {
-      // share selected post's category
       this.sharePostCategoryService.changePostCategory(selectedPostCategory);
-      // go to post's category
       this.router.navigate([`/blog/category/${selectedPostCategory.postCategoryMetaTitle}`]);
     }
   }
@@ -184,7 +154,7 @@ export class HomeComponent implements OnInit {
    * @param event - event
    */
   openDropDownMenu(event): void {
-    this.isMenuOpened = !this.isMenuOpened;
+    this.isDropDownMenuOpened = !this.isDropDownMenuOpened;
   }
 
   /**
@@ -192,54 +162,43 @@ export class HomeComponent implements OnInit {
    * @param event - event
    */
   @HostListener('window:resize', ['$event'])
-  onResize(event) {
-    this.innerWidth = window.innerWidth;
-    this.isMenuOpened = innerWidth > 801;
+  onResize(event): void {
+    this.browserInnerWidth = window.innerWidth;
+    this.isDropDownMenuOpened = this.browserInnerWidth > 801;
   }
 
   /**
    * handle cancel search post modal
    */
-  public handleCancelSearchPostModal() {
+  public handleCancelSearchPostModal(): void {
     this.isSearchPostModalShown = false;
   }
 
   /**
    * handle confirm search post modal
    */
-  public handleConfirmSearchPostModal() {
-    // close search post modal
+  public handleConfirmSearchPostModal(): void {
     this.isSearchPostModalShown = false;
-
-    // check post's category is selected or not
-    if (typeof this.selectedPostCategoryId !== 'undefined') {
-      localStorage.setItem(Config.selectedPostCategoryForSearching, String(this.selectedPostCategoryId));
+    if (typeof this.selectedPostCategoryForSearching !== 'undefined') {
+      localStorage.setItem(Config.selectedPostCategoryForSearching, String(this.selectedPostCategoryForSearching));
     }
-
-    // get search's information
-    localStorage.setItem(Config.selectedPostNameKeywordsForSearching, this.selectedPostName);
-
-    // go to post search result component
+    localStorage.setItem(Config.selectedPostNameKeywordsForSearching, this.selectedPostNameForSearching);
     this.router.navigate(['/blog/search']);
-
-    // share message to tell search post component that get searching posts
     this.shareMessageService.changeMessage('searchPost');
   }
 
   /**
    * show search blog modal
    */
-  public showSearchPostModal() {
+  public showSearchPostModal(): void {
     this.isSearchPostModalShown = true;
   }
 
   /**
    * load current user-account's information
    */
-  private loadCurrentUserInformation() {
-    // show loading component
-    this.loading = true;
-    // check login type then load user-account's information
+  private loadCurrentUserInformation(): void {
+    this.isLoadingSpinnerShown = true;
     if (this.loginType.localeCompare('normal') === 0) {
       this.loadNormalAccountInformation();
     } else if (this.loginType.localeCompare('facebook') === 0) {
@@ -252,45 +211,46 @@ export class HomeComponent implements OnInit {
   /**
    * load normal account information
    */
-  private loadNormalAccountInformation() {
-    // get current user-account's name
+  private loadNormalAccountInformation(): void {
     const authenticatedUserName = this.authentication.currentUserValue.userName;
-    // load user-account's information by user-account's name (load user-account's account and user-account's profile)
-    const getUserAccountByUsernameUrl = `${Config.api}/${Config.apiGetUserAccountByUserName}${authenticatedUserName}`;
-    // get user-account's account information
-    this.userAccountService.getUserAccountByUsername(getUserAccountByUsernameUrl)
+    const getUserAccountUrl = `${Config.apiBaseUrl}/
+${Config.apiUserManagementPrefix}/
+${Config.apiUserAccounts}?
+${Config.userNameParameter}=${authenticatedUserName}`;
+    this.userAccountService.getUserAccount(getUserAccountUrl)
       .subscribe((userAccount: UserAccount) => {
         this.shareUserAccountService.changeUserAccount(userAccount);
         this.shareUserProfileService.changeUserProfile(userAccount.userProfile);
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * load facebook account information
    */
-  private loadFacebookAccountInformation() {
-    // get facebook's id
+  private loadFacebookAccountInformation(): void {
     const selectedFacebookId = localStorage.getItem(Config.facebookId);
-    // load user-account's information by facebookId
-    this.facebookAccountService.getFacebookAccountByFacebookId(selectedFacebookId)
+    const getFacebookAccountUrl = `${Config.apiBaseUrl}/
+${Config.apiUserManagementPrefix}/
+${Config.apiFacebookAccount}/
+${selectedFacebookId}`;
+    this.facebookAccountService.getFacebookAccount(getFacebookAccountUrl)
       .subscribe((facebookAccount: FacebookAccount) => {
         this.shareUserProfileService.changeUserProfile(facebookAccount.userProfile);
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * load google acccount information
    */
-  private loadGoogleAccountInformation() {
-    // get google's id
+  private loadGoogleAccountInformation(): void {
     const selectedGoogleId = localStorage.getItem(Config.googleId);
-    // load user-account's information by googleId
-    this.googleAccountService.getGoogleAccountByGoogleId(selectedGoogleId)
+    const getGoogleAccountUrl = `${Config.apiBaseUrl}/${Config.apiUserManagementPrefix}/${Config.apiGoogleAccount}/${selectedGoogleId}`;
+    this.googleAccountService.getGoogleAccount(getGoogleAccountUrl)
       .subscribe((googleAccount: GoogleAccount) => {
         this.shareUserProfileService.changeUserProfile(googleAccount.userProfile);
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 }

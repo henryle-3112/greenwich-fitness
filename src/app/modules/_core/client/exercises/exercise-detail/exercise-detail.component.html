@@ -1,6 +1,7 @@
+<!--suppress ALL -->
 <div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;">
   <!-- loading component -->
-  <app-loading *ngIf="loading"></app-loading>
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- What to knnow -->
   <h3>What to know</h3>
   <div id="what-to-know" (click)="goToExerciseVideo()">

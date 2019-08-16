@@ -1,9 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {Post, PostCategory, ResponseMessage} from '@gw-models/core';
+import {Post, PostCategory} from '@gw-models/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {PostService} from '@gw-services/core/api/post/post.service';
 import {SharePostCategoryService} from '@gw-services/core/shared/post-category/share-post-category.service';
 import {SharePostService} from '@gw-services/core/shared/post/share-post.service';
+import {Config} from '@gw-config/core';
 
 @Component({
   selector: 'app-blog-category',
@@ -11,27 +12,13 @@ import {SharePostService} from '@gw-services/core/shared/post/share-post.service
   styleUrls: ['./blog-category.component.css']
 })
 export class BlogCategoryComponent implements OnInit {
-
-  // list of post's by category
   postsByCategory: Post[];
-
-  // check loading component is showing or not
-  loading: boolean;
-
-  // current page
-  currentPage: number;
-
-  // get selected post's category
+  isLoadingSpinnerShown: boolean;
+  currentPostsByCategoryPage: number;
   selectedPostCategory: PostCategory;
-
-  // check is post's category or not
+  nPostsByCategoryPerPage: number;
+  totalPostsByCategory: number;
   isPostCategory: boolean;
-
-  // number posts per page
-  nPostsPerPage: number;
-
-  // total posts
-  totalPosts: number;
 
   /**
    *
@@ -48,83 +35,65 @@ export class BlogCategoryComponent implements OnInit {
               private sharePostService: SharePostService) {
   }
 
-  ngOnInit() {
-    // init data
+  ngOnInit(): void {
     this.initData();
-    // get selected post's category
     this.getSelectedPostCategory();
+  }
+
+  /**
+   * init data
+   */
+  private initData(): void {
+    this.nPostsByCategoryPerPage = Config.numberItemsPerPage;
+    this.currentPostsByCategoryPage = Config.currentPage;
   }
 
   /**
    * get selected post's category
    */
-  private getSelectedPostCategory() {
-    // show loading component
-    this.loading = true;
+  private getSelectedPostCategory(): void {
+    this.isLoadingSpinnerShown = true;
     this.sharePostCategoryService.currentPostCategory
       .subscribe(selectedPostCategory => {
-        // get selected post's category
-        this.selectedPostCategory = selectedPostCategory;
-        // check selected post's category existed or not
-        this.checkPostCategoryExistedOrNot();
-      });
-  }
-
-  /**
-   * get posts by category and by page
-   */
-  private loadPostsByCategoryAndByPage() {
-    // get posts
-    this.postService.getPostsByCategoryAndByPage(this.selectedPostCategory.id, this.currentPage, 1)
-      .subscribe(posts => {
-        // get posts
-        this.postsByCategory = posts;
-        // hide loading component
-        this.loading = false;
+        if (selectedPostCategory) {
+          this.selectedPostCategory = selectedPostCategory;
+          this.checkCategoryIsPostCategoryOrNot();
+        } else {
+          this.router.navigate(['/blog/home']);
+        }
       });
   }
 
   /**
    * check post's category existed or not
    */
-  private checkPostCategoryExistedOrNot() {
-    if (this.selectedPostCategory == null) {
-      // redirect to home page
-      this.router.navigate(['/blog/home']);
-    } else {
-      // check is post's category or not
-      if (this.selectedPostCategory.postCategoryName.localeCompare('About') !== 0 &&
-        this.selectedPostCategory.postCategoryName.localeCompare('Contact') !== 0 &&
-        this.selectedPostCategory.postCategoryName.localeCompare('Privacy Policy') !== 0 &&
-        this.selectedPostCategory.postCategoryName.localeCompare('Home') !== 0) {
-        this.isPostCategory = true;
-      }
-      // load post by category and by page
-      this.loadPostsByCategoryAndByPage();
-      // load total posts by category
-      this.loadTotalPostsByCategory();
+  private checkCategoryIsPostCategoryOrNot(): void {
+    this.isPostCategory = this.selectedPostCategory.postCategoryName.localeCompare('About') !== 0 &&
+      this.selectedPostCategory.postCategoryName.localeCompare('Contact') !== 0 &&
+      this.selectedPostCategory.postCategoryName.localeCompare('Privacy Policy') !== 0 &&
+      this.selectedPostCategory.postCategoryName.localeCompare('Home') !== 0;
+    if (this.isPostCategory) {
+      this.getPostsByCategory();
     }
   }
 
   /**
-   * init data
+   * get posts by category and by page
    */
-  private initData() {
-    // init number posts per page
-    this.nPostsPerPage = 8;
-    // init current page
-    this.currentPage = 1;
-  }
-
-  /**
-   * load total posts by category
-   */
-  private loadTotalPostsByCategory() {
-    this.postService.getNumberOfPostsByCategory(this.selectedPostCategory.id, 1)
-      .subscribe((responseMessage: ResponseMessage) => {
-        if (responseMessage) {
-          this.totalPosts = Number(responseMessage.message);
-        }
+  private getPostsByCategory(): void {
+    const selectedPostCategoryId = this.selectedPostCategory.id;
+    const postCategoryStatus = 1;
+    const getPostsUrl = `${Config.apiBaseUrl}/
+${Config.apiPostManagementPrefix}/
+${Config.apiPosts}?
+${Config.categoryIdParameter}=${selectedPostCategoryId}&
+${Config.statusParameter}=${postCategoryStatus}&
+${Config.pageParameter}=${this.currentPostsByCategoryPage}`;
+    this.postService.getPosts(getPostsUrl)
+      .subscribe(response => {
+        this.postsByCategory = response.body;
+        this.totalPostsByCategory = Number(response.headers.get(Config.headerXTotalCount));
+        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -132,13 +101,10 @@ export class BlogCategoryComponent implements OnInit {
    *
    * @param event - current page
    */
-  public postsPageChange(event) {
-    // show loading component
-    this.loading = true;
-    // set new page
-    this.currentPage = event;
-    // load new data
-    this.loadPostsByCategoryAndByPage();
+  public postsPageChange(event): void {
+    this.isLoadingSpinnerShown = true;
+    this.currentPostsByCategoryPage = event;
+    this.getPostsByCategory();
   }
 
 
@@ -146,10 +112,9 @@ export class BlogCategoryComponent implements OnInit {
    *
    * @param selectedPost - selected post
    */
-  public goToPostDetail(selectedPost) {
-    // share post to other components
+  public goToPostDetail(selectedPost): void {
+    // share selected post to other components
     this.sharePostService.changePost(selectedPost);
-    // go to post's detail page
     this.router.navigate([`/blog/post/${selectedPost.postMetaTitle}`]);
   }
 

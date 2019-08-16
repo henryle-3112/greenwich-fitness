@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ShareCoachService} from '@gw-services/core/shared/coach/share-coach.service';
 import {
   Coach,
@@ -7,7 +7,6 @@ import {
   CoachRate, Membership,
   ReplyOnCoachFeedback,
   ReplyOnCoachFeedbackReaction,
-  ResponseMessage,
   UserProfile
 } from '@gw-models/core';
 import {MembershipService} from '@gw-services/core/api/coach/membership.service';
@@ -20,6 +19,7 @@ import {ReplyOnCoachFeedbackService} from '@gw-services/core/api/coach/reply-on-
 import {CoachFeedbackReactionService} from '@gw-services/core/api/coach/coach-feedback-reaction.service';
 import {ReplyOnCoachFeedbackReactionService} from '@gw-services/core/api/coach/reply-on-coach-feedback-reaction.service';
 import {CoachMembershipNotificationService} from '@gw-services/core/api/notification/coach-membership-notification.service';
+import {Config} from '@gw-config/core';
 
 @Component({
   selector: 'app-coach-information',
@@ -27,61 +27,21 @@ import {CoachMembershipNotificationService} from '@gw-services/core/api/notifica
   styleUrls: ['./coach-information.component.css']
 })
 export class CoachInformationComponent implements OnInit {
-  // check loading component is showing or not
-  loading: boolean;
-
-  // selected coach
+  isLoadingSpinnerShown: boolean;
   selectedCoach: Coach;
-  // number of memberships
-  nMemberships: number;
-  // rate average
-  rateAverage: number;
-
-  // check add review form is showing or not
-  isReviewFormShown: boolean;
-
-  // coach's feedbacks
+  isCoachReviewFromShown: boolean;
   coachFeedbacks: CoachFeedback[];
-
-  // need to create coach's feedbacks temp to load data base on current page
   coachFeedbacksTemp: CoachFeedback[];
-
-  // coach's feedbacks per page
   coachFeedbacksPerPage: CoachFeedback[];
-
-  // current page
-  currentPage: number;
-
-  // number coach's feedbacks per page
+  currentCoachFeedbacksPage: number;
   nCoachFeedbacksPerPage: number;
-
-  // total coach's feedbacks
   totalCoachFeedbacks: number;
-
-  // check coach's feedback list and pagination is showing or not
-  isCoachFeedbackAndPaginationShown: boolean;
-
-  // startIndex to get coach's feedbacks per page
-  startIndex: number;
-
-  // selected coach's rate
   selectedCoachRateValue: number;
-
-  // selected coach's rate
-  selectedCoachRate: CoachRate;
-
-  // review's content
-  reviewContent: string;
-
-  // selected user's profile
+  coachReviewContent: string;
   selectedUserProfile: UserProfile;
-
-  // check user sent request to coach or not
-  isSentRequest: boolean;
-
-  // check current user and selected coach are having a relationship or not
+  isHireCoachRequestSent: boolean;
   selectedMembership: Membership;
-  isRelationshipExisted: boolean;
+  isRelationshipBetweenUserAndCoachExixted: boolean;
 
   /**
    *
@@ -111,95 +71,81 @@ export class CoachInformationComponent implements OnInit {
   }
 
   ngOnInit() {
-    // init data
     this.initData();
-    // get selected user's profile
     this.getSelectedUserProfile();
-    // get selected coach
     this.getSelectedCoach();
   }
 
+  /**
+   * init data
+   */
   private initData() {
-    this.rateAverage = 0;
-    this.nMemberships = 0;
-    // init current page
-    this.currentPage = 1;
-    // init number of coach's feedbacks per page
-    this.nCoachFeedbacksPerPage = 8;
+    this.currentCoachFeedbacksPage = Config.currentPage;
+    this.nCoachFeedbacksPerPage = Config.numberItemsPerPage;
+  }
+
+  /**
+   * get selected user's profile
+   */
+  private getSelectedUserProfile() {
+    this.isLoadingSpinnerShown = true;
+    this.shareUserProfileService.currentUserProfile
+      .subscribe(selectedUserProfile => {
+        if (selectedUserProfile) {
+          this.selectedUserProfile = selectedUserProfile;
+        } else {
+          this.router.navigate(['/client']);
+        }
+        this.isLoadingSpinnerShown = false;
+      });
   }
 
   /**
    * toggle add review form
    */
   public toggleAddReviewForm() {
-    this.isReviewFormShown = !this.isReviewFormShown;
+    this.isCoachReviewFromShown = !this.isCoachReviewFromShown;
   }
 
   /**
    * get selected coach
    */
   private getSelectedCoach() {
-    // show loading component
-    this.loading = true;
-
+    this.isLoadingSpinnerShown = true;
     this.shareCoachService.currentCoach
       .subscribe(selectedCoach => {
         if (selectedCoach) {
           this.selectedCoach = selectedCoach;
-          // check selected coach existed or not
-          this.checkSelectedCoachExistedOrNot();
-        }
-        // hide loading component
-        this.loading = false;
-      });
-  }
-
-  /**
-   * get number of memberships
-   */
-  private getNumberOfMemberships() {
-    this.membershipService.countNumberOfMembershipsByCoach(this.selectedCoach, 1)
-      .subscribe((nMemberships: ResponseMessage) => {
-        if (nMemberships) {
-          this.nMemberships = Number(nMemberships.message);
+          this.getSelectedMembership();
+          this.getCoachFeedbacksByCoach();
+          this.getCoachRateByUser();
+        } else {
+          this.router.navigate(['/client']);
         }
       });
-  }
-
-  /**
-   * check selected coach existed or not
-   */
-  private checkSelectedCoachExistedOrNot() {
-    if (this.selectedCoach == null) {
-      this.router.navigate(['/client/coach']);
-    } else {
-      // get number of memberships
-      this.getNumberOfMemberships();
-      // get coach's rate's average
-      this.getCoachRateAverage();
-      // get coach's feedbacks per page
-      this.getCoachFeedbacksByCoach();
-      // get selected coach rate by current user's profile
-      this.getSelectedCoachRate();
-      // get selected membership
-      this.getSelectedMembership();
-    }
   }
 
   /**
    * get selected membership
    */
   private getSelectedMembership() {
-    this.membershipService.getMembershipByCoachAndByUserProfile(this.selectedCoach.id, this.selectedUserProfile.id)
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const selectedCoachId = this.selectedCoach.id;
+    const getMembershipUrl = `${Config.apiBaseUrl}/
+${Config.apiMembershipManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiCoaches}/
+${selectedCoachId}/
+${Config.apiMemberships}`;
+    this.membershipService.getMembership(getMembershipUrl)
       .subscribe((selectedMembership: Membership) => {
         if (selectedMembership) {
           this.selectedMembership = selectedMembership;
-          this.isRelationshipExisted = this.selectedMembership.status === 1;
-          // check user sent quest to coach or not
+          this.isRelationshipBetweenUserAndCoachExixted = this.selectedMembership.status === 1;
           this.checkUserSentRequestToCoach();
         } else {
-          this.isRelationshipExisted = false;
-          // check user sent request to coach or not
+          this.isRelationshipBetweenUserAndCoachExixted = false;
           this.checkUserSentRequestToCoach();
         }
       });
@@ -209,25 +155,55 @@ export class CoachInformationComponent implements OnInit {
    * check user sent request to coach or not
    */
   private checkUserSentRequestToCoach() {
-    // show loading component
-    this.loading = true;
-    this.coachMembershipNotificationService.getCoachMembershipNotificationByUserProfileIdAndByCoachIdAndByStatus(
-      this.selectedUserProfile.id,
-      this.selectedCoach.id,
-      0
-    ).subscribe((selectedCoachMembershipNotification: CoachMembershipNotification) => {
-      this.isSentRequest = !!selectedCoachMembershipNotification;
-      // hide loading component
-      this.loading = false;
-    });
+    this.isLoadingSpinnerShown = true;
+    const selectedCoachId = this.selectedCoach.id;
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const notificationStatus = 0;
+    const getCoachMembershipNotificationUrl = `${Config.apiBaseUrl}/
+${Config.apiNotificationManagementPrefix}/
+${Config.apiCoaches}/
+${selectedCoachId}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiCoachMembershipNotifications}?
+${Config.statusParameter}=${notificationStatus}`;
+    this.coachMembershipNotificationService.getCoachMembershipNotification(getCoachMembershipNotificationUrl)
+      .subscribe((selectedCoachMembershipNotification: CoachMembershipNotification) => {
+        this.isHireCoachRequestSent = !!selectedCoachMembershipNotification;
+        this.isLoadingSpinnerShown = false;
+      });
+  }
+
+  /**
+   * get selected's coach rate
+   */
+  private getCoachRateByUser() {
+    this.isLoadingSpinnerShown = true;
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const selectedCoachId = this.selectedCoach.id;
+    const getCoachRateUrl = `${Config.apiBaseUrl}/
+${Config.apiCoachManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiCoaches}/
+${selectedCoachId}/
+${Config.apiCoachRates}`;
+    this.coachRateService.getCoachRate(getCoachRateUrl)
+      .subscribe((selectedCoachRate: CoachRate) => {
+        if (selectedCoachRate) {
+          this.selectedCoachRateValue = selectedCoachRate.rate;
+        } else {
+          this.selectedCoachRateValue = 0;
+        }
+        this.isLoadingSpinnerShown = false;
+      });
   }
 
   /**
    *
-   * @param event - selectd rate
+   * @param event - selected rate
    */
   public onRateChanged(event) {
-    // assign new rate value for coach
     this.selectedCoachRateValue = event;
   }
 
@@ -235,33 +211,29 @@ export class CoachInformationComponent implements OnInit {
    * get coach's feedbacks by coach
    */
   private getCoachFeedbacksByCoach() {
-    // show loading component
-    this.loading = true;
-    // get coach's feedbacks
-    this.coachFeedbackService.getCoachFeedbacksByCoach(this.selectedCoach, 1)
+    this.isLoadingSpinnerShown = true;
+    const selectedCoachId = this.selectedCoach.id;
+    const coachFeedbackStatus = 1;
+    const getCoachFeedbacksUrl = `${Config.apiBaseUrl}/
+${Config.apiCoachManagementPrefix}/
+${Config.apiCoachFeedbacks}?
+${Config.coachIdParameter}=${selectedCoachId}&
+${Config.statusParameter}=${coachFeedbackStatus}`;
+    this.coachFeedbackService.getCoachFeedbacks(getCoachFeedbacksUrl)
       .subscribe(coachFeedbacks => {
         if (coachFeedbacks) {
-          // check coach's feedbacks list and pagination is showing or not
           if (coachFeedbacks.length > 0) {
-            // get coach's feedbacks
             this.coachFeedbacks = coachFeedbacks;
-            // assign all data to coach's feedbacks temp the first time
             this.coachFeedbacksTemp = coachFeedbacks;
-            // get total number of coach's feedbacks
             this.totalCoachFeedbacks = this.coachFeedbacksTemp.length;
-            // load coach's feedbacks per page
-            this.loadCoachFeedbacksPerPage();
-            //
-            this.isCoachFeedbackAndPaginationShown = true;
+            this.getCoachFeedbacksPerPage();
           } else {
-            this.isCoachFeedbackAndPaginationShown = false;
             this.coachFeedbacks = [];
             this.coachFeedbacksTemp = [];
             this.totalCoachFeedbacks = 0;
             this.coachFeedbacksPerPage = [];
           }
-          // hide loading component
-          this.loading = false;
+          this.isLoadingSpinnerShown = false;
         }
       });
   }
@@ -271,37 +243,73 @@ export class CoachInformationComponent implements OnInit {
    * @param event - current's page
    */
   public coachFeedbacksPageChange(event) {
-    // set current page
-    this.currentPage = event;
-    // show loading component
-    this.loading = true;
-    // load new data
-    this.loadCoachFeedbacksPerPage();
+    this.currentCoachFeedbacksPage = event;
+    this.isLoadingSpinnerShown = true;
+    this.getCoachFeedbacksPerPage();
   }
 
   /**
    * load coach's feedbacks per page
    */
-  private loadCoachFeedbacksPerPage() {
-    // init startIndex
-    this.startIndex = ((this.currentPage - 1) * 8) + 1;
-    // get coach's feedbacks data per page
-    this.coachFeedbacksPerPage = this.coachFeedbacksTemp.slice(this.startIndex - 1, this.startIndex + 7);
-    // hide loading component
-    this.loading = false;
-    // load number of reactions, replies for coach's feedbacks per page
-    this.loadNumberOfRepliesAndReactions();
-    // check which feedback that current user liked and disliked
-    this.loadCoachFeedbackUserLikedAndDisliked();
+  private getCoachFeedbacksPerPage() {
+    const startIndex = ((this.currentCoachFeedbacksPage - 1) * 8) + 1;
+    this.coachFeedbacksPerPage = this.coachFeedbacksTemp.slice(startIndex - 1, startIndex + 7);
+    this.isLoadingSpinnerShown = false;
+    this.getCoachFeedbackReactionsByUser();
+  }
+
+  /**
+   * load coach's feedback that user liked and disliked
+   */
+  private getCoachFeedbackReactionsByUser() {
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const getCoachFeedbackReactionsUrl = `${Config.apiBaseUrl}/
+${Config.apiCoachManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiCoachFeedbackReactions}`;
+    this.coachFeedbackReactionService.getCoachFeedbackReactions(getCoachFeedbackReactionsUrl)
+      .subscribe((coachFeedbackReactions: CoachFeedbackReaction[]) => {
+        if (coachFeedbackReactions) {
+          this.showCoachFeedbacksUserLikedDisliked(coachFeedbackReactions);
+        }
+      });
+  }
+
+  /**
+   *
+   * @param coachFeedbackReactions - coach's feedbacks that user liked and disliked
+   */
+  private showCoachFeedbacksUserLikedDisliked(coachFeedbackReactions: CoachFeedbackReaction[]) {
+    for (const eachCoachFeedbackReaction of coachFeedbackReactions) {
+      for (const eachCoachFeedback of this.coachFeedbacksPerPage) {
+        if (eachCoachFeedbackReaction.coachFeedback.id === eachCoachFeedback.id) {
+          this.changeCoachFeedbackReactionStatus(eachCoachFeedback, eachCoachFeedbackReaction);
+          break;
+        }
+      }
+    }
+  }
+
+  /**
+   *
+   * @param selectedCoachFeedback - coach's feedback that will be set reaction's value
+   * @param selectedCoachFeedbackReaction - reactions's value that will be set to selected coach's feedback
+   */
+  private changeCoachFeedbackReactionStatus(selectedCoachFeedback: CoachFeedback, selectedCoachFeedbackReaction: CoachFeedbackReaction) {
+    selectedCoachFeedback.isReacted = true;
+    if (selectedCoachFeedbackReaction.reaction === 1) {
+      selectedCoachFeedback.isLikeClicked = true;
+    } else if (selectedCoachFeedbackReaction.reaction === 0) {
+      selectedCoachFeedback.isLikeClicked = false;
+    }
   }
 
   /**
    * add coach's feedback for selected coach
    */
   public addCoachReview() {
-    // add coach's feedback
     this.addCoachFeedback();
-    // add coach's rate
     this.addCoachRate();
   }
 
@@ -320,51 +328,22 @@ export class CoachInformationComponent implements OnInit {
   }
 
   /**
-   * get selected's coach rate
-   */
-  private getSelectedCoachRate() {
-    // show loading component
-    this.loading = true;
-    // get selected coach's rate
-    this.coachRateService.getCoachRateByUserIdAndCoachId(
-      this.selectedUserProfile.id,
-      this.selectedCoach.id
-    )
-      .subscribe((selectedCoachRate: CoachRate) => {
-        if (selectedCoachRate) {
-          this.selectedCoachRate = selectedCoachRate;
-          this.selectedCoachRateValue = this.selectedCoachRate.rate;
-        } else {
-          this.selectedCoachRateValue = 0;
-        }
-        // hide loading component
-        this.loading = false;
-      });
-  }
-
-  /**
    * add coach's feedback
    */
   private addCoachFeedback() {
-    // check review's content is empty or not
-    if (this.reviewContent.localeCompare('') === 0) {
-      // show warning message to user
+    if (this.coachReviewContent.localeCompare('') === 0) {
       this.createNotification('error', 'Error', 'Please input your review\'s content');
     } else {
-      // create new coach's feedback
       const coachFeedback = new CoachFeedback();
-      coachFeedback.coachFeedbackContent = this.reviewContent;
+      coachFeedback.coachFeedbackContent = this.coachReviewContent;
       coachFeedback.coachFeedbackCreatedDate = new Date();
       coachFeedback.coachFeedbackStatus = 1;
       coachFeedback.coach = this.selectedCoach;
       coachFeedback.userProfile = this.selectedUserProfile;
-      coachFeedback.nLikes = 0;
-      coachFeedback.nDislikes = 0;
-      coachFeedback.nReplies = 0;
-
-      // add coach's feedback client
+      coachFeedback.numberOfLikes = 0;
+      coachFeedback.numberOfDislikes = 0;
+      coachFeedback.numberOfReplies = 0;
       this.addNewCoachFeedbackOnClent(coachFeedback);
-      // add coach's feedback to database
       this.addNewCoachFeedbackToServer(coachFeedback);
     }
   }
@@ -375,13 +354,9 @@ export class CoachInformationComponent implements OnInit {
    *
    */
   private addNewCoachFeedbackOnClent(coachFeedback: CoachFeedback) {
-    // add coach's feedbacks
     this.coachFeedbacks.push(coachFeedback);
-    // assign all data to coach's feedbacks temp
     this.coachFeedbacksTemp = this.coachFeedbacks;
-    // get total number of coach's feedbacks
     this.totalCoachFeedbacks = this.coachFeedbacksTemp.length;
-    // add to current page if have any free space left
     if (this.coachFeedbacksPerPage.length < 8) {
       this.coachFeedbacksPerPage.push(coachFeedback);
     }
@@ -391,15 +366,13 @@ export class CoachInformationComponent implements OnInit {
    * add new coach's feedback to server
    */
   private addNewCoachFeedbackToServer(coachFeedback) {
-    this.coachFeedbackService.addCoachFeedback(coachFeedback)
+    const addCoachFeedbackUrl = `${Config.apiBaseUrl}/${Config.apiCoachManagementPrefix}/${Config.apiCoachFeedbacks}`;
+    this.coachFeedbackService.addCoachFeedback(addCoachFeedbackUrl, coachFeedback)
       .subscribe((insertedCoachFeedback: CoachFeedback) => {
         if (insertedCoachFeedback) {
-          // assign new coach's feedback
-          this.reviewContent = '';
-          // show success notification
+          this.coachReviewContent = '';
           this.createNotification('success', 'Success', 'Thank your for your feedback!!!');
         } else {
-          // show error notification
           this.createNotification('error', 'Error', 'Cannot submit your feedback! Please try again!');
         }
       });
@@ -409,135 +382,81 @@ export class CoachInformationComponent implements OnInit {
    * add coach's rate
    */
   private addCoachRate() {
-    // create new coach's rate object
     const coachRate = new CoachRate();
     coachRate.rate = this.selectedCoachRateValue;
     coachRate.coach = this.selectedCoach;
     coachRate.userProfile = this.selectedUserProfile;
-
-    // add to database
-    this.coachRateService.addCoachRate(coachRate)
+    const addCoachRateUrl = `${Config.apiBaseUrl}/${Config.apiCoachManagementPrefix}/${Config.apiCoachRates}`;
+    this.coachRateService.addCoachRate(addCoachRateUrl, coachRate)
       .subscribe((insertedCoachRate: CoachRate) => {
         if (insertedCoachRate) {
-          console.log(insertedCoachRate);
-          // assign new coach's rate
-          this.selectedCoachRate = insertedCoachRate;
           this.selectedCoachRateValue = insertedCoachRate.rate;
         }
       });
   }
 
   /**
-   * load number of replies and reactions
+   *
+   * @param selectedCoachFeedback - selected comment that user wants to like
    */
-  private loadNumberOfRepliesAndReactions() {
-    this.coachFeedbacksPerPage.map(eachCoachFeedback => {
-      // count number of coach feedback replies
-      this.replyOnCoachFeedbackService.countNumberOfCoachFeedbackReplies(eachCoachFeedback, 1)
-        .subscribe((nReplies: ResponseMessage) => {
-          if (nReplies) {
-            eachCoachFeedback.nReplies = Number(nReplies.message);
-          } else {
-            eachCoachFeedback.nReplies = 0;
-          }
-        });
-      // count number of like
-      this.coachFeedbackReactionService.countNumberOfCoachFeedbackReactions(eachCoachFeedback, 1)
-        .subscribe((nLikes: ResponseMessage) => {
-          if (nLikes) {
-            eachCoachFeedback.nLikes = Number(nLikes.message);
-          } else {
-            eachCoachFeedback.nLikes = 0;
-          }
-        });
-      // count number of dislikes
-      this.coachFeedbackReactionService.countNumberOfCoachFeedbackReactions(eachCoachFeedback, 0)
-        .subscribe((nDisLikes: ResponseMessage) => {
-          if (nDisLikes) {
-            eachCoachFeedback.nDislikes = Number(nDisLikes.message);
-          } else {
-            eachCoachFeedback.nDislikes = 0;
-          }
-        });
-    });
+  public like(selectedCoachFeedback: CoachFeedback) {
+    if (selectedCoachFeedback.isLikeClicked === true) {
+      return;
+    }
+    if (selectedCoachFeedback.numberOfDislikes > 0 && selectedCoachFeedback.isReacted) {
+      selectedCoachFeedback.numberOfDislikes -= 1;
+    }
+    selectedCoachFeedback.numberOfLikes += 1;
+    selectedCoachFeedback.isLikeClicked = true;
+    selectedCoachFeedback.isReacted = true;
+    // update number of likes of selected coach's feedback
+    this.updateCoachFeedback(selectedCoachFeedback);
+    this.submitNewCoachFeedbackReaction(selectedCoachFeedback, 1);
   }
 
   /**
-   * load coach's feedback that user liked and disliked
+   *
+   * @param selectedCoachFeedback - selected comment that user wants to dislike
    */
-  private loadCoachFeedbackUserLikedAndDisliked() {
-    this.coachFeedbackReactionService.getCoachFeedbackReactionsByUserProfile(this.selectedUserProfile)
-      .subscribe((coachFeedbackReactions: CoachFeedbackReaction[]) => {
-        if (coachFeedbackReactions) {
-          // show current like and dislike status of current user's profile
-          for (const eachCoachFeedbackReaction of coachFeedbackReactions) {
-            for (const eachCoachFeedback of this.coachFeedbacksPerPage) {
-              eachCoachFeedback.isReacted = true;
-              if (eachCoachFeedbackReaction.coachFeedback.id === eachCoachFeedback.id) {
-                if (eachCoachFeedbackReaction.reaction === 1) {
-                  // show like status
-                  eachCoachFeedback.isLikeClicked = true;
-                } else if (eachCoachFeedbackReaction.reaction === 0) {
-                  // show dislike status
-                  eachCoachFeedback.isLikeClicked = false;
-                }
-                break;
-              }
-            }
-          }
-        }
+  public dislike(selectedCoachFeedback: CoachFeedback) {
+    if (selectedCoachFeedback.isLikeClicked === false) {
+      return;
+    }
+    if (selectedCoachFeedback.numberOfLikes > 0 && selectedCoachFeedback.isReacted) {
+      selectedCoachFeedback.numberOfLikes -= 1;
+    }
+    selectedCoachFeedback.numberOfDislikes += 1;
+    selectedCoachFeedback.isLikeClicked = false;
+    selectedCoachFeedback.isReacted = true;
+    // update number of dislikes of selected coach's feedback
+    this.updateCoachFeedback(selectedCoachFeedback);
+    this.submitNewCoachFeedbackReaction(selectedCoachFeedback, 0);
+  }
+
+  /**
+   *
+   * @param selectedCoachFeedback - coach's feedback that will be updated
+   */
+  private updateCoachFeedback(selectedCoachFeedback: CoachFeedback) {
+    const updateCoachFeedbackUrl = `${Config.apiBaseUrl}/${Config.apiCoachManagementPrefix}/${Config.apiCoachFeedbacks}`;
+    this.coachFeedbackService.updateCoachFeedback(updateCoachFeedbackUrl, selectedCoachFeedback)
+      .subscribe((updatedCoachFeedback: CoachFeedback) => {
+        console.log(updatedCoachFeedback);
       });
   }
 
   /**
    *
-   * @param selectedComment - selected comment that user wants to like
+   * @param selectedCoachFeedback - selected coach's feedback that user has reacted
+   * @param reactionValue - reaction's value that will be set to selected coach's feedback
    */
-  public like(selectedComment: CoachFeedback) {
-    if (selectedComment.isLikeClicked === true) {
-      return;
-    }
-    if (selectedComment.nDislikes > 0 && selectedComment.isReacted) {
-      selectedComment.nDislikes -= 1;
-    }
-    selectedComment.nLikes += 1;
-    selectedComment.isLikeClicked = true;
-    selectedComment.isReacted = true;
-    // submit new coach's feedback reaction to database
-    this.submitNewCoachFeedbackReaction(selectedComment, 1);
-  }
-
-  /**
-   *
-   * @param selectedComment - selected comment that user wants to dislike
-   */
-  public dislike(selectedComment) {
-    if (selectedComment.isLikeClicked === false) {
-      return;
-    }
-    if (selectedComment.nLikes > 0 && selectedComment.isReacted) {
-      selectedComment.nLikes -= 1;
-    }
-    selectedComment.nDislikes += 1;
-    selectedComment.isLikeClicked = false;
-    selectedComment.isReacted = true;
-    // submit new coach's feedback reaction to database
-    this.submitNewCoachFeedbackReaction(selectedComment, 0);
-  }
-
-  /**
-   *
-   * @param selectedComment - selected coach's feedback
-   * @param reactionValue - reaction's value
-   */
-  private submitNewCoachFeedbackReaction(selectedComment, reactionValue) {
-    // create new coach's feedback reaction object
+  private submitNewCoachFeedbackReaction(selectedCoachFeedback: CoachFeedback, reactionValue: number) {
     const newCoachFeedbackReaction = new CoachFeedbackReaction();
-    newCoachFeedbackReaction.coachFeedback = selectedComment;
+    newCoachFeedbackReaction.coachFeedback = selectedCoachFeedback;
     newCoachFeedbackReaction.userProfile = this.selectedUserProfile;
     newCoachFeedbackReaction.reaction = reactionValue;
-    // submit to the database
-    this.coachFeedbackReactionService.addCoachFeedbackReaction(newCoachFeedbackReaction)
+    const addCoachFeedbackReactionUrl = `${Config.apiBaseUrl}/${Config.apiCoachManagementPrefix}/${Config.apiCoachFeedbackReactions}`;
+    this.coachFeedbackReactionService.addCoachFeedbackReaction(addCoachFeedbackReactionUrl, newCoachFeedbackReaction)
       .subscribe((insertedCoachFeedbackReaction: CoachFeedbackReaction) => {
         if (insertedCoachFeedbackReaction) {
           console.log(insertedCoachFeedbackReaction);
@@ -547,18 +466,21 @@ export class CoachInformationComponent implements OnInit {
 
   /**
    *
-   * @param selectedComment - selected coach's feedback that user want to view replies
+   * @param selectedCoachFeedback - selected coach's feedback that user want to view replies
    */
-  public viewRepliesOfSelectedCoachFeedback(selectedComment) {
-    if (!selectedComment.replies) {
-      this.replyOnCoachFeedbackService.getRepliesOnSelectedCoachFeedback(selectedComment, 1)
+  public viewRepliesOfSelectedCoachFeedback(selectedCoachFeedback: CoachFeedback) {
+    if (!selectedCoachFeedback.replies) {
+      const selectedCoachFeedbackId = selectedCoachFeedback.id;
+      const getRepliesOnCoachFeedbackUrl = `${Config.apiBaseUrl}/
+${Config.apiCoachManagementPrefix}/
+${Config.apiCoachFeedbacks}/
+${selectedCoachFeedbackId}/
+${Config.apiRepliesOnCoachFeedback}`;
+      this.replyOnCoachFeedbackService.getRepliesOnCoachFeedback(getRepliesOnCoachFeedbackUrl)
         .subscribe((repliesOnCoachFeedback: ReplyOnCoachFeedback[]) => {
           if (repliesOnCoachFeedback) {
-            selectedComment.replies = repliesOnCoachFeedback;
-            // load number of likes and dislikes of replies on coach's feedback
-            this.loadNumberOfReplyOnCoachFeedbackReactions(selectedComment);
-            // check which reply on coach's feedback that current user liked and disliked
-            this.loadReplyOnCoachFeedbackUserLikedAndDisliked(selectedComment);
+            selectedCoachFeedback.replies = repliesOnCoachFeedback;
+            this.getReplyOnCoachFeedbackReactionsByUser(selectedCoachFeedback.replies);
           }
         });
     }
@@ -566,90 +488,103 @@ export class CoachInformationComponent implements OnInit {
 
   /**
    *
-   * @param selectedComment - selected comment that user want to load number of reply's reactions
+   * @param repliesOnCoachFeedback - replies on coach feedback that will be checked user liked or disliked
    */
-  private loadNumberOfReplyOnCoachFeedbackReactions(selectedComment: any) {
-    for (const eachReplyOnCoachFeedback of selectedComment.replies) {
-      // count number of likes
-      this.replyOnCoachFeedbackReactionService.countNumberOfReplyOnCoachFeedbackReaction(eachReplyOnCoachFeedback, 1)
-        .subscribe((nLikes: ResponseMessage) => {
-          if (nLikes) {
-            eachReplyOnCoachFeedback.nLikes = Number(nLikes.message);
-          } else {
-            eachReplyOnCoachFeedback.nLikes = 0;
-          }
-        });
-      // count number dislikes
-      this.replyOnCoachFeedbackReactionService.countNumberOfReplyOnCoachFeedbackReaction(eachReplyOnCoachFeedback, 0)
-        .subscribe((nDislikes: ResponseMessage) => {
-          if (nDislikes) {
-            eachReplyOnCoachFeedback.nDislikes = Number(nDislikes.message);
-          } else {
-            eachReplyOnCoachFeedback.nDislikes = 0;
-          }
-        });
-    }
-  }
-
-  /**
-   * check which reply on coach's feedback that current user liked and disliked
-   */
-  private loadReplyOnCoachFeedbackUserLikedAndDisliked(selectedComment) {
-    this.replyOnCoachFeedbackReactionService.getReplyOnCoachFeedbackReactionsByUserProfile(this.selectedUserProfile)
+  private getReplyOnCoachFeedbackReactionsByUser(repliesOnCoachFeedback: ReplyOnCoachFeedback[]) {
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const getReplyOnCoachFeedbackReactionsUrl = `${Config.apiBaseUrl}/
+${Config.apiCoachManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiReplyOnCoachFeedbackReactions}`;
+    this.replyOnCoachFeedbackReactionService.getReplyOnCoachFeedbackReactions(getReplyOnCoachFeedbackReactionsUrl)
       .subscribe((replyOnCoachFeedbackReactions: ReplyOnCoachFeedbackReaction[]) => {
         if (replyOnCoachFeedbackReactions) {
-          // show current like and dislike status of current user's profile
-          for (const eachReplyOnCoachFeedbackReaction of replyOnCoachFeedbackReactions) {
-            for (const eachReplyOnCoachFeedback of selectedComment.replies) {
-              eachReplyOnCoachFeedback.isReacted = true;
-              if (eachReplyOnCoachFeedbackReaction.replyOnCoachFeedback.id === eachReplyOnCoachFeedback.id) {
-                if (eachReplyOnCoachFeedbackReaction.reaction === 1) {
-                  eachReplyOnCoachFeedback.isLikeClicked = true;
-                } else if (eachReplyOnCoachFeedbackReaction.reaction === 0) {
-                  eachReplyOnCoachFeedback.isLikeClicked = false;
-                }
-                break;
-              }
-            }
-          }
+          this.showRepliesOnCoachFeedbackUserLikedDisliked(repliesOnCoachFeedback, replyOnCoachFeedbackReactions);
         }
       });
   }
 
   /**
    *
-   * @param selectedReplyOnCoachFeedback - selectedReplyOnCoachFeedback
+   * @param repliesOnCoachFeedback - replies on coach's feedback that will be checked which replies user liked and disliked
+   * @param replyOnCoachFeedbackReactions - replies on coach's feedback that user liked and disliked
    */
-  public likeReplyOnCoachFeedback(selectedReplyOnCoachFeedback) {
+  private showRepliesOnCoachFeedbackUserLikedDisliked(repliesOnCoachFeedback: ReplyOnCoachFeedback[],
+                                                      replyOnCoachFeedbackReactions: ReplyOnCoachFeedbackReaction[]) {
+    for (const eachReplyOnCoachFeedbackReaction of replyOnCoachFeedbackReactions) {
+      for (const eachReplyOnCoachFeedback of repliesOnCoachFeedback) {
+        if (eachReplyOnCoachFeedbackReaction.replyOnCoachFeedback.id === eachReplyOnCoachFeedback.id) {
+          this.changeReplyOnCoachFeedbackReactionStatus(eachReplyOnCoachFeedback, eachReplyOnCoachFeedbackReaction);
+          break;
+        }
+      }
+    }
+  }
+
+  /**
+   *
+   * @param selectedReplyOnCoachFeedback - reply on coach's feedback that will be set reaction's value
+   * @param selectedReplyOnCoachFeedbackReaction - reaction's value that will be set to reply on coach's feedback
+   */
+  private changeReplyOnCoachFeedbackReactionStatus(selectedReplyOnCoachFeedback: ReplyOnCoachFeedback,
+                                                   selectedReplyOnCoachFeedbackReaction: ReplyOnCoachFeedbackReaction) {
+    selectedReplyOnCoachFeedback.isReacted = true;
+    if (selectedReplyOnCoachFeedbackReaction.reaction === 1) {
+      selectedReplyOnCoachFeedback.isLikeClicked = true;
+    } else if (selectedReplyOnCoachFeedbackReaction.reaction === 0) {
+      selectedReplyOnCoachFeedback.isLikeClicked = false;
+    }
+  }
+
+  /**
+   *
+   * @param selectedReplyOnCoachFeedback - reply on coach's feedback that user want to like
+   */
+  public likeReplyOnCoachFeedback(selectedReplyOnCoachFeedback: ReplyOnCoachFeedback) {
     if (selectedReplyOnCoachFeedback.isLikeClicked === true) {
       return;
     }
-    if (selectedReplyOnCoachFeedback.nDislikes > 0 && selectedReplyOnCoachFeedback.isReacted) {
-      selectedReplyOnCoachFeedback.nDislikes -= 1;
+    if (selectedReplyOnCoachFeedback.numberOfDislikes > 0 && selectedReplyOnCoachFeedback.isReacted) {
+      selectedReplyOnCoachFeedback.numberOfDislikes -= 1;
     }
-    selectedReplyOnCoachFeedback.nLikes += 1;
+    selectedReplyOnCoachFeedback.numberOfLikes += 1;
     selectedReplyOnCoachFeedback.isLikeClicked = true;
     selectedReplyOnCoachFeedback.isReacted = true;
-    // submit new reply on coach feedback reaction to database
+    // update number of likes of reply on coach's feedback
+    this.updateReplyOnCoachFeedback(selectedReplyOnCoachFeedback);
     this.submitNewReplyCoachFeedbackReaction(selectedReplyOnCoachFeedback, 1);
   }
 
   /**
    *
-   * @param selectedReplyOnCoachFeedback - selectedReplyOnCoachFeedback
+   * @param selectedReplyOnCoachFeedback - reply on coach's feedback that user want to dislike
    */
-  public dislikeReplyOnCoachFeedback(selectedReplyOnCoachFeedback) {
+  public dislikeReplyOnCoachFeedback(selectedReplyOnCoachFeedback: ReplyOnCoachFeedback) {
     if (selectedReplyOnCoachFeedback.isLikeClicked === false) {
       return;
     }
-    if (selectedReplyOnCoachFeedback.nLikes > 0 && selectedReplyOnCoachFeedback.isReacted) {
-      selectedReplyOnCoachFeedback.nLikes -= 1;
+    if (selectedReplyOnCoachFeedback.numberOfLikes > 0 && selectedReplyOnCoachFeedback.isReacted) {
+      selectedReplyOnCoachFeedback.numberOfLikes -= 1;
     }
-    selectedReplyOnCoachFeedback.nDislikes += 1;
+    selectedReplyOnCoachFeedback.numberOfDislikes += 1;
     selectedReplyOnCoachFeedback.isLikeClicked = false;
     selectedReplyOnCoachFeedback.isReacted = true;
-    // submit new reply on coach feedback reaction to database
+    // update number of dislikes of reply on coach's feedback
+    this.updateReplyOnCoachFeedback(selectedReplyOnCoachFeedback);
     this.submitNewReplyCoachFeedbackReaction(selectedReplyOnCoachFeedback, 0);
+  }
+
+  /**
+   *
+   * @param selectedReplyOnCoachFeedback - reply on coach's feedback that will be updated
+   */
+  private updateReplyOnCoachFeedback(selectedReplyOnCoachFeedback: ReplyOnCoachFeedback) {
+    const updateReplyOnCoachFeedbackUrl = `${Config.apiBaseUrl}/${Config.apiCoachManagementPrefix}/${Config.apiRepliesOnCoachFeedback}`;
+    this.replyOnCoachFeedbackService.updateReplyOnCoachFeedback(updateReplyOnCoachFeedbackUrl, selectedReplyOnCoachFeedback)
+      .subscribe((updatedReplyOnCoachFeedback: ReplyOnCoachFeedback) => {
+        console.log(updatedReplyOnCoachFeedback);
+      });
   }
 
   /**
@@ -657,14 +592,16 @@ export class CoachInformationComponent implements OnInit {
    * @param selectedReplyOnCoachFeedback - selected reply on coach feedback
    * @param reactionValue - reaction's value
    */
-  private submitNewReplyCoachFeedbackReaction(selectedReplyOnCoachFeedback, reactionValue) {
-    // create new reply on coach feedback reaction object
+  private submitNewReplyCoachFeedbackReaction(selectedReplyOnCoachFeedback: ReplyOnCoachFeedback, reactionValue: number) {
     const newReplyOnCoachFeedbackReaction = new ReplyOnCoachFeedbackReaction();
     newReplyOnCoachFeedbackReaction.replyOnCoachFeedback = selectedReplyOnCoachFeedback;
     newReplyOnCoachFeedbackReaction.userProfile = this.selectedUserProfile;
     newReplyOnCoachFeedbackReaction.reaction = reactionValue;
-    // submit to the database
-    this.replyOnCoachFeedbackReactionService.addNewReplyOnCoachFeedbackReaction(newReplyOnCoachFeedbackReaction)
+    const addReplyOnCoachFeedbackReactionUrl = `${Config.apiBaseUrl}/
+${Config.apiCoachManagementPrefix}/
+${Config.apiReplyOnCoachFeedbackReactions}`;
+    this.replyOnCoachFeedbackReactionService
+      .addNewReplyOnCoachFeedbackReaction(addReplyOnCoachFeedbackReactionUrl, newReplyOnCoachFeedbackReaction)
       .subscribe((insertedReplyOnCoachFeedbackReaction: ReplyOnCoachFeedbackReaction) => {
         if (insertedReplyOnCoachFeedbackReaction) {
           console.log(insertedReplyOnCoachFeedbackReaction);
@@ -674,16 +611,19 @@ export class CoachInformationComponent implements OnInit {
 
   /**
    *
-   * @param selectedComment - selected comment that user want to reply
+   * @param selectedCoachFeedback - selected comment that user want to reply
    */
-  public showReplyCoachFeedbackBox(selectedComment) {
-    selectedComment.isReplyBoxShown = true;
+  public showReplyCoachFeedbackBox(selectedCoachFeedback: CoachFeedback) {
+    selectedCoachFeedback.isReplyBoxShown = true;
   }
 
-  public showReplyReplyCoachFeedbackBox(selectedReplyComment) {
-    // find coach's feedback and show reply box
+  /**
+   *
+   * @param selectedReplyOnCoachFeedback - reply on coach's feedback that user want to reply
+   */
+  public showReplyReplyCoachFeedbackBox(selectedReplyOnCoachFeedback: ReplyOnCoachFeedback) {
     for (const eachCoachFeedback of this.coachFeedbacksPerPage) {
-      if (selectedReplyComment.coachFeedback.id === eachCoachFeedback.id) {
+      if (selectedReplyOnCoachFeedback.coachFeedback.id === eachCoachFeedback.id) {
         eachCoachFeedback.isReplyBoxShown = true;
         break;
       }
@@ -692,70 +632,36 @@ export class CoachInformationComponent implements OnInit {
 
   /**
    *
-   * @param replyContent - reply's content
-   * @param selectedComment - selectedComment
+   * @param replyContent - reply's content that user want to reply
+   * @param selectedCoachFeedback - selected coach's feedback that user want to reply
    */
-  public replyToCoachFeedback(selectedComment, replyContent) {
-    // create new reply on coach' feedback
+  public replyToCoachFeedback(selectedCoachFeedback: CoachFeedback, replyContent: string) {
     const newReplyOnCoachFeedback = new ReplyOnCoachFeedback();
     newReplyOnCoachFeedback.replyOnCoachFeedbackContent = replyContent;
     newReplyOnCoachFeedback.replyOnCoachFeedbackStatus = 1;
     newReplyOnCoachFeedback.replyOnCoachFeedbackCreatedDate = new Date();
-    newReplyOnCoachFeedback.coachFeedback = selectedComment;
+    newReplyOnCoachFeedback.coachFeedback = selectedCoachFeedback;
     newReplyOnCoachFeedback.userProfile = this.selectedUserProfile;
-    newReplyOnCoachFeedback.nLikes = 0;
-    newReplyOnCoachFeedback.nDislikes = 0;
-
-    // add new reply on coach feedback to the server
-    this.replyOnCoachFeedbackService.addReplyOnCoachFeedback(newReplyOnCoachFeedback)
+    newReplyOnCoachFeedback.numberOfLikes = 0;
+    newReplyOnCoachFeedback.numberOfDislikes = 0;
+    const addReplyOnCoachFeedbackUrl = `${Config.apiBaseUrl}/${Config.apiCoachManagementPrefix}/${Config.apiRepliesOnCoachFeedback}`;
+    this.replyOnCoachFeedbackService.addReplyOnCoachFeedback(addReplyOnCoachFeedbackUrl, newReplyOnCoachFeedback)
       .subscribe((insertedReplyOnCoachFeedback: ReplyOnCoachFeedback) => {
         if (insertedReplyOnCoachFeedback) {
           console.log(insertedReplyOnCoachFeedback);
         }
       });
-
-    // add new reply on client
-    if (selectedComment.replies && selectedComment.replies.length) {
-      selectedComment.replies.push(newReplyOnCoachFeedback);
+    if (selectedCoachFeedback.replies && selectedCoachFeedback.replies.length) {
+      selectedCoachFeedback.replies.push(newReplyOnCoachFeedback);
     }
-    selectedComment.nReplies += 1;
-  }
-
-  /**
-   * get coach's rate's average
-   */
-  private getCoachRateAverage() {
-    this.coachRateService.getCoachRateAverage(this.selectedCoach.id)
-      .subscribe(rateAverage => {
-        if (rateAverage) {
-          this.rateAverage = Number(rateAverage.message);
-        }
-      });
-  }
-
-  /**
-   * get selected user's profile
-   */
-  private getSelectedUserProfile() {
-    // show loading component
-    this.loading = true;
-    this.shareUserProfileService.currentUserProfile
-      .subscribe(selectedUserProfile => {
-        if (selectedUserProfile) {
-          this.selectedUserProfile = selectedUserProfile;
-        }
-        // hide loading component
-        this.loading = false;
-      });
+    selectedCoachFeedback.numberOfReplies += 1;
   }
 
   /**
    * send hire request to coach
    */
   public sendHireRequestToCoach() {
-    // show loading component
-    this.loading = true;
-    // create coach membership notification object
+    this.isLoadingSpinnerShown = true;
     const coachMembershipNotification = new CoachMembershipNotification();
     coachMembershipNotification.coach = this.selectedCoach;
     coachMembershipNotification.userProfile = this.selectedUserProfile;
@@ -763,21 +669,18 @@ export class CoachInformationComponent implements OnInit {
     coachMembershipNotification.status = 0;
     coachMembershipNotification.content =
       `${this.selectedUserProfile.fullName} wants to be trained by ${this.selectedCoach.userProfile.fullName}`;
-
-    // submit coach membership notification to server
-    this.coachMembershipNotificationService.addCoachMembershipNotification(coachMembershipNotification)
+    const addCoachMembershipNotificationUrl = `${Config.apiBaseUrl}/
+${Config.apiNotificationManagementPrefix}/
+${Config.apiCoachMembershipNotifications}`;
+    this.coachMembershipNotificationService.addCoachMembershipNotification(addCoachMembershipNotificationUrl, coachMembershipNotification)
       .subscribe((insertedCoachMembershipNotification: CoachMembershipNotification) => {
         if (insertedCoachMembershipNotification) {
-          // show success message to user
           this.createNotification('success', 'Success', 'Your request was sent successfully');
-          // set flag to isSentRequest
-          this.isSentRequest = true;
+          this.isHireCoachRequestSent = true;
         } else {
-          // show error message to user
           this.createNotification('error', 'Error', 'Failure to send your request, please try again!');
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 }

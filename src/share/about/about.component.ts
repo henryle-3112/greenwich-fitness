@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {AboutService} from '@gw-services/core/api/about/about.service';
 import {About} from '@gw-models/core';
+import {Config} from '@gw-config/core';
 
 @Component({
   selector: 'app-about',
@@ -8,11 +9,8 @@ import {About} from '@gw-models/core';
   styleUrls: ['./about.component.css']
 })
 export class AboutComponent implements OnInit {
-  // selected about's content
   selectedAboutContent: About;
-
-  // check loading component is showing or not
-  loading: boolean;
+  isLoadingSpinnerShown: boolean;
 
   /**
    *
@@ -21,7 +19,7 @@ export class AboutComponent implements OnInit {
   constructor(private aboutService: AboutService) {
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     // get about's content
     this.getAboutContent();
   }
@@ -29,17 +27,16 @@ export class AboutComponent implements OnInit {
   /**
    * get about's content
    */
-  private getAboutContent() {
-    // show loading component
-    this.loading = true;
-    // get about's content
-    this.aboutService.getAboutById(1)
+  private getAboutContent(): void {
+    this.isLoadingSpinnerShown = true;
+    const aboutId = 1;
+    const getAboutUrl = `${Config.apiBaseUrl}/${Config.apiAboutManagementPrefix}/${Config.apiAbouts}/${aboutId}`;
+    this.aboutService.getAbout(getAboutUrl)
       .subscribe((selectedAboutContent: About) => {
         if (selectedAboutContent) {
           this.selectedAboutContent = selectedAboutContent;
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 }

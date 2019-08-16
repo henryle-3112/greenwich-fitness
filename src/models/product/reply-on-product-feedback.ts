@@ -7,8 +7,8 @@ export class ReplyOnProductFeedback {
   replyOnProductFeedbackCreateDate?: Date;
   productFeedback: ProductFeedback;
   userProfile: UserProfile;
-  nLikes?: number;
-  nDislikes?: number;
+  numberOfLikes?: number;
+  numberOfDislikes?: number;
   isLikeClicked?: boolean;
   isReacted?: boolean;
 }

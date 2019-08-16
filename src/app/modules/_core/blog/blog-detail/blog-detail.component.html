@@ -1,7 +1,8 @@
-<div [ngClass]="{'opacity-loading': loading}" style="background-color: white;">
+<!--suppress ALL -->
+<div [ngClass]="{'opacity-loading': isLoadingSpinnerShown}" style="background-color: white;">
 
   <!-- loading component -->
-  <app-loading *ngIf="loading"></app-loading>
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- post's content -->
@@ -17,23 +18,26 @@
     <!-- post tags-->
     <div id="tags">
       <h2>Tags</h2>
-      <nz-tag *ngFor="let eachPostTag of tagsByPost" (click)="goToPostsByTag(eachPostTag.tag)">{{ eachPostTag.tag.tagName }}</nz-tag>
+      <nz-tag *ngFor="let eachPostTag of tagsByPost"
+              (click)="goToPostsByTag(eachPostTag.tag)">{{ eachPostTag.tag.tagName }}</nz-tag>
     </div>
     <!-- end post tags-->
 
     <!-- customer reviews -->
     <div nz-row nzGutter="0" style="padding-bottom: 24px;">
-      <div id="customer-reviews" nz-col class="gutter-row" nzXs="24" nzSm="24" nzMd="24" nzLg="24" nzXl="24" style="background: white;">
+      <div id="customer-reviews" nz-col class="gutter-row" nzXs="24" nzSm="24" nzMd="24" nzLg="24" nzXl="24"
+           style="background: white;">
         <h2 id="title-customer-reviews">Customer Reviews</h2>
         <button nz-button nzType="default" id="btn-write-reviews" (click)="toggleAddReviewForm()">Write Reviews</button>
 
         <div class="clear-both"></div>
 
         <!-- add reviews form -->
-        <div id="add-reviews-form" *ngIf="isReviewFormShown">
-          <nz-rate class="mg-top-24" [ngModel]="selectedPostRateValue" (ngModelChange)="onRateChanged($event)"></nz-rate>
+        <div id="add-reviews-form" *ngIf="isPostReviewFormShown">
+          <nz-rate class="mg-top-24" [ngModel]="selectedPostRateValue"
+                   (ngModelChange)="onRateChanged($event)"></nz-rate>
           <br/>
-          <textarea class="mg-top-24" id="reviews-text-area" rows="4" nz-input [(ngModel)]="reviewContent"
+          <textarea class="mg-top-24" id="reviews-text-area" rows="4" nz-input [(ngModel)]="postReviewContent"
                     placeholder="Write Reviews..."></textarea> <br/>
           <button nz-button nzType="primary" id="btn-add-reviews" (click)="addPostReview()">Add Reviews</button>
         </div>
@@ -55,10 +59,10 @@
                 nzTitle="Like"
                 nz-icon
                 type="like"
-                [theme]="comment.isLikeClicked == true ? 'twotone' : 'outline'"
+                [nzTheme]="comment.isLikeClicked == true ? 'twotone' : 'outline'"
                 (click)="likeReplyOnPostComment(comment)"
               ></i>
-              <span class="count like">{{ comment?.nLikes }}</span>
+              <span class="count like">{{ comment?.numberOfLikes }}</span>
             </nz-comment-action>
             <nz-comment-action>
               <i
@@ -66,10 +70,10 @@
                 nzTitle="Dislike"
                 nz-icon
                 type="dislike"
-                [theme]="comment.isLikeClicked == false ? 'twotone' : 'outline'"
+                [nzTheme]="comment.isLikeClicked == false ? 'twotone' : 'outline'"
                 (click)="dislikeReplyOnPostComment(comment)"
               ></i>
-              <span class="count dislike">{{ comment?.nDislikes }}</span>
+              <span class="count dislike">{{ comment?.numberOfDislikes }}</span>
             </nz-comment-action>
             <nz-comment-action>
               <span (click)="showReplyReplyPostCommentBox(comment)">Reply to</span>
@@ -94,10 +98,10 @@
                 nzTitle="Like"
                 nz-icon
                 type="like"
-                [theme]="comment.isLikeClicked == true ? 'twotone' : 'outline'"
+                [nzTheme]="comment.isLikeClicked == true ? 'twotone' : 'outline'"
                 (click)="like(comment)"
               ></i>
-              <span class="count like">{{ comment?.nLikes }}</span>
+              <span class="count like">{{ comment?.numberOfLikes }}</span>
             </nz-comment-action>
             <nz-comment-action>
               <i
@@ -105,16 +109,17 @@
                 nzTitle="Dislike"
                 nz-icon
                 type="dislike"
-                [theme]="comment.isLikeClicked == false ? 'twotone' : 'outline'"
+                [nzTheme]="comment.isLikeClicked == false ? 'twotone' : 'outline'"
                 (click)="dislike(comment)"
               ></i>
-              <span class="count dislike">{{ comment?.nDislikes }}</span>
+              <span class="count dislike">{{ comment?.numberOfDislikes }}</span>
             </nz-comment-action>
             <nz-comment-action>
               <span (click)="showReplyPostCommentBox(comment)">Reply to</span>
             </nz-comment-action>
             <nz-comment-action>
-              <span (click)="viewRepliesOfSelectedPostComment(comment)">View {{ comment?.nReplies }} replies</span>
+              <span (click)="viewRepliesOfSelectedPostComment(comment)">View {{ comment?.numberOfReplies }}
+                replies</span>
             </nz-comment-action>
             <!-- end  post's comment content -->
 
@@ -153,8 +158,8 @@
 
         <!-- pagination -->
         <nz-pagination
-          *ngIf="isPostCommentsAndPaginationShown"
-          [nzPageIndex]="currentPage"
+          *ngIf="postComments && postComments.length"
+          [nzPageIndex]="currentPostCommentsPage"
           [nzPageSize]="nPostCommentsPerPage"
           [nzTotal]="totalPostComments"
           nzSize="small"

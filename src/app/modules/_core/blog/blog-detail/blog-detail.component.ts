@@ -1,7 +1,6 @@
 import {Component, ElementRef, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
 import {
-  Post, PostComment, PostCommentReaction, PostRate, PostTag, ReplyOnPostComment, ReplyOnPostCommentReaction,
-  ResponseMessage,
+  Post, PostComment, PostCommentReaction, PostRate, PostTag, ReplyOnPostComment, ReplyOnPostCommentReaction, Tag,
   UserProfile
 } from '@gw-models/core';
 import {Router} from '@angular/router';
@@ -15,6 +14,7 @@ import {PostCommentReactionService} from '@gw-services/core/api/post/post-commen
 import {ReplyOnPostCommentReactionService} from '@gw-services/core/api/post/reply-on-post-comment-reaction.service';
 import {PostTagService} from '@gw-services/core/api/post/post-tag.service';
 import {ShareTagService} from '@gw-services/core/shared/tag/share-tag.service';
+import {Config} from '@gw-config/core';
 
 @Component({
   selector: 'app-blog-detail',
@@ -23,60 +23,20 @@ import {ShareTagService} from '@gw-services/core/shared/tag/share-tag.service';
   encapsulation: ViewEncapsulation.None,
 })
 export class BlogDetailComponent implements OnInit {
-
-  // selected post that was chosen by user
   selectedPost: Post;
-
-  // selected post's content
-  selectedPostContent: string;
-
-  // check loading component is showing or not
-  loading: boolean;
-
-  // review's content
-  reviewContent: string;
-
-  // check add review form is showing or not
-  isReviewFormShown: boolean;
-
-  // post's feedbacks
+  isLoadingSpinnerShown: boolean;
+  postReviewContent: string;
+  isPostReviewFormShown: boolean;
   postComments: PostComment[];
-
-  // need to create post's comments temp to load data base on current page
   postCommentsTemp: PostComment[];
-
-  // post's comments per page
   postCommentsPerPage: PostComment[];
-
-  // current page
-  currentPage: number;
-
-  // number post's comments per page
+  currentPostCommentsPage: number;
   nPostCommentsPerPage: number;
-
-  // total post's comments
   totalPostComments: number;
-
-  // check post's comments list and pagination is showing or not
-  isPostCommentsAndPaginationShown: boolean;
-
-  // startIndex to get post's comments per page
-  startIndex: number;
-
-  // selected user's profile
   selectedUserProfile: UserProfile;
-
-  // selected post's rate
   selectedPostRateValue: number;
-
-  // selected post's rate
-  selectedPostRate: PostRate;
-
-  // tags by post
   tagsByPost: PostTag[];
-
   @ViewChild('postContainer') postContainer: ElementRef;
-
 
   /**
    *
@@ -105,158 +65,210 @@ export class BlogDetailComponent implements OnInit {
               private shareTagService: ShareTagService) {
   }
 
-  ngOnInit() {
-    // init data
+  ngOnInit(): void {
     this.initData();
-    // get selected post
     this.getSelectedPost();
-    // get selected user's profile
-    this.getSelectedUserProfile();
-    // get selected post's rate
-    this.getSelectedPostRate();
   }
 
   /**
    * get selected post
    */
-  private getSelectedPost() {
-    // show loading component
-    this.loading = true;
+  private getSelectedPost(): void {
+    this.isLoadingSpinnerShown = true;
     this.sharePostService.currentPost
       .subscribe(selectedPost => {
-        // show loading component
-        this.selectedPost = selectedPost;
-        // check selected post existed or not
-        this.checkSelectedPostExistedOrNot();
-        // get selected's content
-        this.selectedPostContent = this.selectedPost.postContent;
-        this.postContainer.nativeElement.innerHTML = this.selectedPostContent;
-        // hide loading component
-        this.loading = false;
+        if (selectedPost) {
+          this.selectedPost = selectedPost;
+          this.postContainer.nativeElement.innerHTML = this.selectedPost.postContent;
+          this.isLoadingSpinnerShown = false;
+          this.getSelectedUserProfile();
+          this.getSelectedTagsByPost();
+          this.getPostCommentsByPost();
+        } else {
+          this.router.navigate(['/blog/home']);
+        }
       });
   }
 
   /**
-   * check selected post existed or not
+   * init data
    */
-  private checkSelectedPostExistedOrNot() {
-    console.log(`hello`);
-    if (this.selectedPost == null) {
-      console.log(`yahoo!!!`);
-      // if selectedPost is not existed, redirect to home page
-      this.router.navigate(['/blog/home']);
-    } else {
-      // get selected post's tags
-      this.getSelectedTags();
-      // get post's comments
-      this.getPostCommentsByPost();
-    }
+  private initData(): void {
+    this.currentPostCommentsPage = Config.currentPage;
+    this.nPostCommentsPerPage = Config.numberItemsPerPage;
+  }
+
+  /**
+   * get selected user's profile
+   */
+  private getSelectedUserProfile(): void {
+    this.shareUserProfileService.currentUserProfile
+      .subscribe(selectedUserProfile => {
+        if (selectedUserProfile) {
+          this.selectedUserProfile = selectedUserProfile;
+          this.getSelectedPostRate();
+        } else {
+          this.router.navigate(['/blog/home']);
+        }
+      });
+  }
+
+  /**
+   * get selected's post's rate
+   */
+  private getSelectedPostRate(): void {
+    this.isLoadingSpinnerShown = true;
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const selectedPostId = this.selectedPost.id;
+    const getPostRateUrl = `${Config.apiBaseUrl}/
+${Config.apiPostManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiPosts}/
+${selectedPostId}/
+${Config.apiPostRates}`;
+    this.postRateService.getPostRate(getPostRateUrl)
+      .subscribe((selectedPostRate: PostRate) => {
+        if (selectedPostRate) {
+          this.selectedPostRateValue = selectedPostRate.rate;
+        } else {
+          this.selectedPostRateValue = 0;
+        }
+        this.isLoadingSpinnerShown = false;
+      });
   }
 
   /**
    * get selected tags by post
    */
-  private getSelectedTags() {
-    // show loading component
-    this.loading = true;
-    this.postTagService.getTagsByPost(this.selectedPost)
-      .subscribe(tags => {
-        if (tags) {
-          this.tagsByPost = tags;
-        }
-        // hide loading component
-        this.loading = false;
+  private getSelectedTagsByPost(): void {
+    this.isLoadingSpinnerShown = true;
+    const selectedPostId = this.selectedPost.id;
+    const tagStatus = 1;
+    const getTagsUrl = `${Config.apiBaseUrl}/
+${Config.apiPostManagementPrefix}/
+${Config.apiPosts}/
+${selectedPostId}/
+${Config.apiTags}?
+${Config.tagStatusParameter}=${tagStatus}`;
+    this.postTagService.getPostTags(getTagsUrl)
+      .subscribe(response => {
+        this.tagsByPost = response.body;
+        this.isLoadingSpinnerShown = false;
       });
-  }
-
-  /**
-   * toggle add review form
-   */
-  public toggleAddReviewForm() {
-    this.isReviewFormShown = !this.isReviewFormShown;
   }
 
   /**
    * get post's comments by post
    */
-  private getPostCommentsByPost() {
-    // show loading component
-    this.loading = true;
-    // get post's comments
-    this.postCommentService.getPostCommentsByPost(this.selectedPost, 1)
-      .subscribe(postComments => {
-        if (postComments) {
-          // check post's comments list and pagination is showing or not
-          if (postComments.length > 0) {
-            // get post's comments
-            this.postComments = postComments;
-            // assign all data to post's comments temp the first time
-            this.postCommentsTemp = postComments;
-            // get total number of post's comments
-            this.totalPostComments = this.postCommentsTemp.length;
-            // load post's comments per page
-            this.loadPostCommentsPerPage();
-            //
-            this.isPostCommentsAndPaginationShown = true;
-          } else {
-            this.isPostCommentsAndPaginationShown = false;
-            this.postComments = [];
-            this.postCommentsTemp = [];
-            this.totalPostComments = 0;
-            this.postCommentsPerPage = [];
-          }
-          // hide loading component
-          this.loading = false;
+  private getPostCommentsByPost(): void {
+    this.isLoadingSpinnerShown = true;
+    const selectedPostId = this.selectedPost.id;
+    const postCommentStatus = 1;
+    const getPostCommentsUrl = `${Config.apiBaseUrl}/
+${Config.apiPostManagementPrefix}/
+${Config.apiPosts}/
+${selectedPostId}/
+${Config.apiPostComments}?
+${Config.statusParameter}=${postCommentStatus}`;
+    this.postCommentService.getPostComments(getPostCommentsUrl)
+      .subscribe((postComments: PostComment[]) => {
+        if (postComments && postComments.length > 0) {
+          this.postComments = postComments;
+          this.postCommentsTemp = postComments;
+          this.totalPostComments = this.postCommentsTemp.length;
+          this.getPostCommentsPerPage();
+        } else {
+          this.postComments = [];
+          this.postCommentsTemp = [];
+          this.totalPostComments = 0;
+          this.postCommentsPerPage = [];
         }
+        this.isLoadingSpinnerShown = false;
       });
+  }
+
+  /**
+   * get post's comments per page
+   */
+  private getPostCommentsPerPage(): void {
+    const startIndex = ((this.currentPostCommentsPage - 1) * 8) + 1;
+    this.postCommentsPerPage = this.postCommentsTemp.slice(startIndex - 1, startIndex + 7);
+    this.isLoadingSpinnerShown = false;
+    this.getPostCommentReactionsByUser();
+  }
+
+  /**
+   * get reactions of post's comments. Therefore, we can know which post's comment user liked and disliked
+   */
+  private getPostCommentReactionsByUser(): void {
+    this.isLoadingSpinnerShown = true;
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const postCommentReactionsUrl = `${Config.apiBaseUrl}/
+${Config.apiPostManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiPostCommentReactions}`;
+    this.postCommentReactionService.getPostCommentReactions(postCommentReactionsUrl)
+      .subscribe((postCommentReactions: PostCommentReaction[]) => {
+        if (postCommentReactions) {
+          this.showPostCommentsUserLikedDisliked(postCommentReactions);
+        }
+        this.isLoadingSpinnerShown = false;
+      });
+  }
+
+  /**
+   *
+   * @param postCommentReactions - post's comment that user liked or disliked
+   */
+  private showPostCommentsUserLikedDisliked(postCommentReactions: PostCommentReaction[]): void {
+    for (const eachPostCommentReaction of postCommentReactions) {
+      for (const eachPostComment of this.postCommentsPerPage) {
+        if (eachPostCommentReaction.postComment.id === eachPostComment.id) {
+          this.changePostCommentReactionStatus(eachPostComment, eachPostCommentReaction);
+          break;
+        }
+      }
+    }
+  }
+
+  /**
+   *
+   * @param selectedPostComment - selected post's comment that its reaction's status will be changed
+   * @param selectedPostCommentReaction - reaction's value that user has reacted to selected post's comment
+   */
+  private changePostCommentReactionStatus(selectedPostComment: PostComment, selectedPostCommentReaction: PostCommentReaction): void {
+    selectedPostComment.isReacted = true;
+    if (selectedPostCommentReaction.reaction === 1) {
+      selectedPostComment.isLikeClicked = true;
+    } else if (selectedPostCommentReaction.reaction === 0) {
+      selectedPostComment.isLikeClicked = false;
+    }
   }
 
   /**
    *
    * @param event - current's page
    */
-  public postCommentsPageChange(event) {
-    // set current page
-    this.currentPage = event;
-    // show loading component
-    this.loading = true;
-    // load new data
-    this.loadPostCommentsPerPage();
+  public postCommentsPageChange(event): void {
+    this.currentPostCommentsPage = event;
+    this.isLoadingSpinnerShown = true;
+    this.getPostCommentsPerPage();
   }
 
   /**
-   * init data
+   * toggle add review form
    */
-  private initData() {
-    // init current page
-    this.currentPage = 1;
-    // init number of post's comments per page
-    this.nPostCommentsPerPage = 8;
-  }
-
-  /**
-   * load post's comments per page
-   */
-  private loadPostCommentsPerPage() {
-    // init startIndex
-    this.startIndex = ((this.currentPage - 1) * 8) + 1;
-    // get post's comments data per page
-    this.postCommentsPerPage = this.postCommentsTemp.slice(this.startIndex - 1, this.startIndex + 7);
-    // hide loading component
-    this.loading = false;
-    // load number of reactions, replies for post's comments per page
-    this.loadNumberOfRepliesAndReactions();
-    // check which comment that current user liked and disliked
-    this.loadPostCommentUserLikedAndDisliked();
+  public toggleAddReviewForm(): void {
+    this.isPostReviewFormShown = !this.isPostReviewFormShown;
   }
 
   /**
    * add post's comment for selected post
    */
   public addPostReview() {
-    // add post's comment
     this.addPostComment();
-    // add post's rate
     this.addPostRate();
   }
 
@@ -266,7 +278,7 @@ export class BlogDetailComponent implements OnInit {
    * @param title - title of notification
    * @param content - content of notification
    */
-  createNotification(type: string, title: string, content: string) {
+  createNotification(type: string, title: string, content: string): void {
     this.notification.create(
       type,
       title,
@@ -275,89 +287,43 @@ export class BlogDetailComponent implements OnInit {
   }
 
   /**
-   * get selected user's profile
-   */
-  private getSelectedUserProfile() {
-    this.shareUserProfileService.currentUserProfile
-      .subscribe(selectedUserProfile => {
-        if (selectedUserProfile) {
-          this.selectedUserProfile = selectedUserProfile;
-        }
-      });
-  }
-
-  /**
-   * get selected's post's rate
-   */
-  private getSelectedPostRate() {
-    // show loading component
-    this.loading = true;
-    // get selected post rate
-    this.postRateService.getPostRateByUserIdAndPostId(
-      this.selectedUserProfile.id,
-      this.selectedPost.id
-    )
-      .subscribe((selectedPostRate: PostRate) => {
-        if (selectedPostRate) {
-          this.selectedPostRate = selectedPostRate;
-          this.selectedPostRateValue = this.selectedPostRate.rate;
-        } else {
-          this.selectedPostRateValue = 0;
-        }
-        // hide loading component
-        this.loading = false;
-      });
-  }
-
-  /**
    *
    * @param event - handle event when rate change
    */
-  public onRateChanged(event) {
-    // assign new rating value
+  public onRateChanged(event): void {
     this.selectedPostRateValue = event;
   }
 
   /**
    * add post's comment
    */
-  private addPostComment() {
-    // check review's content is empty or not
-    if (this.reviewContent.localeCompare('') === 0) {
-      // show warning message to user
+  private addPostComment(): void {
+    if (this.postReviewContent.localeCompare('') === 0) {
       this.createNotification('error', 'Error', 'Please input your review\'s content');
     } else {
-      // create new post's comment
       const postComment = new PostComment();
-      postComment.postCommentContent = this.reviewContent;
+      postComment.postCommentContent = this.postReviewContent;
       postComment.postCommentCreatedDate = new Date();
       postComment.postCommentStatus = 1;
       postComment.post = this.selectedPost;
       postComment.userProfile = this.selectedUserProfile;
-      postComment.nLikes = 0;
-      postComment.nDislikes = 0;
-      postComment.nReplies = 0;
-
-      // add post's comment client
+      postComment.numberOfLikes = 0;
+      postComment.numberOfDislikes = 0;
+      postComment.numberOfReplies = 0;
       this.addNewPostCommentOnClient(postComment);
-      // add post's comment to database
       this.addNewPostCommentToServer(postComment);
     }
   }
 
   /**
    *
-   * @param postComment - selected post's comment
+   * @param postComment - post's comment that will be add on client page
    *
    */
-  private addNewPostCommentOnClient(postComment: PostComment) {
-    // add post's comment
+  private addNewPostCommentOnClient(postComment: PostComment): void {
     this.postComments.push(postComment);
-    // assign all data to post's comments temp
     this.postCommentsTemp = this.postComments;
-    // get total number of post's comments
     this.totalPostComments = this.postCommentsTemp.length;
-    // add to current page if have any free space left
     if (this.postCommentsPerPage.length < 8) {
       this.postCommentsPerPage.push(postComment);
     }
@@ -365,18 +331,16 @@ export class BlogDetailComponent implements OnInit {
 
   /**
    *
-   * @param postComment - post's comment that user want to add to server
+   * @param postComment - post's comment that will be added to server
    */
-  private addNewPostCommentToServer(postComment) {
-    this.postCommentService.addPostComment(postComment)
+  private addNewPostCommentToServer(postComment: PostComment): void {
+    const addPostCommentUrl = `${Config.apiBaseUrl}/${Config.apiPostManagementPrefix}/${Config.apiPostComments}`;
+    this.postCommentService.addPostComment(addPostCommentUrl, postComment)
       .subscribe((insertedPostComment: PostComment) => {
         if (insertedPostComment) {
-          // assign new post's comment
-          this.reviewContent = '';
-          // show success notification
+          this.postReviewContent = '';
           this.createNotification('success', 'Success', 'Thank your for your comment!!!');
         } else {
-          // show error notification
           this.createNotification('error', 'Error', 'Cannot submit your comment! Please try again!');
         }
       });
@@ -385,158 +349,101 @@ export class BlogDetailComponent implements OnInit {
   /**
    * add post's rate
    */
-  private addPostRate() {
-    // create new post's rate object
+  private addPostRate(): void {
     const postRate = new PostRate();
     postRate.rate = this.selectedPostRateValue;
-    console.log(`Rate: ${this.selectedPostRateValue}`);
     postRate.post = this.selectedPost;
     postRate.userProfile = this.selectedUserProfile;
-
-    // add to database
-    this.postRateService.addPostRate(postRate)
+    const addPostRateUrl = `${Config.apiBaseUrl}/${Config.apiPostManagementPrefix}/${Config.apiPostRates}`;
+    this.postRateService.addPostRate(addPostRateUrl, postRate)
       .subscribe((insertedPostRate: PostRate) => {
         if (insertedPostRate) {
-          // assign new post's rate
-          this.selectedPostRate = insertedPostRate;
           this.selectedPostRateValue = insertedPostRate.rate;
         }
       });
   }
 
   /**
-   * load number of replies and reactions
-   */
-  private loadNumberOfRepliesAndReactions() {
-    this.postCommentsPerPage.map(eachPostComment => {
-      // count number of post's comment replies
-      this.replyOnPostCommentService.countNumberOfPostCommentReplies(eachPostComment, 1)
-        .subscribe((nReplies: ResponseMessage) => {
-          if (nReplies) {
-            eachPostComment.nReplies = Number(nReplies.message);
-          } else {
-            eachPostComment.nReplies = 0;
-          }
-        });
-      // count number of like
-      this.postCommentReactionService.countNumberOfPostCommentReactions(eachPostComment, 1)
-        .subscribe((nLikes: ResponseMessage) => {
-          if (nLikes) {
-            eachPostComment.nLikes = Number(nLikes.message);
-          } else {
-            eachPostComment.nLikes = 0;
-          }
-        });
-      // count number of dislikes
-      this.postCommentReactionService.countNumberOfPostCommentReactions(eachPostComment, 0)
-        .subscribe((nDisLikes: ResponseMessage) => {
-          if (nDisLikes) {
-            eachPostComment.nDislikes = Number(nDisLikes.message);
-          } else {
-            eachPostComment.nDislikes = 0;
-          }
-        });
-    });
-  }
-
-  /**
-   * load post's comment that user liked and disliked
-   */
-  private loadPostCommentUserLikedAndDisliked() {
-    this.postCommentReactionService.getPostCommentReactionsByUserProfile(this.selectedUserProfile)
-      .subscribe((postCommentReactions: PostCommentReaction[]) => {
-        if (postCommentReactions) {
-          // show current like and dislike status of current user's profile
-          for (const eachPostCommentReaction of postCommentReactions) {
-            for (const eachPostComment of this.postCommentsPerPage) {
-              if (eachPostCommentReaction.postComment.id === eachPostComment.id) {
-                // set flag to check current post comment is reacted or not
-                eachPostComment.isReacted = true;
-                if (eachPostCommentReaction.reaction === 1) {
-                  // show like status
-                  eachPostComment.isLikeClicked = true;
-                } else if (eachPostCommentReaction.reaction === 0) {
-                  // show dislike status
-                  eachPostComment.isLikeClicked = false;
-                }
-                break;
-              }
-            }
-          }
-        }
-      });
-  }
-
-  /**
    *
-   * @param selectedComment - selected comment that user wants to like
+   * @param selectedPostComment - selected comment that user wants to like
    */
-  public like(selectedComment: PostComment) {
-    if (selectedComment.isLikeClicked === true) {
+  public like(selectedPostComment: PostComment): void {
+    if (selectedPostComment.isLikeClicked === true) {
       return;
     }
-    if (selectedComment.nDislikes > 0 && selectedComment.isReacted) {
-      selectedComment.nDislikes -= 1;
+    if (selectedPostComment.numberOfDislikes > 0 && selectedPostComment.isReacted) {
+      selectedPostComment.numberOfDislikes -= 1;
     }
-    selectedComment.nLikes += 1;
-    selectedComment.isLikeClicked = true;
-    selectedComment.isReacted = true;
-    // submit new post's comment reaction to database
-    this.submitNewPostCommentReaction(selectedComment, 1);
+    selectedPostComment.numberOfLikes += 1;
+    selectedPostComment.isLikeClicked = true;
+    selectedPostComment.isReacted = true;
+    // update number of likes of selected post's comment
+    this.updatePostComment(selectedPostComment);
+    this.submitNewPostCommentReaction(selectedPostComment, 1);
   }
 
   /**
    *
-   * @param selectedComment - selected comment that user wants to dislike
+   * @param selectedPostComment - selected comment that user wants to dislike
    */
-  public dislike(selectedComment: PostComment) {
-    if (selectedComment.isLikeClicked === false) {
+  public dislike(selectedPostComment: PostComment): void {
+    if (selectedPostComment.isLikeClicked === false) {
       return;
     }
-    if (selectedComment.nLikes > 0 && selectedComment.isReacted) {
-      selectedComment.nLikes -= 1;
+    if (selectedPostComment.numberOfLikes > 0 && selectedPostComment.isReacted) {
+      selectedPostComment.numberOfLikes -= 1;
     }
-    selectedComment.nDislikes += 1;
-    selectedComment.isLikeClicked = false;
-    selectedComment.isReacted = true;
-    // submit new post's comment reaction to database
-    this.submitNewPostCommentReaction(selectedComment, 0);
+    selectedPostComment.numberOfDislikes += 1;
+    selectedPostComment.isLikeClicked = false;
+    selectedPostComment.isReacted = true;
+    // update number of dislikes of selected post's comment
+    this.updatePostComment(selectedPostComment);
+    this.submitNewPostCommentReaction(selectedPostComment, 0);
   }
 
   /**
    *
-   * @param selectedComment - selected post's comment
+   * @param selectedPostComment - selected post's comment that will be updated
+   */
+  private updatePostComment(selectedPostComment: PostComment): void {
+    const updatePostCommentUrl = `${Config.apiBaseUrl}/${Config.apiPostManagementPrefix}/${Config.apiPostComments}`;
+    this.postCommentService.updatePostComment(updatePostCommentUrl, selectedPostComment)
+      .subscribe();
+  }
+
+  /**
+   *
+   * @param selectedPostComment - selected post's comment
    * @param reactionValue - reaction's value
    */
-  private submitNewPostCommentReaction(selectedComment, reactionValue) {
-    // create new post's comment reaction object
+  private submitNewPostCommentReaction(selectedPostComment: PostComment, reactionValue: number): void {
     const newPostCommentReaction = new PostCommentReaction();
-    newPostCommentReaction.postComment = selectedComment;
+    newPostCommentReaction.postComment = selectedPostComment;
     newPostCommentReaction.userProfile = this.selectedUserProfile;
     newPostCommentReaction.reaction = reactionValue;
-    // submit to the database
-    this.postCommentReactionService.addNewPostCommentReaction(newPostCommentReaction)
-      .subscribe((insertedPostCommentReaction: PostCommentReaction) => {
-        if (insertedPostCommentReaction) {
-          console.log(insertedPostCommentReaction);
-        }
-      });
+    const addPostCommentReactionUrl = `${Config.apiBaseUrl}/${Config.apiPostManagementPrefix}/${Config.apiPostCommentReactions}`;
+    this.postCommentReactionService.addNewPostCommentReaction(addPostCommentReactionUrl, newPostCommentReaction).subscribe();
   }
 
   /**
    *
-   * @param selectedComment - selected post's comment that user want to view replies
+   * @param selectedPostComment - selected post's comment that user want to view replies
    */
-  public viewRepliesOfSelectedPostComment(selectedComment) {
-    if (!selectedComment.replies) {
-      this.replyOnPostCommentService.getRepliesOnSelectedPostComment(selectedComment, 1)
+  public viewRepliesOfSelectedPostComment(selectedPostComment: PostComment): void {
+    if (!selectedPostComment.replies) {
+      const selectedPostCommentId = selectedPostComment.id;
+      const replyOnPostCommentStatus = 1;
+      const getRepliesOnPostCommentUrl = `${Config.apiBaseUrl}/
+${Config.apiPostManagementPrefix}/
+${Config.apiPostComments}/
+${selectedPostCommentId}/
+${Config.apiRepliesOnPostComment}?
+${Config.statusParameter}=${replyOnPostCommentStatus}`;
+      this.replyOnPostCommentService.getRepliesOnPostComment(getRepliesOnPostCommentUrl)
         .subscribe((repliesOnPostComment: ReplyOnPostComment[]) => {
           if (repliesOnPostComment) {
-            selectedComment.replies = repliesOnPostComment;
-            // load number of likes and dislikes of replies on post's comment
-            this.loadNumberOfReplyOnPostCommentReactions(selectedComment);
-            // check which reply on post's comment that current user liked and disliked
-            this.loadReplyOnPostCommentUserLikedAndDisliked(selectedComment);
+            selectedPostComment.replies = repliesOnPostComment;
+            this.getReplyOnPostCommentReactionsByUser(selectedPostComment.replies);
           }
         });
     }
@@ -544,125 +451,135 @@ export class BlogDetailComponent implements OnInit {
 
   /**
    *
-   * @param selectedComment - selected comment that user want to load number of reply's reactions
+   * @param repliesOnPostComment - get reactions of replies on post's comment.
+   * Therefore, we can know which replies that user liked and disliked
    */
-  private loadNumberOfReplyOnPostCommentReactions(selectedComment: any) {
-    for (const eachReplyOnPostComment of selectedComment.replies) {
-      // count number of likes
-      this.replyOnPostCommentReactionService.countNumberOfReplyOnPostCommentReaction(eachReplyOnPostComment, 1)
-        .subscribe((nLikes: ResponseMessage) => {
-          if (nLikes) {
-            eachReplyOnPostComment.nLikes = Number(nLikes.message);
-          } else {
-            eachReplyOnPostComment.nLikes = 0;
-          }
-        });
-      // count number dislikes
-      this.replyOnPostCommentReactionService.countNumberOfReplyOnPostCommentReaction(eachReplyOnPostComment, 0)
-        .subscribe((nDislikes: ResponseMessage) => {
-          if (nDislikes) {
-            eachReplyOnPostComment.nDislikes = Number(nDislikes.message);
-          } else {
-            eachReplyOnPostComment.nDislikes = 0;
-          }
-        });
-    }
-  }
-
-  /**
-   * check which reply on post's comment that current user liked and disliked
-   */
-  private loadReplyOnPostCommentUserLikedAndDisliked(selectedComment) {
-    this.replyOnPostCommentReactionService.getReplyOnPostCommentReactionsByUserProfile(this.selectedUserProfile)
+  private getReplyOnPostCommentReactionsByUser(repliesOnPostComment: ReplyOnPostComment[]): void {
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const getReplyOnPostCommentReactionsUrl = `${Config.apiBaseUrl}/
+${Config.apiPostManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiReplyOnPostCommentReactions}`;
+    this.replyOnPostCommentReactionService.getReplyOnPostCommentReactions(getReplyOnPostCommentReactionsUrl)
       .subscribe((replyOnPostCommentReactions: ReplyOnPostCommentReaction[]) => {
         if (replyOnPostCommentReactions) {
-          // show current like and dislike status of current user's profile
-          for (const eachReplyOnPostCommentReaction of replyOnPostCommentReactions) {
-            for (const eachReplyOnPostComment of selectedComment.replies) {
-              // set flag to check user has reacted to this reply on post comment
-              eachReplyOnPostComment.isReacted = true;
-              if (eachReplyOnPostCommentReaction.replyOnPostComment.id === eachReplyOnPostComment.id) {
-                if (eachReplyOnPostCommentReaction.reaction === 1) {
-                  eachReplyOnPostComment.isLikeClicked = true;
-                } else if (eachReplyOnPostCommentReaction.reaction === 0) {
-                  eachReplyOnPostComment.isLikeClicked = false;
-                }
-                break;
-              }
-            }
-          }
+          this.showRepliesOnPostCommentUserLikedAndDisliked(repliesOnPostComment, replyOnPostCommentReactions);
         }
       });
   }
 
   /**
    *
-   * @param selectedReplyOnPostComment - selectedReplyOnPostComment
+   * @param repliesOnPostComment - replies on post's comment that will be check which replies user liked and disliked
+   * @param replyOnPostCommentReactions - replies on post's comment that user liked and disliked
    */
-  public likeReplyOnPostComment(selectedReplyOnPostComment: ReplyOnPostComment) {
+  private showRepliesOnPostCommentUserLikedAndDisliked(repliesOnPostComment: ReplyOnPostComment[],
+                                                       replyOnPostCommentReactions: ReplyOnPostCommentReaction[]): void {
+    for (const eachReplyOnPostCommentReaction of replyOnPostCommentReactions) {
+      for (const eachReplyOnPostComment of repliesOnPostComment) {
+        if (eachReplyOnPostCommentReaction.replyOnPostComment.id === eachReplyOnPostComment.id) {
+          this.changeReplyOnPostCommentReactionStatus(eachReplyOnPostComment, eachReplyOnPostCommentReaction);
+          break;
+        }
+      }
+    }
+  }
+
+  /**
+   *
+   * @param selectedReplyOnPostComment - reply on post's comment that its reactions' status will be changed
+   * @param selectedReplyOnPostCommentReaction - reaction's value that will be set to selected reply on post's comment
+   */
+  private changeReplyOnPostCommentReactionStatus(selectedReplyOnPostComment: ReplyOnPostComment,
+                                                 selectedReplyOnPostCommentReaction: ReplyOnPostCommentReaction): void {
+    selectedReplyOnPostComment.isReacted = true;
+    if (selectedReplyOnPostCommentReaction.reaction === 1) {
+      selectedReplyOnPostComment.isLikeClicked = true;
+    } else if (selectedReplyOnPostCommentReaction.reaction === 0) {
+      selectedReplyOnPostComment.isLikeClicked = false;
+    }
+  }
+
+  /**
+   *
+   * @param selectedReplyOnPostComment - reply on post's comment that user want to like
+   */
+  public likeReplyOnPostComment(selectedReplyOnPostComment: ReplyOnPostComment): void {
     if (selectedReplyOnPostComment.isLikeClicked === true) {
       return;
     }
-    if (selectedReplyOnPostComment.nDislikes > 0 && selectedReplyOnPostComment.isReacted) {
-      selectedReplyOnPostComment.nDislikes -= 1;
+    if (selectedReplyOnPostComment.numberOfDislikes > 0 && selectedReplyOnPostComment.isReacted) {
+      selectedReplyOnPostComment.numberOfDislikes -= 1;
     }
-    selectedReplyOnPostComment.nLikes += 1;
+    selectedReplyOnPostComment.numberOfLikes += 1;
+    // update number of likes of reply on post's comment
+    this.updateReplyOnPostComment(selectedReplyOnPostComment);
     selectedReplyOnPostComment.isLikeClicked = true;
     selectedReplyOnPostComment.isReacted = true;
-    // submit new reply on post's comment reaction to database
     this.submitNewReplyPostCommentReaction(selectedReplyOnPostComment, 1);
   }
 
   /**
    *
-   * @param selectedReplyOnPostComment - selectedReplyOnPostComment
+   * @param selectedReplyOnPostComment - reply on post's comment that user want to dislike
    */
-  public dislikeReplyOnPostComment(selectedReplyOnPostComment: ReplyOnPostComment) {
+  public dislikeReplyOnPostComment(selectedReplyOnPostComment: ReplyOnPostComment): void {
     if (selectedReplyOnPostComment.isLikeClicked === false) {
       return;
     }
-    if (selectedReplyOnPostComment.nLikes > 0 && selectedReplyOnPostComment.isReacted) {
-      selectedReplyOnPostComment.nLikes -= 1;
+    if (selectedReplyOnPostComment.numberOfLikes > 0 && selectedReplyOnPostComment.isReacted) {
+      selectedReplyOnPostComment.numberOfLikes -= 1;
     }
-    selectedReplyOnPostComment.nDislikes += 1;
+    selectedReplyOnPostComment.numberOfDislikes += 1;
+    // update number of dislikes of reply on post's comment
+    this.updateReplyOnPostComment(selectedReplyOnPostComment);
     selectedReplyOnPostComment.isLikeClicked = false;
     selectedReplyOnPostComment.isReacted = true;
-    // submit new reply on post's comment reaction to database
     this.submitNewReplyPostCommentReaction(selectedReplyOnPostComment, 0);
   }
 
   /**
    *
-   * @param selectedReplyOnPostComment - selected reply on post's comment
-   * @param reactionValue - reaction's value
+   * @param selectedReplyOnPostComment - reply on post's comment that user want to update
    */
-  private submitNewReplyPostCommentReaction(selectedReplyOnPostComment, reactionValue) {
-    // create new reply on post's comment reaction object
-    const newReplyOnPostCommentReaction = new ReplyOnPostCommentReaction();
-    newReplyOnPostCommentReaction.replyOnPostComment = selectedReplyOnPostComment;
-    newReplyOnPostCommentReaction.userProfile = this.selectedUserProfile;
-    newReplyOnPostCommentReaction.reaction = reactionValue;
-    // submit to the database
-    this.replyOnPostCommentReactionService.addNewReplyOnPostCommentReaction(newReplyOnPostCommentReaction)
-      .subscribe((insertedReplyOnPostCommentReaction: ReplyOnPostCommentReaction) => {
-        if (insertedReplyOnPostCommentReaction) {
-          console.log(insertedReplyOnPostCommentReaction);
-        }
-      });
+  private updateReplyOnPostComment(selectedReplyOnPostComment: ReplyOnPostComment) {
+    const updateReplyOnPostCommentUrl = `${Config.apiBaseUrl}/${Config.apiPostManagementPrefix}/${Config.apiRepliesOnPostComment}`;
+    this.replyOnPostCommentService.updateReplyOnPostComment(updateReplyOnPostCommentUrl, selectedReplyOnPostComment).subscribe();
   }
 
   /**
    *
-   * @param selectedComment - selected comment that user want to reply
+   * @param selectedReplyOnPostComment - selected reply on post's comment that user reacted
+   * @param reactionValue - reaction's value that user reacted to selected reply on post's comment
    */
-  public showReplyPostCommentBox(selectedComment) {
-    selectedComment.isReplyBoxShown = true;
+  private submitNewReplyPostCommentReaction(selectedReplyOnPostComment, reactionValue): void {
+    const newReplyOnPostCommentReaction = new ReplyOnPostCommentReaction();
+    newReplyOnPostCommentReaction.replyOnPostComment = selectedReplyOnPostComment;
+    newReplyOnPostCommentReaction.userProfile = this.selectedUserProfile;
+    newReplyOnPostCommentReaction.reaction = reactionValue;
+    const addReplyOnPostCommentReactionUrl = `${Config.apiBaseUrl}/
+${Config.apiPostManagementPrefix}/
+${Config.apiReplyOnPostCommentReactions}`;
+    this.replyOnPostCommentReactionService.addNewReplyOnPostCommentReaction(addReplyOnPostCommentReactionUrl, newReplyOnPostCommentReaction)
+      .subscribe();
   }
 
-  public showReplyReplyPostCommentBox(selectedReplyComment) {
-    // find post's comment and show reply box
+  /**
+   *
+   * @param selectedPostComment - selected comment that user want to reply
+   */
+  public showReplyPostCommentBox(selectedPostComment: PostComment): void {
+    selectedPostComment.isReplyBoxShown = true;
+  }
+
+  /**
+   *
+   * @param selectedReplyOnPostComment - selected reply on post's comment that user want to reply
+   */
+  public showReplyReplyPostCommentBox(selectedReplyOnPostComment: ReplyOnPostComment): void {
     for (const eachPostComment of this.postCommentsPerPage) {
-      if (selectedReplyComment.postComment.id === eachPostComment.id) {
+      if (selectedReplyOnPostComment.postComment.id === eachPostComment.id) {
         eachPostComment.isReplyBoxShown = true;
         break;
       }
@@ -671,43 +588,37 @@ export class BlogDetailComponent implements OnInit {
 
   /**
    *
-   * @param replyContent - reply's content
-   * @param selectedComment - selectedComment
+   * @param replyContent - reply's content that user want to reply to selected post's comment
+   * @param selectedPostComment - selected post's comment that user want to reply
    */
-  public replyToPostComment(selectedComment, replyContent) {
+  public replyToPostComment(selectedPostComment: PostComment, replyContent: string): void {
     // create new reply on post's comment
     const newReplyOnPostComment = new ReplyOnPostComment();
     newReplyOnPostComment.replyOnPostCommentContent = replyContent;
     newReplyOnPostComment.replyOnPostCommentStatus = 1;
     newReplyOnPostComment.replyOnPostCommentCreatedDate = new Date();
-    newReplyOnPostComment.postComment = selectedComment;
+    newReplyOnPostComment.postComment = selectedPostComment;
     newReplyOnPostComment.userProfile = this.selectedUserProfile;
-    newReplyOnPostComment.nLikes = 0;
-    newReplyOnPostComment.nDislikes = 0;
-
-    // add new reply on post's comment to the server
-    this.replyOnPostCommentService.addReplyOnPostComment(newReplyOnPostComment)
-      .subscribe((insertedReplyOnPostComment: ReplyOnPostComment) => {
-        if (insertedReplyOnPostComment) {
-          console.log(insertedReplyOnPostComment);
-        }
-      });
-
-    // add new reply on client
-    if (selectedComment.replies && selectedComment.replies.length) {
-      selectedComment.replies.push(newReplyOnPostComment);
+    newReplyOnPostComment.numberOfLikes = 0;
+    newReplyOnPostComment.numberOfDislikes = 0;
+    const addReplyOnPostCommentUrl = `${Config.apiBaseUrl}/${Config.apiPostManagementPrefix}/${Config.apiRepliesOnPostComment}`;
+    this.replyOnPostCommentService.addReplyOnPostComment(addReplyOnPostCommentUrl, newReplyOnPostComment)
+      .subscribe();
+    selectedPostComment.numberOfReplies += 1;
+    // update number of replies of selected post's comment
+    this.updatePostComment(selectedPostComment);
+    if (selectedPostComment.replies && selectedPostComment.replies.length) {
+      selectedPostComment.replies.push(newReplyOnPostComment);
     }
-    selectedComment.nReplies += 1;
   }
 
   /**
    *
-   * @param selectedTag - selected tag that user want to view post
+   * @param selectedTag - selected tag that user want to view posts
    */
-  public goToPostsByTag(selectedTag) {
-    // share tag
+  public goToPostsByTag(selectedTag: Tag): void {
+    // share tag to other components (tag that user want to view posts)
     this.shareTagService.changeTag(selectedTag);
-    // go to posts by tag component
     this.router.navigate([`/blog/tag/${selectedTag.tagName.toLowerCase()}`]);
   }
 }

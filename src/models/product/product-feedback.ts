@@ -7,9 +7,9 @@ export class ProductFeedback {
   feedbackStatus?: number;
   userProfile?: UserProfile;
   product?: Product;
-  nLikes?: number;
-  nDislikes?: number;
-  nReplies?: number;
+  numberOfLikes?: number;
+  numberOfDislikes?: number;
+  numberOfReplies?: number;
   isLikeClicked?: boolean;
   replies: ReplyOnProductFeedback[];
   isReplyBoxShown?: boolean;

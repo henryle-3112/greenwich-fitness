@@ -1,6 +1,7 @@
+<!--suppress ALL -->
 <div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;">
   <!-- loading component -->
-  <app-loading *ngIf="loading"></app-loading>
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- search box-->
@@ -16,58 +17,58 @@
   <div>
     <nz-tag class="mg-bottom-12 workout-tag"
             (click)="handleTagActive('beginner')"
-            [ngClass]="{'tag-active': isBeginnerActive, 'tag-unactive': !isBeginnerActive}">Beginner
+            [ngClass]="{'tag-active': isBeginnerTagActive, 'tag-unactive': !isBeginnerTagActive}">Beginner
     </nz-tag>
     <nz-tag class="mg-bottom-12 workout-tag"
             (click)="handleTagActive('intermediate')"
-            [ngClass]="{'tag-active': isIntermediateActive, 'tag-unactive': !isIntermediateActive}">Intermediate
+            [ngClass]="{'tag-active': isIntermediateTagActive, 'tag-unactive': !isIntermediateTagActive}">Intermediate
     </nz-tag>
     <nz-tag class="mg-bottom-12 workout-tag"
             (click)="handleTagActive('advanced')"
-            [ngClass]="{'tag-active': isAdvancedActive, 'tag-unactive': !isAdvancedActive}">Advanced
+            [ngClass]="{'tag-active': isAdvancedTagActive, 'tag-unactive': !isAdvancedTagActive}">Advanced
     </nz-tag>
     <nz-tag class="mg-bottom-12 workout-tag"
             (click)="handleTagActive('short')"
-            [ngClass]="{'tag-active': isShortActive, 'tag-unactive': !isShortActive}">Short
+            [ngClass]="{'tag-active': isShortTagActive, 'tag-unactive': !isShortTagActive}">Short
     </nz-tag>
     <nz-tag class="mg-bottom-12 workout-tag"
             (click)="handleTagActive('medium')"
-            [ngClass]="{'tag-active': isMediumActive, 'tag-unactive': !isMediumActive}">Medium
+            [ngClass]="{'tag-active': isMediumTagActive, 'tag-unactive': !isMediumTagActive}">Medium
     </nz-tag>
     <nz-tag class="mg-bottom-12 workout-tag"
             (click)="handleTagActive('long')"
-            [ngClass]="{'tag-active': isLongActive, 'tag-unactive': !isLongActive}">Long
+            [ngClass]="{'tag-active': isLongTagActive, 'tag-unactive': !isLongTagActive}">Long
     </nz-tag>
     <nz-tag class="mg-bottom-12 workout-tag"
             (click)="handleTagActive('full_body')"
-            [ngClass]="{'tag-active': isFullBodyActive, 'tag-unactive': !isFullBodyActive}">Full Body
+            [ngClass]="{'tag-active': isFullBodyTagActive, 'tag-unactive': !isFullBodyTagActive}">Full Body
     </nz-tag>
     <nz-tag class="mg-bottom-12 workout-tag"
             (click)="handleTagActive('upper')"
-            [ngClass]="{'tag-active': isUpperActive, 'tag-unactive': !isUpperActive}">Upper
+            [ngClass]="{'tag-active': isUpperTagActive, 'tag-unactive': !isUpperTagActive}">Upper
     </nz-tag>
     <nz-tag class="mg-bottom-12 workout-tag"
             (click)="handleTagActive('core')"
-            [ngClass]="{'tag-active': isCoreActive, 'tag-unactive': !isCoreActive}">Core
+            [ngClass]="{'tag-active': isCoreTagActive, 'tag-unactive': !isCoreTagActive}">Core
     </nz-tag>
     <nz-tag class="mg-bottom-12 workout-tag"
             (click)="handleTagActive('lower')"
-            [ngClass]="{'tag-active': isLowerActive, 'tag-unactive': !isLowerActive}">Lower
+            [ngClass]="{'tag-active': isLowerTagActive, 'tag-unactive': !isLowerTagActive}">Lower
     </nz-tag>
     <nz-tag class="mg-bottom-12 workout-tag"
             (click)="handleTagActive('no_distance')"
-            [ngClass]="{'tag-active': isNoDistanceActive, 'tag-unactive': !isNoDistanceActive}">No Distance
+            [ngClass]="{'tag-active': isNoDistanceTagActive, 'tag-unactive': !isNoDistanceTagActive}">No Distance
     </nz-tag>
     <nz-tag class="mg-bottom-12 workout-tag"
             (click)="handleTagActive('no_equipment')"
-            [ngClass]="{'tag-active': isNoEquipmentActive, 'tag-unactive': !isNoEquipmentActive}">No Equipment
+            [ngClass]="{'tag-active': isNoEquipmentTagActive, 'tag-unactive': !isNoEquipmentTagActive}">No Equipment
     </nz-tag>
   </div>
   <!-- end tag filter -->
 
   <!-- custom list -->
   <nz-list [nzDataSource]="workoutsPerPage" [nzRenderItem]="item" [nzItemLayout]="'horizontal'"
-           [ngClass]="{'opacity-loading': loading, 'mg-bottom-24': true}">
+           [ngClass]="{'opacity-loading': isLoadingSpinnerShown, 'mg-bottom-24': true}">
     <ng-template #item let-item>
       <nz-list-item>
         <nz-list-item-meta
@@ -85,7 +86,7 @@
 
   <!-- pagination -->
   <nz-pagination
-    [nzPageIndex]="currentPage"
+    [nzPageIndex]="currentWorkoutsPage"
     [nzPageSize]="nWorkoutPerPage"
     [nzTotal]="totalWorkouts"
     [nzSize]="'small'"

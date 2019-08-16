@@ -11,160 +11,171 @@ import {Config} from '@gw-config/core';
   styleUrls: ['./workout-detail.component.css']
 })
 export class WorkoutDetailComponent implements OnInit {
-
-  // selected workout that user-account want to do
   selectedWorkout: Workout;
-  // check loading is show or not
-  loading: boolean;
-  // exercises list to show in what to know
-  exerises: WorkoutExercise[];
-  // check change volume model is show or not
+  isLoadingSpinnerShown: boolean;
+  exercises: WorkoutExercise[];
   isChangeVolumeModelShow = false;
-  // radio volume value
   radioVolumeValue: string;
-  // current volume value
   currentVolume: string;
-  // number of detailed rounds
   nDetailedRounds: number;
-  // detailed rounds temp ( will be changed based on volume )
   detailedRounds: DetailedRounds[];
   nDetailedRoundsTemp: number;
 
   /**
    *
-   * @param shareWorkout - inject share workout service to get selected workout
-   * @param shareSingleExercise - inject share single exercise to get selected single exercise
-   * @param route - inject router for routing
+   * @param shareWorkout - inject shareWorkout
+   * @param shareSingleExercise - inject shareSingleExercise
+   * @param router - inject router
    */
   constructor(private shareWorkout: ShareWorkoutService,
               private shareSingleExercise: ShareSingleExerciseService,
-              private route: Router) {
+              private router: Router) {
   }
 
   /**
    * init data
    */
-  ngOnInit() {
-    // init data
+  ngOnInit(): void {
     this.initData();
-    // get selected workout
-    this.loading = true;
-    this.shareWorkout
-      .currentWorkout.subscribe(selectedWorkout => {
-      // console.log(selectedWorkout);
-      this.selectedWorkout = selectedWorkout;
-      this.loading = false;
-      // check selected workout existed or not
-      // if selected workout not existed - redirect to list of workout
-      this.checkSelectedWorkoutExistedOrNot();
-    });
+    this.getSelectedWorkout();
   }
 
   /**
-   * check selected workout existed or not, if not redirect to workout list to let user-account choose again
+   * init data
    */
-  private checkSelectedWorkoutExistedOrNot() {
-    if (this.selectedWorkout == null) {
-      this.route.navigate(['/client/workout']);
+  private initData(): void {
+    this.exercises = [];
+    // get saved instance state, when user go to video component and comeback
+    const isUserViewedTutorVideo = localStorage.getItem(Config.checkUserGoToExerciseVideo)
+      && localStorage.getItem(Config.checkUserGoToExerciseVideo).localeCompare('true') === 0;
+    if (isUserViewedTutorVideo) {
+      this.currentVolume = localStorage.getItem(Config.currentWorkoutVolume);
+      this.radioVolumeValue = this.currentVolume;
+      this.detailedRounds = [];
+      localStorage.setItem(Config.checkUserGoToExerciseVideo, 'false');
     } else {
-      this.exerises = this.selectedWorkout.detailedRounds[0].exercises;
-      this.nDetailedRounds = this.selectedWorkout.detailedRounds.length;
-      this.detailedRounds = this.selectedWorkout.detailedRounds;
-      this.nDetailedRoundsTemp = this.nDetailedRounds;
+      this.currentVolume = 'x1';
+      this.radioVolumeValue = this.currentVolume;
+      this.detailedRounds = [];
+      localStorage.setItem(`${Config.currentWorkoutVolume}`, this.currentVolume);
     }
   }
 
   /**
-   * init data
+   * get selected workout
    */
-  private initData() {
-    // create exercises list
-    this.exerises = [];
-    // init current volume
-    this.currentVolume = 'x1';
-    // init radio volume of change volume modal
-    this.radioVolumeValue = this.currentVolume;
-    // init detailed rounds
-    this.detailedRounds = [];
-    // save current volume to locale storage
-    localStorage.setItem(`${Config.currentWorkoutVolume}`, this.currentVolume);
+  private getSelectedWorkout(): void {
+    this.isLoadingSpinnerShown = true;
+    this.shareWorkout
+      .currentWorkout.subscribe(selectedWorkout => {
+      if (selectedWorkout) {
+        this.selectedWorkout = selectedWorkout;
+        this.exercises = this.selectedWorkout.detailedRounds[0].exercises;
+        this.setDetailedRounds();
+      } else {
+        this.router.navigate(['/client/workout']);
+      }
+      this.isLoadingSpinnerShown = false;
+    });
   }
+
 
   /**
    *
    * @param selectedSingleExercie - pass selected single exercise to view tutorial
    */
-  public goToExerciseVideo(selectedSingleExercie) {
-    // pass selected single exercise to video exercise component
+  public goToExerciseVideo(selectedSingleExercie): void {
+    localStorage.setItem(Config.checkUserGoToExerciseVideo, 'true');
     this.shareSingleExercise.changeSingleExercise(selectedSingleExercie);
-    // go to video exercise component
-    this.route.navigate([`/client/exercise/tutorial/${selectedSingleExercie.slug}`]);
+    this.router.navigate([`/client/exercise/tutorial/${selectedSingleExercie.slug}`]);
   }
 
   /**
    * go to workout training componnet
    */
-  public startTraining() {
-    // go to training
-    this.route.navigate([`/client/workout/training/${this.selectedWorkout.slug}`]);
+  public startTraining(): void {
+    this.router.navigate([`/client/workout/training/${this.selectedWorkout.slug}`]);
   }
 
   /**
    * handle event when user-account clicked on 'cancel' button on change volume modal
    */
-  public handleCancelChangeVolumeModal() {
+  public handleCancelChangeVolumeModal(): void {
     this.isChangeVolumeModelShow = false;
   }
 
   /**
    * handle event when user-account clicked on 'ok' button on change volume modal
    */
-  public handleConfirmChangeVolumeModal() {
+  public handleConfirmChangeVolumeModal(): void {
     this.isChangeVolumeModelShow = false;
-    // change current volume
     this.currentVolume = this.radioVolumeValue;
     this.radioVolumeValue = this.currentVolume;
-    this.increaseDetailedRounds();
+    this.setDetailedRounds();
     localStorage.setItem(`${Config.currentWorkoutVolume}`, this.currentVolume);
   }
 
   /**
    * open change volume modal
    */
-  public openModalChangeVolume() {
+  public openModalChangeVolume(): void {
     this.isChangeVolumeModelShow = true;
   }
 
   /**
    * increase detail rounds based on volume
    */
-  private increaseDetailedRounds() {
+  private setDetailedRounds(): void {
     switch (this.currentVolume) {
       case 'x1':
-        this.detailedRounds = [];
-        this.detailedRounds = this.detailedRounds.concat(this.selectedWorkout.detailedRounds);
-        this.nDetailedRoundsTemp = this.nDetailedRounds;
+        this.setOneWorkout();
         break;
       case 'x2':
-        this.detailedRounds = [];
-        let i = 0;
-        while (i < 2) {
-          this.detailedRounds = this.detailedRounds.concat(this.selectedWorkout.detailedRounds);
-          i++;
-        }
-        this.nDetailedRoundsTemp = this.nDetailedRounds * 2;
+        this.doubleWorkouts();
         break;
       case 'x3':
-        this.detailedRounds = [];
-        let j = 0;
-        while (j < 3) {
-          this.detailedRounds = this.detailedRounds.concat(this.selectedWorkout.detailedRounds);
-          j++;
-        }
-        this.nDetailedRoundsTemp = this.nDetailedRounds * 3;
+        this.tripleWorkouts();
         break;
       default:
         break;
     }
+  }
+
+  /**
+   * set to workout (it means that volume is 1)
+   */
+  private setOneWorkout(): void {
+    this.nDetailedRounds = this.selectedWorkout.detailedRounds.length;
+    this.detailedRounds = [];
+    this.detailedRounds = this.detailedRounds.concat(this.selectedWorkout.detailedRounds);
+    this.nDetailedRoundsTemp = this.nDetailedRounds;
+  }
+
+  /**
+   * double workouts
+   */
+  private doubleWorkouts(): void {
+    this.nDetailedRounds = this.selectedWorkout.detailedRounds.length;
+    this.detailedRounds = [];
+    let i = 0;
+    while (i < 2) {
+      this.detailedRounds = this.detailedRounds.concat(this.selectedWorkout.detailedRounds);
+      i++;
+    }
+    this.nDetailedRoundsTemp = this.nDetailedRounds * 2;
+  }
+
+  /**
+   * triple workouts
+   */
+  private tripleWorkouts(): void {
+    this.nDetailedRounds = this.selectedWorkout.detailedRounds.length;
+    this.detailedRounds = [];
+    let j = 0;
+    while (j < 3) {
+      this.detailedRounds = this.detailedRounds.concat(this.selectedWorkout.detailedRounds);
+      j++;
+    }
+    this.nDetailedRoundsTemp = this.nDetailedRounds * 3;
   }
 }

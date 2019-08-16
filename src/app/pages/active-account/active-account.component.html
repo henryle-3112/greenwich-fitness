@@ -4,12 +4,12 @@
   [ngClass]="{'height-100': true, 'pd-top-200': true}"
   [ngStyle]="{ 'background-image': 'url(' + backgroundImage + ')'}">
   <!-- loading component -->
-  <app-loading *ngIf="loading"></app-loading>
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
   <!-- message -->
-  <h1 *ngIf="!isActivated && !loading" class="message">Your account is activating</h1>
-  <h1 *ngIf="isActivated && !loading" class="message">Your account is activated</h1>
-  <div align="center" *ngIf="!loading">
+  <h1 *ngIf="!isActivated && !isLoadingSpinnerShown" class="message">Your account is activating</h1>
+  <h1 *ngIf="isActivated && !isLoadingSpinnerShown" class="message">Your account is activated</h1>
+  <div align="center" *ngIf="!isLoadingSpinnerShown">
     <button nz-button [nzType]="'primary'" (click)="goToLogin();">Go to Log In</button>
   </div>
 </div>

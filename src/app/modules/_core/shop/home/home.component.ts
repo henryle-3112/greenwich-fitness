@@ -33,39 +33,17 @@ import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/sha
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit {
-  // check when width of the browser changed
-  private innerWidth: any;
-
-  // check loading component is showing or not
-  loading: boolean;
-
-  // list of product's slides
+  browserInnerWidth: any;
+  isLoadingSpinnerShown: boolean;
   productSlides: ProductSlide[];
-
-  // list of product's categories
   productCategories: ProductCategory[];
-
-  // check dropdown menu is opened or not
-  isMenuOpened: boolean;
-
-  // check is search product modal is showing or not
+  isDropDownMenuOpened: boolean;
   isSearchProductModalShown: boolean;
-
-  // selected product's category's id (for searching)
-  selectedProductCategoryId: number;
-
-  // selected product's price (for searching)
-  selectedProductPrice: any;
-
-  // selected product's name (for searching)
-  selectedPostName: string;
-
-  // product's category selection
+  selectedProductCategoryForSearching: number;
+  selectedProductPriceRangeForSearching: any;
+  selectedProductNameForSearching: string;
   productCategoriesSelection: ProductCategory[];
-
-  // not product's category selection
   notProductCategoriesSelection: ProductCategory[];
-
   // check login type (login by facebook, google or normal account)
   loginType: string;
 
@@ -96,56 +74,48 @@ export class HomeComponent implements OnInit {
               private shareUserProfileService: ShareUserProfileService) {
   }
 
-  ngOnInit() {
-    // get login type
+  ngOnInit(): void {
     this.loginType = localStorage.getItem(Config.loginType);
-    // load current user-account's information
     this.loadCurrentUserInformation();
-    // init selected product price (for searching)
-    this.selectedProductPrice = [0, 50];
-    // init selected product's name (for searching)
-    this.selectedPostName = '';
-    // init innerWidth to check when window's size changes
-    this.innerWidth = window.innerWidth;
-    // get all product's categories
+    this.selectedProductPriceRangeForSearching = [0, 50];
+    this.selectedProductNameForSearching = '';
+    this.browserInnerWidth = window.innerWidth;
     this.getAllProductCategories();
-    // get all product's slides
     this.getAllProductSlides();
   }
 
   /**
    * get all product's slides
    */
-  private getAllProductSlides() {
-    // show loading component
-    this.loading = true;
-    // get all product's slides
-    this.productSlideService.getAllProductSlides(1)
+  private getAllProductSlides(): void {
+    this.isLoadingSpinnerShown = true;
+    const productSlideStatus = 1;
+    const productSlidesUrl = `${Config.apiBaseUrl}/
+${Config.apiProductManagementPrefix}/
+${Config.apiProductSlides}?${Config.statusParameter}=${productSlideStatus}`;
+    this.productSlideService.getProductSlides(productSlidesUrl)
       .subscribe(productSlides => {
         this.productSlides = productSlides;
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * get all product's categories
    */
-  private getAllProductCategories() {
-    // show loading component
-    this.loading = true;
-    // get all product's categories
-    this.productCategoryService.getAllProductCategories(1)
+  private getAllProductCategories(): void {
+    this.isLoadingSpinnerShown = true;
+    const productCategoryStatus = 1;
+    const getProductCategoriesUrl = `${Config.apiBaseUrl}/
+${Config.apiProductManagementPrefix}/
+${Config.apiProductCategories}?
+${Config.statusParameter}=${productCategoryStatus}`;
+    this.productCategoryService.getProductCategories(getProductCategoriesUrl)
       .subscribe(productCategories => {
-        // get all products categories
         this.productCategories = productCategories;
-        // share to main component
         this.shareProductCategoryService.changeProductCategories(productCategories);
-        // init product's categories selection
         this.productCategoriesSelection = [];
-        // init not product's categories selection
         this.notProductCategoriesSelection = [];
-        // get product's categories selection and not product's categories selection
         this.productCategories.map(eachProductCategory => {
           if (eachProductCategory.productCategoryName.localeCompare('Home') !== 0 &&
             eachProductCategory.productCategoryName.localeCompare('Contact') !== 0 &&
@@ -156,16 +126,15 @@ export class HomeComponent implements OnInit {
             this.notProductCategoriesSelection.push(eachProductCategory);
           }
         });
-        console.log(this.selectedProductCategoryId);
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
-   * go to product's category
+   *
+   * @param selectedProductCategory - product's category that user want to view
    */
-  public goToCategory(selectedProductCategory: ProductCategory) {
+  public goToCategory(selectedProductCategory: ProductCategory): void {
     if (selectedProductCategory.productCategoryName.localeCompare('About') === 0) {
       this.router.navigate(['/shop/about']);
     } else if (selectedProductCategory.productCategoryName.localeCompare('Privacy Policy') === 0) {
@@ -175,9 +144,7 @@ export class HomeComponent implements OnInit {
     } else if (selectedProductCategory.productCategoryName.localeCompare('Home') === 0) {
       this.router.navigate([`/shop/home`]);
     } else {
-      // share selected product's category
       this.shareProductCategoryService.changeProductCategory(selectedProductCategory);
-      // go to product's category
       this.router.navigate([`/shop/category/${selectedProductCategory.productCategoryMetaTitle}`]);
     }
   }
@@ -187,7 +154,7 @@ export class HomeComponent implements OnInit {
    * @param event - event
    */
   openDropDownMenu(event): void {
-    this.isMenuOpened = !this.isMenuOpened;
+    this.isDropDownMenuOpened = !this.isDropDownMenuOpened;
   }
 
   /**
@@ -195,38 +162,30 @@ export class HomeComponent implements OnInit {
    * @param event - event
    */
   @HostListener('window:resize', ['$event'])
-  onResize(event) {
-    this.innerWidth = window.innerWidth;
-    this.isMenuOpened = innerWidth > 801;
+  onResize(event): void {
+    this.browserInnerWidth = window.innerWidth;
+    this.isDropDownMenuOpened = this.browserInnerWidth > 801;
   }
 
   /**
    * handle cancel search product modal
    */
-  public handleCancelSearchProductModal() {
+  public handleCancelSearchProductModal(): void {
     this.isSearchProductModalShown = false;
   }
 
   /**
    * handle confirm search product modal
    */
-  public handleConfirmSearchProductModal() {
-    // close search product modal
+  public handleConfirmSearchProductModal(): void {
     this.isSearchProductModalShown = false;
-
-    // check product's category is selected or not
-    if (typeof this.selectedProductCategoryId !== 'undefined') {
-      localStorage.setItem(Config.selectedProductCategoryForSearching, String(this.selectedProductCategoryId));
+    if (typeof this.selectedProductCategoryForSearching !== 'undefined') {
+      localStorage.setItem(Config.selectedProductCategoryForSearching, String(this.selectedProductCategoryForSearching));
     }
-
-    // get search's information
-    localStorage.setItem(Config.selectedProductMinPriceForSearching, String(this.selectedProductPrice[0]));
-    localStorage.setItem(Config.selectedProductMaxPriceForSearching, String(this.selectedProductPrice[1]));
-    localStorage.setItem(Config.selectedProductNameKeywordsForSearching, this.selectedPostName);
-
-    // go to product search result component
+    localStorage.setItem(Config.selectedProductMinPriceForSearching, String(this.selectedProductPriceRangeForSearching[0]));
+    localStorage.setItem(Config.selectedProductMaxPriceForSearching, String(this.selectedProductPriceRangeForSearching[1]));
+    localStorage.setItem(Config.selectedProductNameKeywordsForSearching, this.selectedProductNameForSearching);
     this.router.navigate(['/shop/search']);
-
     // share message to tell search product component that get searching products
     this.shareMessageService.changeMessage('searchProduct');
   }
@@ -234,17 +193,15 @@ export class HomeComponent implements OnInit {
   /**
    * show search product modal
    */
-  public showSearchProductModal() {
+  public showSearchProductModal(): void {
     this.isSearchProductModalShown = true;
   }
 
   /**
    * load current user-account's information
    */
-  private loadCurrentUserInformation() {
-    // show loading component
-    this.loading = true;
-    // check login type then load user-account's information
+  private loadCurrentUserInformation(): void {
+    this.isLoadingSpinnerShown = true;
     if (this.loginType.localeCompare('normal') === 0) {
       this.loadNormalAccountInformation();
     } else if (this.loginType.localeCompare('facebook') === 0) {
@@ -257,52 +214,53 @@ export class HomeComponent implements OnInit {
   /**
    * load normal account information
    */
-  private loadNormalAccountInformation() {
-    // get current user-account's name
+  private loadNormalAccountInformation(): void {
     const authenticatedUserName = this.authentication.currentUserValue.userName;
-    // load user-account's information by user-account's name (load user-account's account and user-account's profile)
-    const getUserAccountByUsernameUrl = `${Config.api}/${Config.apiGetUserAccountByUserName}${authenticatedUserName}`;
-    // get user-account's account information
-    this.userAccountService.getUserAccountByUsername(getUserAccountByUsernameUrl)
+    const getUserAccountUrl = `${Config.apiBaseUrl}/
+${Config.apiUserManagementPrefix}/
+${Config.apiUserAccounts}?
+${Config.userNameParameter}=${authenticatedUserName}`;
+    this.userAccountService.getUserAccount(getUserAccountUrl)
       .subscribe((userAccount: UserAccount) => {
         this.shareUserAccountService.changeUserAccount(userAccount);
         this.shareUserProfileService.changeUserProfile(userAccount.userProfile);
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * load facebook account information
    */
-  private loadFacebookAccountInformation() {
-    // get facebook's id
+  private loadFacebookAccountInformation(): void {
     const selectedFacebookId = localStorage.getItem(Config.facebookId);
-    // load user-account's information by facebookId
-    this.facebookAccountService.getFacebookAccountByFacebookId(selectedFacebookId)
+    const getFacebookAccountUrl = `${Config.apiBaseUrl}/
+${Config.apiUserManagementPrefix}/
+${Config.apiFacebookAccount}/
+${selectedFacebookId}`;
+    this.facebookAccountService.getFacebookAccount(getFacebookAccountUrl)
       .subscribe((facebookAccount: FacebookAccount) => {
         this.shareUserProfileService.changeUserProfile(facebookAccount.userProfile);
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
-   * load google acccount information
+   * load google account information
    */
-  private loadGoogleAccountInformation() {
-    // get google's id
+  private loadGoogleAccountInformation(): void {
     const selectedGoogleId = localStorage.getItem(Config.googleId);
-    // load user-account's information by googleId
-    this.googleAccountService.getGoogleAccountByGoogleId(selectedGoogleId)
+    const getGoogleAccountUrl = `${Config.apiBaseUrl}/${Config.apiUserManagementPrefix}/${Config.apiGoogleAccount}/${selectedGoogleId}`;
+    this.googleAccountService.getGoogleAccount(getGoogleAccountUrl)
       .subscribe((googleAccount: GoogleAccount) => {
         this.shareUserProfileService.changeUserProfile(googleAccount.userProfile);
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * go to shopping cart
    */
-  public goToShoppingCart() {
+  public goToShoppingCart(): void {
     this.router.navigate(['/shop/cart']);
   }
 }

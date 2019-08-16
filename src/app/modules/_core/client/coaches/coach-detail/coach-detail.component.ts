@@ -4,6 +4,7 @@ import {Coach, Membership, UserProfile} from '@gw-models/core';
 import {Router} from '@angular/router';
 import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
 import {MembershipService} from '@gw-services/core/api/coach/membership.service';
+import {Config} from '@gw-config/core';
 
 @Component({
   selector: 'app-coach-detail',
@@ -11,17 +12,9 @@ import {MembershipService} from '@gw-services/core/api/coach/membership.service'
   styleUrls: ['./coach-detail.component.css']
 })
 export class CoachDetailComponent implements OnInit {
-
-  // selected coach
   selectedCoach: Coach;
-
-  // selected user's profile
   selectedUserProfile: UserProfile;
-
-  // check relationship between coacah and user existed or not
-  isRelationshipExisted: boolean;
-
-  // check coach's information should be shown or not
+  isRelationshipBetWeenUserAndCoachExisted: boolean;
   isCoachInformationShow: boolean;
 
   /**
@@ -37,47 +30,33 @@ export class CoachDetailComponent implements OnInit {
               private router: Router) {
   }
 
-  ngOnInit() {
-    // get selected coach
+  ngOnInit(): void {
     this.getSelectedCoach();
   }
 
   /**
    * get selected coach
    */
-  private getSelectedCoach() {
+  private getSelectedCoach(): void {
     this.shareCoachService.currentCoach
       .subscribe(selectedCoach => {
         if (selectedCoach) {
           this.selectedCoach = selectedCoach;
-          // check selected coach existed or not
-          this.checkSelectedCoachExistedOrNot();
+          this.getSelectedUserProfile();
+        } else {
+          this.router.navigate(['/client']);
         }
       });
   }
 
   /**
-   * check selected coach existed or not
-   */
-  private checkSelectedCoachExistedOrNot() {
-    if (this.selectedCoach == null) {
-      // go to coach list
-      this.router.navigate(['/client/coach']);
-    } else {
-      // get selected user's profile
-      this.getSelectedUserProfile();
-    }
-  }
-
-  /**
    * get selected user's profile
    */
-  private getSelectedUserProfile() {
+  private getSelectedUserProfile(): void {
     this.shareUserProfile.currentUserProfile
       .subscribe(selectedUserProfile => {
         if (selectedUserProfile) {
           this.selectedUserProfile = selectedUserProfile;
-          // check relationship between user and coach
           this.checkRelationshipBetweenUserAndCoach();
         } else {
           this.router.navigate(['/client']);
@@ -88,15 +67,21 @@ export class CoachDetailComponent implements OnInit {
   /**
    * check relationship between user and coach
    */
-  private checkRelationshipBetweenUserAndCoach() {
-    this.membershipService.getMembershipByCoachAndByUserProfile(this.selectedCoach.id, this.selectedUserProfile.id)
+  private checkRelationshipBetweenUserAndCoach(): void {
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const selectedCoachId = this.selectedCoach.id;
+    const getMembershipUrl = `${Config.apiBaseUrl}/
+${Config.apiMembershipManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiCoaches}/
+${selectedCoachId}/
+${Config.apiMemberships}`;
+    this.membershipService.getMembership(getMembershipUrl)
       .subscribe((selectedMembership: Membership) => {
         if (selectedMembership) {
-          this.isRelationshipExisted = true;
-        } else {
-          this.router.navigate(['/client']);
+          this.isRelationshipBetWeenUserAndCoachExisted = true;
         }
-        // show coach information component
         this.isCoachInformationShow = true;
       });
   }

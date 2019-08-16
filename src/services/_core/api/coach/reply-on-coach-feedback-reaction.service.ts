@@ -1,16 +1,11 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {
-  ReplyOnCoachFeedback,
   ReplyOnCoachFeedbackReaction,
-  ResponseMessage,
-  UserProfile
 } from '@gw-models/core';
 import {Observable} from 'rxjs';
-import {Config} from '@gw-config/core';
 import {tap} from 'rxjs/operators';
 
-// httpOptions to change content-type to application/json
 const httpOptions = {
   headers: new HttpHeaders({'Content-Type': 'application/json'})
 };
@@ -23,29 +18,26 @@ export class ReplyOnCoachFeedbackReactionService {
   constructor(private http: HttpClient) {
   }
 
-  /** POST: count number of reply on coach feedback reaction */
-  public countNumberOfReplyOnCoachFeedbackReaction(
-    replyOnCoachFeedback: ReplyOnCoachFeedback, reactionType: number): Observable<ResponseMessage> {
-    return this.http.post<ResponseMessage>(
-      `${Config.api}/${Config.apiCountReplyOnCoachFeedbackReaction}/${reactionType}`, replyOnCoachFeedback, httpOptions).pipe(
-      tap((responseMessage: ResponseMessage) => console.log(JSON.stringify(responseMessage)))
+  /**
+   *
+   * @param url - url that will be used to get reactions of replies on coach's feedback
+   */
+  public getReplyOnCoachFeedbackReactions(url: string): Observable<ReplyOnCoachFeedbackReaction[]> {
+    return this.http.get<ReplyOnCoachFeedbackReaction[]>(url, httpOptions).pipe(
+      tap((replyOnCoachFeedbackReactions: ReplyOnCoachFeedbackReaction[]) => {
+        console.log(JSON.stringify(replyOnCoachFeedbackReactions));
+      })
     );
   }
 
-  /** POST: get reply on coach feedback reactions by user's profile */
-  public getReplyOnCoachFeedbackReactionsByUserProfile(userProfile: UserProfile): Observable<ReplyOnCoachFeedbackReaction[]> {
-    return this.http.post<ReplyOnCoachFeedbackReaction[]>(
-      `${Config.api}/${Config.apiGetReplyOnCoachFeedbackReaction}`, userProfile, httpOptions).pipe(
-      tap(
-        (replyOnCoachFeedbackReactions: ReplyOnCoachFeedbackReaction[]) => console.log(JSON.stringify(replyOnCoachFeedbackReactions)))
-    );
-  }
-
-  /** POST: add new reply on coach feedback reaction */
-  public addNewReplyOnCoachFeedbackReaction(
-    replyOnCoachFeedbackReaction: ReplyOnCoachFeedbackReaction): Observable<ReplyOnCoachFeedbackReaction> {
-    return this.http.post<ReplyOnCoachFeedbackReaction>(
-      `${Config.api}/${Config.apiAddNewReplyOnCoachFeedbackReaction}`, replyOnCoachFeedbackReaction, httpOptions).pipe(
+  /**
+   *
+   * @param url - url that will be used to add reaction of reply on coach's feedback
+   * @param replyOnCoachFeedbackReaction - reaction of reply on coach's feedback that will be added
+   */
+  public addNewReplyOnCoachFeedbackReaction(url: string, replyOnCoachFeedbackReaction: ReplyOnCoachFeedbackReaction)
+    : Observable<ReplyOnCoachFeedbackReaction> {
+    return this.http.post<ReplyOnCoachFeedbackReaction>(url, replyOnCoachFeedbackReaction, httpOptions).pipe(
       tap(
         (insertedReplyOnCoachFeedbackReaction: ReplyOnCoachFeedbackReaction) =>
           console.log(JSON.stringify(insertedReplyOnCoachFeedbackReaction)))

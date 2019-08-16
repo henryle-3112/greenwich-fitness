@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Coach, CoachMembershipNotification, ResponseMessage, UserProfile} from '@gw-models/core';
+import {Coach, CoachMembershipNotification, UserProfile} from '@gw-models/core';
 import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
 import {Router} from '@angular/router';
 import {CoachService} from '@gw-services/core/api/coach/coach.service';
@@ -14,30 +14,25 @@ import {PaymentService} from '@gw-services/core/api/payment/payment.service';
   styleUrls: ['./training-notification.component.css']
 })
 export class TrainingNotificationComponent implements OnInit {
-
-  // currentPage
-  currentPage = 1;
-
-  // loading component is show ot not
-  loading = true;
-
-  // search value - return notifications and change pagination based on keywords
-  searchValue: string;
-
-  // number notifications per page
+  currentTrainingNotificationsPage = 1;
+  isLoadingSpinnerShown = true;
+  trainingNotificationContentKeywords: string;
   nNotificationsPerPage: number;
-
-  // total notifications
-  totalNotifications: number;
-
-  // selected user's profile
+  totalTrainingNotifications: number;
   selectedUserProfile: UserProfile;
-
   // check current user is coach or normal user. If user is a coach, then get coach's information
   selectedCoach: Coach;
-
   coachMembershipNotifications: CoachMembershipNotification[];
 
+  /**
+   *
+   * @param shareUserProfileService - inject shareUserProfileService
+   * @param paymentService - inject shareUserProfileService
+   * @param coachMembershipNotificationService - inject shareUserProfileService
+   * @param coachService - inject shareUserProfileService
+   * @param notification - inject shareUserProfileService
+   * @param router - inject shareUserProfileService
+   */
   constructor(private shareUserProfileService: ShareUserProfileService,
               private paymentService: PaymentService,
               private coachMembershipNotificationService: CoachMembershipNotificationService,
@@ -46,171 +41,107 @@ export class TrainingNotificationComponent implements OnInit {
               private router: Router) {
   }
 
-  ngOnInit() {
-    // init current coach membership notifications
+  ngOnInit(): void {
     this.coachMembershipNotifications = [];
-    // init number of notifications per page
     this.nNotificationsPerPage = 8;
-    // init current search value
-    this.searchValue = '';
-    // init total number of notifications
-    this.totalNotifications = 0;
-    // get selected user profile
+    this.trainingNotificationContentKeywords = '';
+    this.totalTrainingNotifications = 0;
     this.getSelectedUserProfile();
   }
 
   /**
    * get selected user profile
    */
-  private getSelectedUserProfile() {
-    // show loading component
-    this.loading = true;
+  private getSelectedUserProfile(): void {
+    this.isLoadingSpinnerShown = true;
     this.shareUserProfileService.currentUserProfile
       .subscribe((selectedUserProfile: UserProfile) => {
         if (selectedUserProfile) {
           this.selectedUserProfile = selectedUserProfile;
-          // check user is a coach or not. If user is a coach, then get coach's information
           this.getSelectedCoach();
         } else {
           this.router.navigate(['/client']);
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * get selected coach
    */
-  private getSelectedCoach() {
-    // show loading component
-    this.loading = true;
-    this.coachService.getCoachByUserProfile(this.selectedUserProfile, 1)
+  private getSelectedCoach(): void {
+    this.isLoadingSpinnerShown = true;
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const coachStatus = 1;
+    const getCoachUrl = `${Config.apiBaseUrl}/
+${Config.apiCoachManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiCoaches}?
+${Config.statusParameter}=${coachStatus}`;
+    this.coachService.getCoach(getCoachUrl)
       .subscribe((selectedCoach: Coach) => {
         if (selectedCoach) {
-          // user is a coach
           this.selectedCoach = selectedCoach;
-          // get number of membership coach notifications based on coach and keyword
-          this.getNumberOfCoachMembershipNotificationsByCoachIdAndByPageAndByKeyword();
-          // get membership coach notification based on coach and keyword and page
-          this.getCoachMembershipNotificationsByCoachIdAndByPageAndByKeyword();
+          this.getTrainingNotificationsForCoach();
         } else {
-          // user is not a coach
-          // get number of coach membership notifications based on user profile and keyword
-          this.getNumberOfCoachMembershipNotificationsByUserProfileIdAndByPageAndByKeyword();
-          // get membership coach notification based on user profile and keyword and page
-          this.getCoachMembershipNotificationsByUserProfileIdAndByPageAndByKeyword();
+          this.getTrainingNotificationsForUser();
         }
-        // hide loading component
-        this.loading = false;
-      });
-  }
-
-  /**
-   * get number of coach membership notificatoins by coach and by keyword
-   */
-  private getNumberOfCoachMembershipNotificationsByCoachIdAndByPageAndByKeyword() {
-    // show loading component
-    this.loading = true;
-    // create url to get total number of coach membership notifications by coach id and by keyword
-    let currentGetNumberOfCoachMembershipNotificationsByCoachIdAndByKeyword =
-      `${Config.api}/${Config.apiGetNumberOfCoachMembershipNotificationsByCoachIdAndByKeyword}/${this.selectedCoach.id}`;
-    // if search value is not equal to '', then include keywords to the url
-    if (this.searchValue.localeCompare('') !== 0) {
-      currentGetNumberOfCoachMembershipNotificationsByCoachIdAndByKeyword += `?keyword=${this.searchValue.toLowerCase()}`;
-    }
-    // get total number of coach membership notifications by coach id and by keyword
-    this.coachMembershipNotificationService.getNumberOfCoachMembershipNotificationsByCoachIdAndByPageAndByKeyword(
-      currentGetNumberOfCoachMembershipNotificationsByCoachIdAndByKeyword)
-      .subscribe((nNotifications: ResponseMessage) => {
-        if (nNotifications) {
-          // assign total number of notifications
-          this.totalNotifications = Number(nNotifications.message);
-        }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * get notifications by coach id and by page and by keyword
    */
-  private getCoachMembershipNotificationsByCoachIdAndByPageAndByKeyword() {
-    // show loading component
-    this.loading = true;
-    // create url to get notifications by current page
-    let currentGetNotificationsByCoachIdAndByPageAndByKeywordUrl =
-      `${Config.api}/${Config.apiGetCoachMembershipNotificationsByCoachIdAndByKeywordAndByPage}
-/${this.selectedCoach.id}/${this.currentPage}`;
-    // if search value is not equal to '', then include keywords to the url
-    if (this.searchValue.localeCompare('') !== 0) {
-      currentGetNotificationsByCoachIdAndByPageAndByKeywordUrl += `?keyword=${this.searchValue.toLowerCase()}`;
+  private getTrainingNotificationsForCoach(): void {
+    this.isLoadingSpinnerShown = true;
+    const selectedCoachId = this.selectedCoach.id;
+    let getTrainingNotificationsUrl = `${Config.apiBaseUrl}/
+${Config.apiNotificationManagementPrefix}/
+${Config.apiCoaches}/
+${selectedCoachId}/
+${Config.apiCoachMembershipNotifications}?
+${Config.pageParameter}=${this.currentTrainingNotificationsPage}`;
+    if (this.trainingNotificationContentKeywords.localeCompare('') !== 0) {
+      getTrainingNotificationsUrl += `&${Config.searchParameter}=${this.trainingNotificationContentKeywords.toLowerCase()}`;
     }
     // get notifications by page and keywords (if existed)
-    this.coachMembershipNotificationService.getCoachMembershipNotificationsByCoachIdAndByPageAndByKeyword(
-      currentGetNotificationsByCoachIdAndByPageAndByKeywordUrl)
-      .subscribe((coachMembershipNotifications: CoachMembershipNotification[]) => {
-        if (coachMembershipNotifications) {
-          this.coachMembershipNotifications = [];
-          // assign data to coach membership notifications
-          this.coachMembershipNotifications = coachMembershipNotifications;
-        }
-        // hide loading component
-        this.loading = false;
+    this.coachMembershipNotificationService.getCoachMembershipNotifications(getTrainingNotificationsUrl)
+      .subscribe(response => {
+        // if (coachMembershipNotifications) {
+        //   this.coachMembershipNotifications = [];
+        //   // assign data to coach membership notifications
+        //   this.coachMembershipNotifications = coachMembershipNotifications;
+        // }
+        console.log(response);
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * get coach membership notifications by user profile id and by page and by keyword
    */
-  private getCoachMembershipNotificationsByUserProfileIdAndByPageAndByKeyword() {
-    // show loading component
-    this.loading = true;
-    // create url to get notifications by current page
-    let currentGetNotificationsByUserProfileIdAndByPageAndByKeywordUrl =
-      `${Config.api}/${Config.apiGetCoachMembershipNotificationsByUserProfileIdAndByKeywordAndByPage}
-/${this.selectedUserProfile.id}/${this.currentPage}`;
-    // if search value is not equal to '', then include keywords to the url
-    if (this.searchValue.localeCompare('') !== 0) {
-      currentGetNotificationsByUserProfileIdAndByPageAndByKeywordUrl += `?keyword=${this.searchValue.toLowerCase()}`;
+  private getTrainingNotificationsForUser(): void {
+    this.isLoadingSpinnerShown = true;
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    let getTrainingNotificationsUrl = `${Config.apiBaseUrl}/
+${Config.apiNotificationManagementPrefix}/
+${Config.apiUsers}/${selectedUserProfileId}/
+${Config.apiCoachMembershipNotifications}?
+${Config.pageParameter}=${this.currentTrainingNotificationsPage}`;
+    if (this.trainingNotificationContentKeywords.localeCompare('') !== 0) {
+      getTrainingNotificationsUrl += `&${Config.searchParameter}=${this.trainingNotificationContentKeywords.toLowerCase()}`;
     }
     // get notifications by page and keywords (if existed)
-    this.coachMembershipNotificationService.getCoachMembershipNotificationsByUserProfileIdAndByPageAndByKeyword(
-      currentGetNotificationsByUserProfileIdAndByPageAndByKeywordUrl)
-      .subscribe((coachMembershipNotifications: CoachMembershipNotification[]) => {
-        if (coachMembershipNotifications) {
-          this.coachMembershipNotifications = [];
-          // assign data to coach membership notifications
-          this.coachMembershipNotifications = coachMembershipNotifications;
-        }
-        // hide loading component
-        this.loading = false;
-      });
-  }
-
-  /**
-   * get number fo coach membership notifications by user profile and by page and by keyword
-   */
-  private getNumberOfCoachMembershipNotificationsByUserProfileIdAndByPageAndByKeyword() {
-    // show loading component
-    this.loading = true;
-    // create url to get total number of coach membership notifications by coach id and by keyword
-    let currentGetNumberOfCoachMembershipNotificationsByUserProfileIdAndByKeyword =
-      `${Config.api}/${Config.apiGetNumberOfCoachMembershipNotificationsByUserProfileIdAndByKeyword}/${this.selectedUserProfile.id}`;
-    // if search value is not equal to '', then include keywords to the url
-    if (this.searchValue.localeCompare('') !== 0) {
-      currentGetNumberOfCoachMembershipNotificationsByUserProfileIdAndByKeyword += `?keyword=${this.searchValue.toLowerCase()}`;
-    }
-    // get total number of coach membership notifications by coach id and by keyword
-    this.coachMembershipNotificationService.getNumberOfCoachMembershipNotificationsByUserProfileIdAndByPageAndByKeyword(
-      currentGetNumberOfCoachMembershipNotificationsByUserProfileIdAndByKeyword)
-      .subscribe((nNotifications: ResponseMessage) => {
-        if (nNotifications) {
-          // assign total number of notifications
-          this.totalNotifications = Number(nNotifications.message);
-        }
-        // hide loading component
-        this.loading = false;
+    this.coachMembershipNotificationService.getCoachMembershipNotifications(getTrainingNotificationsUrl)
+      .subscribe(response => {
+        // if (coachMembershipNotifications) {
+        //   this.coachMembershipNotifications = [];
+        //   this.coachMembershipNotifications = coachMembershipNotifications;
+        // }
+        console.log(response);
+        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -218,35 +149,26 @@ export class TrainingNotificationComponent implements OnInit {
    *
    * @param event - current page
    */
-  private notificationsPageChange(event) {
-    // get current page
-    this.currentPage = event;
-    // reload data on page
+  private notificationsPageChange(event): void {
+    this.currentTrainingNotificationsPage = event;
     if (this.selectedCoach) {
-      // if user is a coach
-      this.getCoachMembershipNotificationsByCoachIdAndByPageAndByKeyword();
+      this.getTrainingNotificationsForCoach();
     } else {
-      // if user is a normal user
-      this.getCoachMembershipNotificationsByUserProfileIdAndByPageAndByKeyword();
+      this.getTrainingNotificationsForUser();
     }
   }
 
   /**
    *
-   * @param keyword - keyword
+   * @param keyword - keyword that will be used to filter list of training's notifications
    */
-  private searchNotifications(keyword) {
-    // get search value
-    this.searchValue = keyword;
-    // restart current page
-    this.currentPage = 1;
-    // reload data
+  private searchNotifications(keyword): void {
+    this.trainingNotificationContentKeywords = keyword;
+    this.currentTrainingNotificationsPage = 1;
     if (this.selectedCoach) {
-      this.getNumberOfCoachMembershipNotificationsByCoachIdAndByPageAndByKeyword();
-      this.getCoachMembershipNotificationsByCoachIdAndByPageAndByKeyword();
+      this.getTrainingNotificationsForCoach();
     } else {
-      this.getNumberOfCoachMembershipNotificationsByUserProfileIdAndByPageAndByKeyword();
-      this.getCoachMembershipNotificationsByUserProfileIdAndByPageAndByKeyword();
+      this.getTrainingNotificationsForUser();
     }
   }
 
@@ -256,7 +178,7 @@ export class TrainingNotificationComponent implements OnInit {
    * @param title - title of notification
    * @param content - content of notification
    */
-  createNotification(type: string, title: string, content: string) {
+  createNotification(type: string, title: string, content: string): void {
     this.notification.create(
       type,
       title,
@@ -265,59 +187,61 @@ export class TrainingNotificationComponent implements OnInit {
   }
 
   /**
-   * accept membership request
+   *
+   * @param selectedCoachMembershipNotification - training's notification that coach want to accept
    */
-  public acceptMembershipRequest(selectedCoachMembershipNotification: CoachMembershipNotification) {
-    console.log('hello');
-    // show loading component
-    this.loading = true;
+  public acceptMembershipRequest(selectedCoachMembershipNotification: CoachMembershipNotification): void {
+    this.isLoadingSpinnerShown = true;
     selectedCoachMembershipNotification.status = 1;
-    // update selected coach membership notification
-    this.coachMembershipNotificationService.updateCoachMembershipNotification(selectedCoachMembershipNotification)
+    const updateTrainingNotificationUrl = `${Config.apiBaseUrl}/
+${Config.apiNotificationManagementPrefix}/
+${Config.apiCoachMembershipNotifications}`;
+    this.coachMembershipNotificationService
+      .updateCoachMembershipNotification(updateTrainingNotificationUrl, selectedCoachMembershipNotification)
       .subscribe((updatedCoachMembershipNotificationService: CoachMembershipNotification) => {
         if (updatedCoachMembershipNotificationService) {
-          // show success message to user
           this.createNotification('success', 'Success', 'Your request was handled successfully');
         } else {
-          // show error message to user
           this.createNotification('error', 'Error', 'Failure to handle your request');
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
-   * decline membership request
+   *
+   * @param selectedCoachMembershipNotification - training's notification that coach want to decline
    */
-  public declinedMembershipRequest(selectedCoachMembershipNotification: CoachMembershipNotification) {
-    // show loading component
-    this.loading = true;
+  public declinedMembershipRequest(selectedCoachMembershipNotification: CoachMembershipNotification): void {
+    this.isLoadingSpinnerShown = true;
     selectedCoachMembershipNotification.status = 0;
-    // update selected coach membership notification
-    this.coachMembershipNotificationService.updateCoachMembershipNotification(selectedCoachMembershipNotification)
+    const updateTrainingNotificationUrl = `${Config.apiBaseUrl}/
+${Config.apiNotificationManagementPrefix}/
+${Config.apiCoachMembershipNotifications}`;
+    this.coachMembershipNotificationService
+      .updateCoachMembershipNotification(updateTrainingNotificationUrl, selectedCoachMembershipNotification)
       .subscribe((updatedCoachMembershipNotification: CoachMembershipNotification) => {
         if (updatedCoachMembershipNotification) {
-          // show success message to user
           this.createNotification('success', 'Success', 'Your request was handled successfully');
         } else {
-          // show error messaeg to user
           this.createNotification('error', 'Error', 'Failure to hand your request');
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
-   * payment for coach
+   *
+   * @param selectedCoachMembershipNotification - training's notification that user want to make payment
    */
-  public paymentForCoach(selectedCoachMembershipNotification: CoachMembershipNotification) {
-    // show loading component
-    this.loading = true;
-    // create payment
+  public paymentForCoach(selectedCoachMembershipNotification: CoachMembershipNotification): void {
+    this.isLoadingSpinnerShown = true;
     const totalPayment = 20;
-    this.paymentService.makePayment(totalPayment)
+    const makePaymentUrl = `${Config.apiBaseUrl}/
+${Config.apiPaypalManagementPrefix}/
+${Config.apiMakePayment}?
+${Config.sumParameter}=${totalPayment}`;
+    this.paymentService.makePayment(makePaymentUrl)
       .subscribe((response: any) => {
         if (response) {
           // set flag to check user use paypal to hire coach not buying products
@@ -327,10 +251,10 @@ export class TrainingNotificationComponent implements OnInit {
           localStorage.setItem(Config.currentCoachMembershipNotification, JSON.stringify(selectedCoachMembershipNotification));
           localStorage.setItem(Config.currentCoach, JSON.stringify(selectedCoachMembershipNotification.coach));
           localStorage.setItem(Config.currentUserProfile, JSON.stringify(selectedCoachMembershipNotification.userProfile));
+          localStorage.setItem(Config.totalCoachPayment, JSON.stringify(totalPayment));
           window.location.href = response.redirect_url;
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 }

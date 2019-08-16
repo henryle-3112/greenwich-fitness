@@ -9,21 +9,23 @@ import {Coffeti} from '@gw-models/core';
 })
 export class AlertVerifyEmailComponent implements OnInit {
 
-  // background image
   backgroundImage: string;
-
-  // coffeti interval to show coffeti animation after every one second
-  coffetiInterval: any;
+  coffetiAnimationInterval: any;
 
   constructor(private router: Router) {
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.backgroundImage = './assets/images/rest.jpg';
-    // create coffeti object
+    this.showCoffetiAnimation();
+  }
+
+  /**
+   * show coffeti animation
+   */
+  private showCoffetiAnimation(): void {
     const coffeti = new Coffeti();
-    // show coffeti animation after every one second
-    this.coffetiInterval = setInterval(() => {
+    this.coffetiAnimationInterval = setInterval(() => {
       coffeti.shoot();
     }, 1000);
   }
@@ -31,11 +33,9 @@ export class AlertVerifyEmailComponent implements OnInit {
   /**
    * go to login
    */
-  public goToLogin() {
-    // redirect to login page
+  public goToLogin(): void {
+    clearInterval(this.coffetiAnimationInterval);
     this.router.navigate(['/login']);
-    // clear coffeti interval
-    clearInterval(this.coffetiInterval);
   }
 
 }

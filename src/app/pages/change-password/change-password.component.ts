@@ -6,6 +6,7 @@ import {ResetPasswordService} from '@gw-services/core/api/user/reset-password.se
 import {ResponseMessage, UserAccount} from '@gw-models/core';
 import {NzNotificationService} from 'ng-zorro-antd';
 import {AuthenticationService} from '@gw-services/core/authentication/authentication.service';
+import {Config} from '@gw-config/core';
 
 @Component({
   selector: 'app-change-password',
@@ -13,21 +14,18 @@ import {AuthenticationService} from '@gw-services/core/authentication/authentica
   styleUrls: ['./change-password.component.css']
 })
 export class ChangePasswordComponent implements OnInit {
-  // change password form
   changePasswordForm: FormGroup;
-  // get password reminder token
   passwordReminderToken: string;
-  // check loading component is showing or not
-  loading = false;
+  isLoadingSpinnerShown = false;
 
   /**
    *
-   * @param fb - inject form builder to create change password form
+   * @param fb - inject fb
    * @param authenticationService - inject authenticationService
-   * @param route - inject route to get url's parameter
-   * @param router - inject router for routing
-   * @param resetPasswordService - inject reset password's service to change user-account's password
-   * @param notification - inject notification to get message
+   * @param route - inject route
+   * @param router - inject router
+   * @param resetPasswordService - inject resetPasswordService
+   * @param notification - inject notification
    */
   constructor(private fb: FormBuilder,
               private authenticationService: AuthenticationService,
@@ -40,37 +38,33 @@ export class ChangePasswordComponent implements OnInit {
   /**
    * init data
    */
-  ngOnInit() {
-    // set up validators for login form
+  ngOnInit(): void {
     this.changePasswordForm = this.fb.group({
       confirmPassword: [null, [Validators.required, CustomValidator.passwordValidator]],
       password: [null, [Validators.required, CustomValidator.passwordValidator]]
     });
-    // set current value to input fields when the form was loaded the first time to avoid null exception
     this.f.password.setValue('');
     this.f.confirmPassword.setValue('');
-    // get passwordReminderToken from route parameters.
     this.passwordReminderToken = this.route.snapshot.queryParams['token'] || '';
-    // if password reminder token does not existed. Therefore, password cannot be changed
-    // customers will be redirected to login page
     if (this.passwordReminderToken.localeCompare('') === 0) {
-      // redirect to login page
       this.router.navigate(['/login']);
     }
   }
 
-  // convenience getter for easy access to form fields
+  /**
+   * convenience getter for easy access to form fields
+   */
   get f() {
     return this.changePasswordForm.controls;
   }
 
-  // submit login form
+  /**
+   * submit form
+   */
   submitForm(): void {
-    // stop here if form is invalid
     if (this.changePasswordForm.invalid) {
       return;
     }
-    // update new password to the database server
     const updatedUserAccount = new UserAccount();
     updatedUserAccount.passwordReminderToken = this.passwordReminderToken;
     updatedUserAccount.password = this.f.password.value;
@@ -82,22 +76,17 @@ export class ChangePasswordComponent implements OnInit {
    * @param updatedUserAccount - updated user-account's account to change password
    */
   resetUserPassword(updatedUserAccount: UserAccount): void {
-    // change password
-    this.resetPasswordService.changePassword(updatedUserAccount)
+    const changePasswordUrl = `${Config.apiBaseUrl}/${Config.apiUserManagementPrefix}/${Config.apiChangeUserPassword}`;
+    this.resetPasswordService.changePassword(changePasswordUrl, updatedUserAccount)
       .subscribe((responseMessage: ResponseMessage) => {
         if (responseMessage.message.localeCompare('successfully') === 0) {
-          // show success message
           this.createNotification('success', 'Success', 'Your password was changed successfully');
         } else {
-          // show error message
           this.createNotification('error', 'Error', 'Your password cannot be changed');
         }
-        // logout if user has logged in
         this.authenticationService.logout();
-        // redirect to login page
         this.router.navigate(['/login']);
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -107,7 +96,7 @@ export class ChangePasswordComponent implements OnInit {
    * @param title - title of notification
    * @param content - content of notification
    */
-  createNotification(type: string, title: string, content: string) {
+  createNotification(type: string, title: string, content: string): void {
     this.notification.create(
       type,
       title,
@@ -130,7 +119,6 @@ export class ChangePasswordComponent implements OnInit {
    */
   validateConfirmPassword(): void {
     if (this.f.confirmPassword.value.toString().localeCompare(this.f.password.value) !== 0) {
-      // show error if confirm password and password are not the same
       this.f.confirmPassword.markAsTouched();
       this.f.confirmPassword.setErrors({'required': true});
     } else {

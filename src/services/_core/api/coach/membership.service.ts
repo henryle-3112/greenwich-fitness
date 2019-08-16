@@ -1,11 +1,13 @@
 import {Injectable} from '@angular/core';
-import {Coach, CoachPayment, Membership, ResponseMessage} from '@gw-models/core';
+import {Coach, Membership} from '@gw-models/core';
 import {Observable} from 'rxjs';
-import {Config} from '@gw-config/core';
-import {tap} from 'rxjs/operators';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
 
-// httpOptions to change content-type to application/json
+const httpFullOptions = {
+  headers: new HttpHeaders({'Content-Type': 'application/json'}),
+  observe: 'response' as 'body'
+};
+
 const httpOptions = {
   headers: new HttpHeaders({'Content-Type': 'application/json'})
 };
@@ -18,55 +20,45 @@ export class MembershipService {
   constructor(private http: HttpClient) {
   }
 
-  /** POST: get number of memberships by coach */
-  public countNumberOfMembershipsByCoach(coach: Coach, status: number): Observable<ResponseMessage> {
-    return this.http.post<ResponseMessage>(
-      `${Config.api}/${Config.apiCountNumberOfMemberships}/${status}`, coach, httpOptions).pipe(
-      tap((responseMessage: ResponseMessage) => console.log(JSON.stringify(responseMessage)))
-    );
-  }
-
-  /** GET: get memberships by page based on keywords */
-  public getMembershipsByPage(url): Observable<Membership[]> {
-    return this.http.get<Coach[]>(url, httpOptions).pipe(
-      tap((memberships: Membership[]) => console.log(JSON.stringify(memberships)))
-    );
-  }
-
-  /** GET: get total memberships based on keywords */
-  public getTotalMemberships(url): Observable<ResponseMessage> {
-    return this.http.get<ResponseMessage>(url, httpOptions).pipe(
-      tap((responseMessage: ResponseMessage) => console.log(JSON.stringify(responseMessage)))
-    );
-  }
-
-  /** GET: check user has pay for selected coach or not */
-  public checkUserHasPayForSelectedCoachOrNot(url): Observable<ResponseMessage> {
-    return this.http.get<ResponseMessage>(url, httpOptions).pipe(
-      tap((responseMessage: ResponseMessage) => console.log(JSON.stringify(responseMessage)))
-    );
-  }
-
-  public getMembershipByCoachAndByUserProfile(coachId: number, userProfileId: number): Observable<Membership> {
-    return this.http.get<Membership>(`${Config.api}/${Config.apiGetMembershipByCoachAndByUserProfile}/${coachId}/${userProfileId}`
-      , httpOptions).pipe(
-      tap((selectedMembership: Membership) => console.log(JSON.stringify(selectedMembership)))
-    );
+  /**
+   *
+   * @param url - url that will be used to get memberships
+   */
+  public getMemberships(url): Observable<HttpResponse<Membership[]>> {
+    return this.http.get<HttpResponse<Membership[]>>(url, httpFullOptions);
   }
 
   /**
    *
-   * @param membership - membership
+   * @param url - url that will be used to get coaches
    */
-  public addMembership(membership: Membership) {
-    return this.http.post<Membership>(`${Config.api}/${Config.apiAddMembership}`, membership, httpOptions).pipe(
-      tap((insertedMembership: Membership) => console.log(insertedMembership))
-    );
+  public getCoaches(url): Observable<HttpResponse<Coach[]>> {
+    return this.http.get<HttpResponse<Coach[]>>(url, httpFullOptions);
   }
 
-  public updateMembership(membership: Membership) {
-    return this.http.post<Membership>(`${Config.api}/${Config.apiUpdateMembership}`, membership, httpOptions).pipe(
-      tap((updatedMembership: Membership) => console.log(updatedMembership))
-    );
+  /**
+   *
+   * @param url - url that user want to get selected membership
+   */
+  public getMembership(url: string): Observable<Membership> {
+    return this.http.get<Membership>(url, httpOptions);
+  }
+
+  /**
+   *
+   * @param url - url that will be used tot add membership
+   * @param membership - membership that will be added
+   */
+  public addMembership(url: string, membership: Membership) {
+    return this.http.post<Membership>(url, membership, httpOptions);
+  }
+
+  /**
+   *
+   * @param url - url that will be used to update membership
+   * @param membership - membership that will be updated
+   */
+  public updateMembership(url: string, membership: Membership) {
+    return this.http.post<Membership>(url, membership, httpOptions);
   }
 }

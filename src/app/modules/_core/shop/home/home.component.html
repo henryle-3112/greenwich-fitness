@@ -1,7 +1,8 @@
-<nz-layout class="height-auto" [ngClass]="{'opacity-loading': loading}">
+<!--suppress ALL -->
+<nz-layout class="height-auto" [ngClass]="{'opacity-loading': isLoadingSpinnerShown}">
 
   <!-- loading component -->
-  <app-loading *ngIf="loading"></app-loading>
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- header -->
@@ -46,7 +47,7 @@
 
     <!-- col menu -->
     <div nz-col class="gutter-row drop-down-menu" nzXs="24" nzSm="24" nzMd="24" nzLg="24" nzXl="24" [@fadeInAnimation]
-         *ngIf="isMenuOpened">
+         *ngIf="isDropDownMenuOpened">
       <div class="gutter-box" style="background-color: #fff; min-height: 280px; padding: 24px;">
         <h3>Menu</h3>
         <nz-divider></nz-divider>
@@ -133,7 +134,7 @@
             (nzOnOk)="handleConfirmSearchProductModal()">
     <!-- product's category selection -->
     <h3 class="mg-bottom-24">Product Category: </h3>
-    <nz-select style="width: 200px;" class="mg-bottom-24" [(ngModel)]="selectedProductCategoryId"
+    <nz-select style="width: 200px;" class="mg-bottom-24" [(ngModel)]="selectedProductCategoryForSearching"
                nzPlaceHolder="Choose Product Category">
       <nz-option *ngFor="let eachProductCategory of productCategoriesSelection" nzValue="{{ eachProductCategory.id }}"
                  nzLabel="{{ eachProductCategory.productCategoryName}}"></nz-option>
@@ -142,13 +143,13 @@
 
     <!-- product's price selection -->
     <h3 class="mg-bottom-24">Product Price($): </h3>
-    <nz-slider nzRange [(ngModel)]="selectedProductPrice"></nz-slider>
+    <nz-slider nzRange [(ngModel)]="selectedProductPriceRangeForSearching"></nz-slider>
     <!-- end product's price selection -->
 
     <!-- product's name input -->
     <h3 class="mg-bottom-24 mg-top-24">Product Name: </h3>
     <nz-input-group [nzSuffix]="suffixIconSearch" [ngClass]="{'mg-bottom-24': true}" style="width: 200px;">
-      <input [(ngModel)]="selectedPostName" type="text" nz-input placeholder="Product Name..."/>
+      <input [(ngModel)]="selectedProductNameForSearching" type="text" nz-input placeholder="Product Name..."/>
     </nz-input-group>
     <ng-template #suffixIconSearch>
       <i nz-icon type="search"></i>

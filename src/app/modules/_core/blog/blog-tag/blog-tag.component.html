@@ -1,7 +1,8 @@
-<div [ngClass]="{'opacity-loading': loading}">
+<!--suppress ALL -->
+<div [ngClass]="{'opacity-loading': isLoadingSpinnerShown}">
 
   <!-- loading component -->
-  <app-loading *ngIf="loading"></app-loading>
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- posts -->
@@ -31,7 +32,8 @@
     <div id="pagination">
       <!-- pagination -->
       <nz-pagination
-        [nzPageIndex]="currentPage"
+        *ngIf="postsByTag && postsByTag.length"
+        [nzPageIndex]="currentPostsPage"
         [nzPageSize]="nPostsPerPage"
         [nzTotal]="totalPosts"
         (nzPageIndexChange)="postsPageChange($event)"></nz-pagination>

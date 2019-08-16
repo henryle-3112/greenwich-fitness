@@ -5,6 +5,7 @@ import {ResetPasswordService} from '@gw-services/core/api/user/reset-password.se
 import {ResponseMessage} from '@gw-models/core';
 import {NzNotificationService} from 'ng-zorro-antd';
 import {Router} from '@angular/router';
+import {Config} from '@gw-config/core';
 
 @Component({
   selector: 'app-forgot-password',
@@ -12,10 +13,8 @@ import {Router} from '@angular/router';
   styleUrls: ['./forgot-password.component.css']
 })
 export class ForgotPasswordComponent implements OnInit {
-  // forgot password form
   forgotPasswordForm: FormGroup;
-  // check loading component is showing or not
-  loading = false;
+  isLoadingSpinnerShown = false;
 
   /**
    *
@@ -54,26 +53,20 @@ export class ForgotPasswordComponent implements OnInit {
    * submit login form
    */
   submitForm(): void {
-    // stop here if form is invalid
     if (this.forgotPasswordForm.invalid) {
       return;
     }
-    // show loading component
-    this.loading = true;
-    // change reset password
-    this.resetPasswordService.sendEmailToResetPassword(this.f.email.value.toString())
+    this.isLoadingSpinnerShown = true;
+    const sendEmailResetPasswordUrl = `${Config.apiBaseUrl}/${Config.apiUserManagementPrefix}/${Config.apiSendEmailResetPassword}`;
+    this.resetPasswordService.sendEmailToResetPassword(sendEmailResetPasswordUrl, this.f.email.value.toString())
       .subscribe((responseMessage: ResponseMessage) => {
         if (responseMessage.message.localeCompare('successfully') === 0) {
-          // show success message
           this.createNotification('success', 'Successfully', 'Email was sent successfully, if you do not see the email, please try again!');
-          // redirect to login page
           this.router.navigate(['/login']);
         } else {
-          // hide success message
           this.createNotification('error', 'Error', 'Email cannot be sent. Please try again!');
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 

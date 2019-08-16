@@ -1,13 +1,10 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {BodyIndex} from '@gw-models/core';
-import {tap} from 'rxjs/operators';
-import {Config} from '@gw-config/core';
 
-// httpOptions to change content-type to application/json
 const httpOptions = {
-  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  headers: new HttpHeaders({'Content-Type': 'application/json'})
 };
 
 @Injectable({
@@ -16,19 +13,23 @@ const httpOptions = {
 
 export class BodyIndexService {
 
-  constructor(private http: HttpClient) { }
-
-  /** GET: get body index by user-account's id */
-  public getBodyIndexByUserProfileId(url): Observable<BodyIndex[]> {
-    return this.http.get<BodyIndex[]>(url, httpOptions).pipe(
-      tap((bodyIndex: BodyIndex[]) => console.log(JSON.stringify(bodyIndex)))
-    );
+  constructor(private http: HttpClient) {
   }
 
-  /** POST: update or create body index */
-  public updateOrCreateBodyIndex(bodyIndex: BodyIndex): Observable<BodyIndex> {
-    return this.http.post<BodyIndex>(`${Config.api}/${Config.apiUpdateBodyIndex}`, bodyIndex, httpOptions).pipe(
-      tap((selectedBodyIndex: BodyIndex) => console.log(selectedBodyIndex))
-    );
+  /**
+   *
+   * @param url - url that will be used to get body indexes
+   */
+  public getBodyIndexes(url: string): Observable<BodyIndex[]> {
+    return this.http.get<BodyIndex[]>(url, httpOptions);
+  }
+
+  /**
+   *
+   * @param url - url that will be used to update or create body index
+   * @param bodyIndex - created or updated body index
+   */
+  public updateOrCreateBodyIndex(url: string, bodyIndex: BodyIndex): Observable<BodyIndex> {
+    return this.http.post<BodyIndex>(url, bodyIndex, httpOptions);
   }
 }

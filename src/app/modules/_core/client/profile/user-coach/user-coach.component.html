@@ -1,11 +1,14 @@
-<div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;" [ngClass]="{'opacity-loading': loading}">
+<!--suppress ALL -->
+<div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+     [ngClass]="{'opacity-loading': isLoadingSpinnerShown}">
   <!-- loading component -->
-  <app-loading *ngIf="loading"></app-loading>
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- search box-->
-  <nz-input-group  *ngIf="coaches && coaches.length" [nzSuffix]="suffixIconSearch" [ngClass]="{'mg-bottom-24': true, 'width-50': true}">
-    <input type="text" nz-input placeholder="Name..." #searchBox  (keyup.enter)="searchCoach(searchBox.value)"/>
+  <nz-input-group *ngIf="coaches && coaches.length" [nzSuffix]="suffixIconSearch"
+                  [ngClass]="{'mg-bottom-24': true, 'width-50': true}">
+    <input type="text" nz-input placeholder="Name..." #searchBox (keyup.enter)="searchCoach(searchBox.value)"/>
   </nz-input-group>
   <ng-template #suffixIconSearch>
     <i nz-icon type="search"></i>
@@ -33,7 +36,7 @@
   <!-- pagination -->
   <nz-pagination
     *ngIf="coaches && coaches.length"
-    [nzPageIndex]="currentPage"
+    [nzPageIndex]="currentCoachesPage"
     [nzPageSize]="nCoachesPerPage"
     [nzTotal]="totalCoaches"
     [nzSize]="'small'"

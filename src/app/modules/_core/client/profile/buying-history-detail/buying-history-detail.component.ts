@@ -3,6 +3,7 @@ import {ShareProductOrderService} from '@gw-services/core/shared/order/share-pro
 import {Router} from '@angular/router';
 import {ProductOrder, ProductOrderDetail} from '@gw-models/core';
 import {ProductOrderDetailService} from '@gw-services/core/api/product/product-order-detail.service';
+import {Config} from '@gw-config/core';
 
 @Component({
   selector: 'app-buying-history-detail',
@@ -10,73 +11,74 @@ import {ProductOrderDetailService} from '@gw-services/core/api/product/product-o
   styleUrls: ['./buying-history-detail.component.css']
 })
 export class BuyingHistoryDetailComponent implements OnInit {
-
-  // selected product's order
   selectedProductOrder: ProductOrder;
-
-  // check loading component is showing or not
-  loading: boolean;
-
-  // list of product order details
+  isLoadingSpinnerShown: boolean;
   productOrderDetails: ProductOrderDetail[];
+  totalShoppingCartPrice: number;
 
-  // total price
-  totalPrice: number;
-
+  /**
+   *
+   * @param shareProductOrderService - inject shareProductOrderService
+   * @param router - inject router
+   * @param productOrderDetailService - inject productOrderDetailService
+   */
   constructor(private shareProductOrderService: ShareProductOrderService,
               private router: Router,
               private productOrderDetailService: ProductOrderDetailService) {
   }
 
-  ngOnInit() {
-    // init productOrderDetails
+  ngOnInit(): void {
     this.productOrderDetails = [];
-    // get selected product order
     this.getSelectedProductOrder();
   }
 
   /**
    * get selectd product order
    */
-  private getSelectedProductOrder() {
-    // show loading component
-    this.loading = true;
+  private getSelectedProductOrder(): void {
+    this.isLoadingSpinnerShown = true;
     this.shareProductOrderService.currentProductOrder
       .subscribe((selectedProductOrder: ProductOrder) => {
         if (selectedProductOrder) {
           this.selectedProductOrder = selectedProductOrder;
-          // get list of product order details
           this.getProductOrderDetails();
         } else {
-          // redirect to client page
           this.router.navigate(['/client']);
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * get product order details
    */
-  private getProductOrderDetails() {
-    // show loading component
-    this.loading = true;
-    this.productOrderDetailService.getProductOrderDetailsByProductOrder(this.selectedProductOrder)
+  private getProductOrderDetails(): void {
+    this.isLoadingSpinnerShown = true;
+    const selectedProductOrderId = this.selectedProductOrder.id;
+    const getProductOrderDetailsUrl = `${Config.apiBaseUrl}/
+${Config.apiProductManagementPrefix}/
+${Config.apiProductOrders}/
+${selectedProductOrderId}/
+${Config.apiProductOrderDetails}`;
+    this.productOrderDetailService.getProductOrderDetails(getProductOrderDetailsUrl)
       .subscribe((productOrderDetails: ProductOrderDetail[]) => {
         if (productOrderDetails) {
           this.productOrderDetails = productOrderDetails;
-          // calculate total price
-          this.totalPrice = 0;
-          for (const eachProductOrderDetail of productOrderDetails) {
-            this.totalPrice = this.totalPrice + eachProductOrderDetail.quantity * eachProductOrderDetail.product.productPrice;
-          }
+          this.calculateTotalShoppingCartPrice();
         } else {
-          // redirect to client page
           this.router.navigate(['/client']);
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
+  }
+
+  /**
+   * calculate total shopping cart price
+   */
+  private calculateTotalShoppingCartPrice(): void {
+    this.totalShoppingCartPrice = 0;
+    for (const eachProductOrderDetail of this.productOrderDetails) {
+      this.totalShoppingCartPrice += eachProductOrderDetail.quantity * eachProductOrderDetail.product.productPrice;
+    }
   }
 }

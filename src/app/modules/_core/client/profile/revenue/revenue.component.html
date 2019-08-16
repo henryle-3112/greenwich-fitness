@@ -1,6 +1,6 @@
 <div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;">
   <!-- loading component -->
-  <app-loading *ngIf="loading"></app-loading>
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!--month picker -->
@@ -12,8 +12,8 @@
   <!-- end month picker -->
 
   <!-- custom list -->
-  <nz-list class="mg-top-24" [nzDataSource]="coachPayments" [nzRenderItem]="item" [nzItemLayout]="'horizontal'"
-           *ngIf="coachPayments && coachPayments.length && !loading">
+  <nz-list class="mg-top-24" [nzDataSource]="revenues" [nzRenderItem]="item" [nzItemLayout]="'horizontal'"
+           *ngIf="revenues && revenues.length && !isLoadingSpinnerShown">
     <ng-template #item let-item>
       <nz-list-item>
         <nz-list-item-meta
@@ -32,24 +32,25 @@
   <!-- pagination -->
   <div id="pagination">
     <nz-pagination
-      *ngIf="coachPayments && coachPayments.length && !loading"
-      [nzPageIndex]="currentPage"
-      [nzPageSize]="nCoachPaymentsPerPage"
-      [nzTotal]="totalCoachPayments"
+      *ngIf="revenues && revenues.length && !isLoadingSpinnerShown"
+      [nzPageIndex]="currentRevenuesPage"
+      [nzPageSize]="nRevenuesPerPage"
+      [nzTotal]="totalRevenues"
       [nzSize]="'small'"
-      (nzPageIndexChange)="coachPaymentsPageChange($event)"></nz-pagination>
+      (nzPageIndexChange)="revenuesPageChange($event)"></nz-pagination>
   </div>
   <!-- end pagination -->
 
   <!-- total coach revenue -->
   <div id="total-revenue-by-selected-month-and-by-selected-year"
-       *ngIf="coachPayments
-        && coachPayments.length
-        && !loading
-        && totalPaymentByCoachIdAndMonthAndYear">
-    <h3 id="total-revenue-by-selected-month-and-by-selected-year-title">Total Revenue in {{ selectedMonthToViewRevenue }}
+       *ngIf="revenues
+        && revenues.length
+        && !isLoadingSpinnerShown
+        && totalCoachRevenues">
+    <h3 id="total-revenue-by-selected-month-and-by-selected-year-title">Total Revenue
+      in {{ selectedMonthToViewRevenue }}
       /{{ selectedYearToViewRevenue }}: </h3>
-    <h3 id="total-revenue-by-selected-month-and-by-selected-year-result">{{ totalPaymentByCoachIdAndMonthAndYear }}$</h3>
+    <h3 id="total-revenue-by-selected-month-and-by-selected-year-result">{{ totalCoachRevenues }}$</h3>
   </div>
   <!-- end total coach revenue-->
 

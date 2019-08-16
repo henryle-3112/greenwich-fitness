@@ -5,7 +5,7 @@ import {
   ProductFeedbackReaction,
   ProductRate,
   ReplyOnProductFeedback, ReplyOnProductFeedbackReaction,
-  ResponseMessage, ShoppingCart,
+  ShoppingCart,
   UserProfile
 } from '@gw-models/core';
 import {ShareProductService} from '@gw-services/core/shared/product/share-product.service';
@@ -25,53 +25,18 @@ import {Config} from '@gw-config/core';
   styleUrls: ['./product-detail.component.css']
 })
 export class ProductDetailComponent implements OnInit {
-
-  // selected product that was chosen by user
   selectedProduct: Product;
-
-  // check loading component is showing or not
-  loading: boolean;
-
-  // review's content
-  reviewContent: string;
-
-  // check add review form is showing or not
-  isReviewFormShown: boolean;
-
-  // product's feedbacks
+  isLoadingSpinnerShown: boolean;
+  productReviewContent: string;
+  isProductReviewFormShown: boolean;
   productFeedbacks: ProductFeedback[];
-
-  // need to create product's feedbacks temp to load data base on current page
   productFeedbacksTemp: ProductFeedback[];
-
-  // product's feedbacks per page
   productFeedbacksPerPage: ProductFeedback[];
-
-  // current page
-  currentPage: number;
-
-  // number product's feedbacks per page
+  currentProductFeedbacksPage: number;
   nProductFeedbacksPerPage: number;
-
-  // total product's feedbacks
   totalProductFeedbacks: number;
-
-  // check product's feedback list and pagination is showing or not
-  isProductFeedbacksAndPaginationShown: boolean;
-
-  // startIndex to get product's feedbacks per page
-  startIndex: number;
-
-  // selected user's profile
   selectedUserProfile: UserProfile;
-
-  // selected product's rate
   selectedProductRateValue: number;
-
-  // selected product's rate
-  selectedProductRate: ProductRate;
-
-  // selected product's quantity
   selectedProductQuantity: number;
 
   /**
@@ -97,87 +62,112 @@ export class ProductDetailComponent implements OnInit {
               private replyOnProductFeedbackReactionService: ReplyOnProductFeedbackReactionService) {
   }
 
-  ngOnInit() {
-    // init data
+  ngOnInit(): void {
     this.initData();
-    // get selected product
     this.getSelectedProduct();
-    // get selected user's profile
     this.getSelectedUserProfile();
-    // get selected product's rate
     this.getSelectedProductRate();
+  }
+
+  /**
+   * init data
+   */
+  private initData(): void {
+    this.selectedProductQuantity = 1;
+    this.currentProductFeedbacksPage = 1;
+    this.nProductFeedbacksPerPage = 8;
   }
 
   /**
    * get selected product
    */
-  private getSelectedProduct() {
-    // show loading componnet
-    this.loading = true;
+  private getSelectedProduct(): void {
+    this.isLoadingSpinnerShown = true;
     this.shareProductService.currentProduct
       .subscribe(selectedProduct => {
-        // show loading component
-        this.selectedProduct = selectedProduct;
-        // check selected product existed or not
-        this.checkSelectedProductExistedOrNot();
-        // hide loading component
-        this.loading = false;
+        if (selectedProduct) {
+          this.selectedProduct = selectedProduct;
+          this.getProductFeedbacksByProduct();
+        } else {
+          this.router.navigate(['/shop/home']);
+        }
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
-   * check selected product existed or not
+   * get selected user's profile
    */
-  private checkSelectedProductExistedOrNot() {
-    if (this.selectedProduct == null) {
-      // if selectedProduct is not existed, redirect to home page
-      this.router.navigate(['/shop/home']);
-    } else {
-      // get feedback's products
-      this.getProductFeedbacksByProduct();
-    }
+  private getSelectedUserProfile(): void {
+    this.isLoadingSpinnerShown = true;
+    this.shareUserProfileService.currentUserProfile
+      .subscribe(selectedUserProfile => {
+        if (selectedUserProfile) {
+          this.selectedUserProfile = selectedUserProfile;
+        } else {
+          this.router.navigate(['/shop/home']);
+        }
+        this.isLoadingSpinnerShown = false;
+      });
+  }
+
+  /**
+   * get selected's product rate
+   */
+  private getSelectedProductRate(): void {
+    this.isLoadingSpinnerShown = true;
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const selectedProductId = this.selectedProduct.id;
+    const getProductRateUrl = `${Config.apiBaseUrl}/
+${Config.apiProductManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiProducts}/
+${selectedProductId}/
+${Config.apiProductRates}`;
+    this.productRateService.getProductRate(getProductRateUrl)
+      .subscribe((selectedProductRate: ProductRate) => {
+        if (selectedProductRate) {
+          this.selectedProductRateValue = selectedProductRate.rate;
+        }
+        this.isLoadingSpinnerShown = false;
+      });
   }
 
   /**
    * toggle add review form
    */
-  public toggleAddReviewForm() {
-    this.isReviewFormShown = !this.isReviewFormShown;
+  public toggleAddReviewForm(): void {
+    this.isProductReviewFormShown = !this.isProductReviewFormShown;
   }
 
   /**
    * get product's feedbacks by product
    */
-  private getProductFeedbacksByProduct() {
-    // show loading component
-    this.loading = true;
-    // get product's feedbacks
-    this.productFeedbackService.getProductFeedbacksByProduct(this.selectedProduct, 1)
+  private getProductFeedbacksByProduct(): void {
+    this.isLoadingSpinnerShown = true;
+    const selectedProductId = this.selectedProduct.id;
+    const productFeedbackStatus = 1;
+    const getProductFeedbacksUrl = `${Config.apiBaseUrl}/
+${Config.apiProductManagementPrefix}/
+${Config.apiProducts}/
+${selectedProductId}/
+${Config.apiProductFeedbacks}?
+${Config.statusParameter}=${productFeedbackStatus}`;
+    this.productFeedbackService.getProductFeedbacks(getProductFeedbacksUrl)
       .subscribe(productFeedbacks => {
-        if (productFeedbacks) {
-          // check product's feedbacks list and pagination is showing or not
-          if (productFeedbacks.length > 0) {
-            // get product's feedbacks
-            this.productFeedbacks = productFeedbacks;
-            // assign all data to product's feedbacks temp the first time
-            this.productFeedbacksTemp = productFeedbacks;
-            // get total number of product's feedbacks
-            this.totalProductFeedbacks = this.productFeedbacksTemp.length;
-            // load product's feedbacks per page
-            this.loadProductFeedbacksPerPage();
-            //
-            this.isProductFeedbacksAndPaginationShown = true;
-          } else {
-            this.isProductFeedbacksAndPaginationShown = false;
-            // init product feedback
-            this.productFeedbacks = [];
-            this.productFeedbacksPerPage = [];
-            this.productFeedbacksTemp = [];
-            this.totalProductFeedbacks = 0;
-          }
-          // hide loading component
-          this.loading = false;
+        if (productFeedbacks && productFeedbacks.length > 0) {
+          this.productFeedbacks = productFeedbacks;
+          this.productFeedbacksTemp = productFeedbacks;
+          this.totalProductFeedbacks = this.productFeedbacksTemp.length;
+          this.getProductFeedbacksPerPage();
+        } else {
+          this.productFeedbacks = [];
+          this.productFeedbacksPerPage = [];
+          this.productFeedbacksTemp = [];
+          this.totalProductFeedbacks = 0;
         }
+        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -185,50 +175,75 @@ export class ProductDetailComponent implements OnInit {
    *
    * @param event - current's page
    */
-  public productFeedbacksPageChange(event) {
-    // set current page
-    this.currentPage = event;
-    // show loading component
-    this.loading = true;
-    // load new data
-    this.loadProductFeedbacksPerPage();
-  }
-
-  /**
-   * init data
-   */
-  private initData() {
-    // init current product's quantity
-    this.selectedProductQuantity = 1;
-    // init current page
-    this.currentPage = 1;
-    // init number of product's feedbacks per page
-    this.nProductFeedbacksPerPage = 8;
+  public productFeedbacksPageChange(event): void {
+    this.currentProductFeedbacksPage = event;
+    this.isLoadingSpinnerShown = true;
+    this.getProductFeedbacksPerPage();
   }
 
   /**
    * load product's feedbacks per page
    */
-  private loadProductFeedbacksPerPage() {
-    // init startIndex
-    this.startIndex = ((this.currentPage - 1) * 8) + 1;
-    // get product's feedbacks data per page
-    this.productFeedbacksPerPage = this.productFeedbacksTemp.slice(this.startIndex - 1, this.startIndex + 7);
-    // hide loading component
-    this.loading = false;
-    // load number of reactions, replies for product's feedbacks per page
-    this.loadNumberOfRepliesAndReactions();
-    // check which feedback that current user liked and disliked
-    this.loadProductFeedbackUserLikedAndDisliked();
+  private getProductFeedbacksPerPage(): void {
+    const startIndex = ((this.currentProductFeedbacksPage - 1) * 8) + 1;
+    this.productFeedbacksPerPage = this.productFeedbacksTemp.slice(startIndex - 1, startIndex + 7);
+    this.isLoadingSpinnerShown = false;
+    this.getProductFeedbackReactionsByUser();
+  }
+
+  /**
+   * get product's feedback that user liked or disliked
+   */
+  private getProductFeedbackReactionsByUser(): void {
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const getProductFeedbackReactionsUrl = `${Config.apiBaseUrl}/
+${Config.apiProductManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiProductFeedbackReactions}`;
+    this.productFeedbackReactionService.getProductFeedbackReactions(getProductFeedbackReactionsUrl)
+      .subscribe((productFeedbackReactions: ProductFeedbackReaction[]) => {
+        if (productFeedbackReactions) {
+          this.showProductFeedbacksUserLikedDisliked(productFeedbackReactions);
+        }
+      });
+  }
+
+  /**
+   *
+   * @param productFeedbackReactions - product's feedbacks that user liked and disliked
+   */
+  private showProductFeedbacksUserLikedDisliked(productFeedbackReactions: ProductFeedbackReaction[]): void {
+    for (const eachProductFeedbackReaction of productFeedbackReactions) {
+      for (const eachProductFeedback of this.productFeedbacksPerPage) {
+        if (eachProductFeedbackReaction.productFeedback.id === eachProductFeedback.id) {
+          this.changeProductFeedbackReactionStatus(eachProductFeedback, eachProductFeedbackReaction);
+          break;
+        }
+      }
+    }
+  }
+
+  /**
+   *
+   * @param selectedProductFeedback - selected product's feedback that user liked and disliked
+   * @param selectedProductFeedbackReaction - reaction's value that user has reacted to selected products' feedback
+   */
+  private changeProductFeedbackReactionStatus(selectedProductFeedback: ProductFeedback,
+                                              selectedProductFeedbackReaction: ProductFeedbackReaction): void {
+    selectedProductFeedback.isReacted = true;
+    if (selectedProductFeedbackReaction.reaction === 1) {
+      selectedProductFeedback.isLikeClicked = true;
+    } else if (selectedProductFeedbackReaction.reaction === 0) {
+      selectedProductFeedback.isLikeClicked = false;
+    }
   }
 
   /**
    * add product's feedback for selected product
    */
-  public addProductReview() {
-    // add product's feedback
+  public addProductReview(): void {
     this.addProductFeedback();
-    // add product's rate
     this.addProductRate();
   }
 
@@ -238,7 +253,7 @@ export class ProductDetailComponent implements OnInit {
    * @param title - title of notification
    * @param content - content of notification
    */
-  createNotification(type: string, title: string, content: string) {
+  createNotification(type: string, title: string, content: string): void {
     this.notification.create(
       type,
       title,
@@ -246,70 +261,32 @@ export class ProductDetailComponent implements OnInit {
     );
   }
 
-  /**
-   * get selected user's profile
-   */
-  private getSelectedUserProfile() {
-    this.shareUserProfileService.currentUserProfile
-      .subscribe(selectedUserProfile => {
-        if (selectedUserProfile) {
-          this.selectedUserProfile = selectedUserProfile;
-        }
-      });
-  }
-
-  /**
-   * get selected's product rate
-   */
-  private getSelectedProductRate() {
-    // show loading component
-    this.loading = true;
-    // get selected product's rate
-    this.productRateService.getProductRateByUserIdAndProductId(
-      this.selectedUserProfile.id,
-      this.selectedProduct.id
-    )
-      .subscribe((selectedProductRate: ProductRate) => {
-        if (selectedProductRate) {
-          this.selectedProductRate = selectedProductRate;
-          this.selectedProductRateValue = this.selectedProductRate.rate;
-        }
-        // hide loading component
-        this.loading = false;
-      });
-  }
 
   /**
    *
    * @param event - rate value
    */
-  public onRateChanged(event) {
+  public onRateChanged(event): void {
     this.selectedProductRateValue = event;
   }
 
   /**
    * add product's feedback
    */
-  private addProductFeedback() {
-    // check review's content is empty or not
-    if (this.reviewContent.localeCompare('') === 0) {
-      // show warning message to user
+  private addProductFeedback(): void {
+    if (this.productReviewContent.localeCompare('') === 0) {
       this.createNotification('error', 'Error', 'Please input your review\'s content');
     } else {
-      // create new product's feedback
       const productFeedback = new ProductFeedback();
-      productFeedback.feedbackContent = this.reviewContent;
+      productFeedback.feedbackContent = this.productReviewContent;
       productFeedback.feedbackCreatedDate = new Date();
       productFeedback.feedbackStatus = 1;
       productFeedback.product = this.selectedProduct;
       productFeedback.userProfile = this.selectedUserProfile;
-      productFeedback.nLikes = 0;
-      productFeedback.nDislikes = 0;
-      productFeedback.nReplies = 0;
-
-      // add product's feedback client
+      productFeedback.numberOfLikes = 0;
+      productFeedback.numberOfDislikes = 0;
+      productFeedback.numberOfReplies = 0;
       this.addNewProductFeedbackOnClient(productFeedback);
-      // add product's feedback to database
       this.addNewProductFeedbackToServer(productFeedback);
     }
   }
@@ -319,32 +296,27 @@ export class ProductDetailComponent implements OnInit {
    * @param productFeedback - selected product's feedback
    *
    */
-  private addNewProductFeedbackOnClient(productFeedback: ProductFeedback) {
-    // add product's feedbacks
+  private addNewProductFeedbackOnClient(productFeedback: ProductFeedback): void {
     this.productFeedbacks.push(productFeedback);
-    // assign all data to product's feedbacks temp
     this.productFeedbacksTemp = this.productFeedbacks;
-    // get total number of product's feedbacks
     this.totalProductFeedbacks = this.productFeedbacksTemp.length;
-    // add to current page if have any free space left
     if (this.productFeedbacksPerPage.length < 8) {
       this.productFeedbacksPerPage.push(productFeedback);
     }
   }
 
   /**
-   * add new product's feedback to server
+   *
+   * @param productFeedback - product's feedback that will be added
    */
-  private addNewProductFeedbackToServer(productFeedback) {
-    this.productFeedbackService.addProductFeedback(productFeedback)
+  private addNewProductFeedbackToServer(productFeedback: ProductFeedback): void {
+    const addProductFeedbackUrl = `${Config.apiBaseUrl}/${Config.apiProductManagementPrefix}/${Config.apiProductFeedbacks}`;
+    this.productFeedbackService.addProductFeedback(addProductFeedbackUrl, productFeedback)
       .subscribe((insertedProductFeedback: ProductFeedback) => {
         if (insertedProductFeedback) {
-          // assign new product's feedback
-          this.reviewContent = '';
-          // show success notification
+          this.productReviewContent = '';
           this.createNotification('success', 'Success', 'Thank your for your feedback!!!');
         } else {
-          // show error notification
           this.createNotification('error', 'Error', 'Cannot submit your feedback! Please try again!');
         }
       });
@@ -353,136 +325,82 @@ export class ProductDetailComponent implements OnInit {
   /**
    * add product's rate
    */
-  private addProductRate() {
-    // create new product's rate object
+  private addProductRate(): void {
     const productRate = new ProductRate();
     productRate.rate = this.selectedProductRateValue;
     productRate.product = this.selectedProduct;
     productRate.userProfile = this.selectedUserProfile;
-
-    // add to database
-    this.productRateService.addProductRate(productRate)
+    const addProductRateUrl = `${Config.apiBaseUrl}/${Config.apiProductManagementPrefix}/${Config.apiProductRates}`;
+    this.productRateService.addProductRate(addProductRateUrl, productRate)
       .subscribe((insertedProductRate: ProductRate) => {
         if (insertedProductRate) {
-          console.log(insertedProductRate);
-          // assign new product's rate
-          this.selectedProductRate = insertedProductRate;
           this.selectedProductRateValue = insertedProductRate.rate;
         }
       });
   }
 
   /**
-   * load number of replies and reactions
+   *
+   * @param selectedProductFeedback - selected product's feedback that user want to like
    */
-  private loadNumberOfRepliesAndReactions() {
-    this.productFeedbacksPerPage.map(eachProductFeedback => {
-      // count number of product feedback replies
-      this.replyOnProductFeedbackService.countNumberOfProductFeedbackReplies(eachProductFeedback, 1)
-        .subscribe((nReplies: ResponseMessage) => {
-          if (nReplies) {
-            eachProductFeedback.nReplies = Number(nReplies.message);
-          } else {
-            eachProductFeedback.nReplies = 0;
-          }
-        });
-      // count number of like
-      this.productFeedbackReactionService.countNumberOfProductFeedbackReactions(eachProductFeedback, 1)
-        .subscribe((nLikes: ResponseMessage) => {
-          if (nLikes) {
-            eachProductFeedback.nLikes = Number(nLikes.message);
-          } else {
-            eachProductFeedback.nLikes = 0;
-          }
-        });
-      // count number of dislikes
-      this.productFeedbackReactionService.countNumberOfProductFeedbackReactions(eachProductFeedback, 0)
-        .subscribe((nDisLikes: ResponseMessage) => {
-          if (nDisLikes) {
-            eachProductFeedback.nDislikes = Number(nDisLikes.message);
-          } else {
-            eachProductFeedback.nDislikes = 0;
-          }
-        });
-    });
+  public like(selectedProductFeedback: ProductFeedback): void {
+    if (selectedProductFeedback.isLikeClicked === true) {
+      return;
+    }
+    if (selectedProductFeedback.numberOfDislikes > 0 && selectedProductFeedback.isReacted) {
+      selectedProductFeedback.numberOfDislikes -= 1;
+    }
+    selectedProductFeedback.numberOfLikes += 1;
+    selectedProductFeedback.isLikeClicked = true;
+    selectedProductFeedback.isReacted = true;
+    // update number of likes of selected product's feedback
+    this.updateProductFeedback(selectedProductFeedback);
+    this.submitNewProductFeedbackReaction(selectedProductFeedback, 1);
   }
 
   /**
-   * load product's feedback that user liked and disliked
+   *
+   * @param selectedProductFeedback - selected product's feedback that user wants to dislike
    */
-  private loadProductFeedbackUserLikedAndDisliked() {
-    this.productFeedbackReactionService.getProductFeedbackReactionsByUserProfile(this.selectedUserProfile)
-      .subscribe((productFeedbackReactions: ProductFeedbackReaction[]) => {
-        if (productFeedbackReactions) {
-          // show current like and dislike status of current user's profile
-          for (const eachProductFeedbackReaction of productFeedbackReactions) {
-            for (const eachProductFeedback of this.productFeedbacksPerPage) {
-              eachProductFeedback.isReacted = true;
-              if (eachProductFeedbackReaction.productFeedback.id === eachProductFeedback.id) {
-                if (eachProductFeedbackReaction.reaction === 1) {
-                  // show like status
-                  eachProductFeedback.isLikeClicked = true;
-                } else if (eachProductFeedbackReaction.reaction === 0) {
-                  // show dislike status
-                  eachProductFeedback.isLikeClicked = false;
-                }
-                break;
-              }
-            }
-          }
-        }
+  public dislike(selectedProductFeedback: ProductFeedback): void {
+    if (selectedProductFeedback.isLikeClicked === false) {
+      return;
+    }
+    if (selectedProductFeedback.numberOfLikes > 0 && selectedProductFeedback.isReacted) {
+      selectedProductFeedback.numberOfLikes -= 1;
+    }
+    selectedProductFeedback.numberOfDislikes += 1;
+    selectedProductFeedback.isLikeClicked = false;
+    selectedProductFeedback.isReacted = true;
+    // update number of dislikes of selected product's feedback
+    this.updateProductFeedback(selectedProductFeedback);
+    this.submitNewProductFeedbackReaction(selectedProductFeedback, 0);
+  }
+
+  /**
+   *
+   * @param selectedProductFeedback - product's feedback that will be updated
+   */
+  private updateProductFeedback(selectedProductFeedback: ProductFeedback): void {
+    const updateProductFeedbackUrl = `${Config.apiBaseUrl}/${Config.apiProductManagementPrefix}/${Config.apiProductFeedbacks}`;
+    this.productFeedbackService.updateProductFeedback(updateProductFeedbackUrl, selectedProductFeedback)
+      .subscribe((updatedProductFeedback: ProductFeedback) => {
+        console.log(updatedProductFeedback);
       });
   }
 
   /**
    *
-   * @param selectedComment - selected comment that user wants to like
+   * @param selectedProductFeedback - selected product's feedback that user want to like or dislike
+   * @param reactionValue - reaction's value that will be set to selected product's feedback
    */
-  public like(selectedComment: ProductFeedback) {
-    if (selectedComment.isLikeClicked === true) {
-      return;
-    }
-    if (selectedComment.nDislikes > 0 && selectedComment.isReacted) {
-      selectedComment.nDislikes -= 1;
-    }
-    selectedComment.nLikes += 1;
-    selectedComment.isLikeClicked = true;
-    selectedComment.isReacted = true;
-    // submit new product's feedback reaction to database
-    this.submitNewProductFeedbackReaction(selectedComment, 1);
-  }
-
-  /**
-   *
-   * @param selectedComment - selected comment that user wants to dislike
-   */
-  public dislike(selectedComment: ProductFeedback) {
-    if (selectedComment.isLikeClicked === false) {
-      return;
-    }
-    if (selectedComment.nLikes > 0 && selectedComment.isReacted) {
-      selectedComment.nLikes -= 1;
-    }
-    selectedComment.nDislikes += 1;
-    selectedComment.isLikeClicked = false;
-    selectedComment.isReacted = true;
-    // submit new product's feedback reaction to database
-    this.submitNewProductFeedbackReaction(selectedComment, 0);
-  }
-
-  /**
-   *
-   * @param selectedComment - selected product's feedback
-   * @param reactionValue - reaction's value
-   */
-  private submitNewProductFeedbackReaction(selectedComment, reactionValue) {
-    // create new product's feedback reaction object
+  private submitNewProductFeedbackReaction(selectedProductFeedback: ProductFeedback, reactionValue: number): void {
     const newProductFeedbackReaction = new ProductFeedbackReaction();
-    newProductFeedbackReaction.productFeedback = selectedComment;
+    newProductFeedbackReaction.productFeedback = selectedProductFeedback;
     newProductFeedbackReaction.userProfile = this.selectedUserProfile;
     newProductFeedbackReaction.reaction = reactionValue;
-    // submit to the database
-    this.productFeedbackReactionService.addNewProductFeedbackReaction(newProductFeedbackReaction)
+    const addProductFeedbackReactionUrl = `${Config.apiBaseUrl}/${Config.apiProductManagementPrefix}/${Config.apiProductFeedbackReactions}`;
+    this.productFeedbackReactionService.addNewProductFeedbackReaction(addProductFeedbackReactionUrl, newProductFeedbackReaction)
       .subscribe((insertedProductFeedbackReaction: ProductFeedbackReaction) => {
         if (insertedProductFeedbackReaction) {
           console.log(insertedProductFeedbackReaction);
@@ -492,45 +410,22 @@ export class ProductDetailComponent implements OnInit {
 
   /**
    *
-   * @param selectedComment - selected product's feedback that user want to view replies
+   * @param selectedProductFeedback - selected product's feedback that user want to view replies
    */
-  public viewRepliesOfSelectedProductFeedback(selectedComment) {
-    if (!selectedComment.replies) {
-      this.replyOnProductFeedbackService.getRepliesOnSelectedProductFeedback(selectedComment, 1)
+  public viewRepliesOfSelectedProductFeedback(selectedProductFeedback: ProductFeedback): void {
+    if (!selectedProductFeedback.replies) {
+      const replyOnProductFeedbackStatus = 1;
+      const getRepliesOnProductFeedbackUrl = `${Config.apiBaseUrl}/
+${Config.apiProductManagementPrefix}/
+${Config.apiProductFeedbacks}/
+${selectedProductFeedback.id}/
+${Config.apiRepliesOnProductFeedback}?
+${Config.statusParameter}=${replyOnProductFeedbackStatus}`;
+      this.replyOnProductFeedbackService.getRepliesOnProductFeedback(getRepliesOnProductFeedbackUrl)
         .subscribe((repliesOnProductFeedback: ReplyOnProductFeedback[]) => {
           if (repliesOnProductFeedback) {
-            selectedComment.replies = repliesOnProductFeedback;
-            // load number of likes and dislikes of replies on product's feedback
-            this.loadNumberOfReplyOnProductFeedbackReactions(selectedComment);
-            // check which reply on product's feedback that current user liked and disliked
-            this.loadReplyOnProductFeedbackUserLikedAndDisliked(selectedComment);
-          }
-        });
-    }
-  }
-
-  /**
-   *
-   * @param selectedComment - selected comment that user want to load number of reply's reactions
-   */
-  private loadNumberOfReplyOnProductFeedbackReactions(selectedComment: any) {
-    for (const eachReplyOnProductFeedback of selectedComment.replies) {
-      // count number of likes
-      this.replyOnProductFeedbackReactionService.countNumberOfReplyOnProductFeedbackReaction(eachReplyOnProductFeedback, 1)
-        .subscribe((nLikes: ResponseMessage) => {
-          if (nLikes) {
-            eachReplyOnProductFeedback.nLikes = Number(nLikes.message);
-          } else {
-            eachReplyOnProductFeedback.nLikes = 0;
-          }
-        });
-      // count number dislikes
-      this.replyOnProductFeedbackReactionService.countNumberOfReplyOnProductFeedbackReaction(eachReplyOnProductFeedback, 0)
-        .subscribe((nDislikes: ResponseMessage) => {
-          if (nDislikes) {
-            eachReplyOnProductFeedback.nDislikes = Number(nDislikes.message);
-          } else {
-            eachReplyOnProductFeedback.nDislikes = 0;
+            selectedProductFeedback.replies = repliesOnProductFeedback;
+            this.getReplyOnProductFeedbackReactionsByUser(selectedProductFeedback);
           }
         });
     }
@@ -539,43 +434,69 @@ export class ProductDetailComponent implements OnInit {
   /**
    * check which reply on product's feedback that current user liked and disliked
    */
-  private loadReplyOnProductFeedbackUserLikedAndDisliked(selectedComment) {
-    this.replyOnProductFeedbackReactionService.getReplyOnProductFeedbackReactionsByUserProfile(this.selectedUserProfile)
+  private getReplyOnProductFeedbackReactionsByUser(selectedProductFeedback: ProductFeedback): void {
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const getReplyOnProductFeedbackReactionsUrl = `${Config.apiBaseUrl}/
+${Config.apiProductManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiReplyOnProductFeedbackReaction}`;
+    this.replyOnProductFeedbackReactionService.getReplyOnProductFeedbackReactions(getReplyOnProductFeedbackReactionsUrl)
       .subscribe((replyOnProductFeedbackReactions: ReplyOnProductFeedbackReaction[]) => {
         if (replyOnProductFeedbackReactions) {
-          // show current like and dislike status of current user's profile
-          for (const eachReplyOnProductFeedbackReaction of replyOnProductFeedbackReactions) {
-            for (const eachReplyOnProductFeedback of selectedComment.replies) {
-              eachReplyOnProductFeedback.isReacted = true;
-              if (eachReplyOnProductFeedbackReaction.replyOnProductFeedback.id === eachReplyOnProductFeedback.id) {
-                if (eachReplyOnProductFeedbackReaction.reaction === 1) {
-                  eachReplyOnProductFeedback.isLikeClicked = true;
-                } else if (eachReplyOnProductFeedbackReaction.reaction === 0) {
-                  eachReplyOnProductFeedback.isLikeClicked = false;
-                }
-                break;
-              }
-            }
-          }
+          this.showReplyOnProductFeedbacksUserLikedDisliked(selectedProductFeedback.replies, replyOnProductFeedbackReactions);
         }
       });
   }
 
   /**
    *
+   * @param repliesOnProductFeedback - replies on product's feedback that will be checked which replies that user liked and disliked
+   * @param replyOnProductFeedbackReactions - replies on product's feedback that user liked and disliked
+   */
+  private showReplyOnProductFeedbacksUserLikedDisliked(repliesOnProductFeedback: ReplyOnProductFeedback[],
+                                                       replyOnProductFeedbackReactions: ReplyOnProductFeedbackReaction[]): void {
+    for (const eachReplyOnProductFeedbackReaction of replyOnProductFeedbackReactions) {
+      for (const eachReplyOnProductFeedback of repliesOnProductFeedback) {
+        if (eachReplyOnProductFeedbackReaction.replyOnProductFeedback.id === eachReplyOnProductFeedback.id) {
+          this.changeReplyOnProductFeedbackReactionStatus(eachReplyOnProductFeedback, eachReplyOnProductFeedbackReaction);
+          break;
+        }
+      }
+    }
+  }
+
+  /**
+   *
+   * @param selectedReplyOnProductFeedback - reply on product's feedback that its reaction will be changed
+   * @param selectedReplyOnProductFeedbackReacton - reaction's value that will be set to selected reply on product's feedback
+   */
+  private changeReplyOnProductFeedbackReactionStatus(selectedReplyOnProductFeedback: ReplyOnProductFeedback,
+                                                     selectedReplyOnProductFeedbackReacton: ReplyOnProductFeedbackReaction): void {
+    selectedReplyOnProductFeedback.isReacted = true;
+    if (selectedReplyOnProductFeedbackReacton.reaction === 1) {
+      selectedReplyOnProductFeedback.isLikeClicked = true;
+    } else if (selectedReplyOnProductFeedbackReacton.reaction === 0) {
+      selectedReplyOnProductFeedback.isLikeClicked = false;
+    }
+  }
+
+  /**
+   *
    * @param selectedReplyOnProductFeedback - selectedReplyOnProductFeedback
    */
-  public likeReplyOnProductFeedback(selectedReplyOnProductFeedback: ReplyOnProductFeedback) {
+  public likeReplyOnProductFeedback(selectedReplyOnProductFeedback: ReplyOnProductFeedback): void {
     if (selectedReplyOnProductFeedback.isLikeClicked === true) {
       return;
     }
-    if (selectedReplyOnProductFeedback.nDislikes > 0 && selectedReplyOnProductFeedback.isReacted) {
-      selectedReplyOnProductFeedback.nDislikes -= 1;
+    if (selectedReplyOnProductFeedback.numberOfDislikes > 0 && selectedReplyOnProductFeedback.isReacted) {
+      selectedReplyOnProductFeedback.numberOfDislikes -= 1;
     }
-    selectedReplyOnProductFeedback.nLikes += 1;
+    selectedReplyOnProductFeedback.numberOfLikes += 1;
     selectedReplyOnProductFeedback.isLikeClicked = true;
     selectedReplyOnProductFeedback.isReacted = true;
-    // submit new reply on product feedback reaction to database
+    // update number of likes of reply on product's feedback
+    this.updateReplyOnProductFeedback(selectedReplyOnProductFeedback);
     this.submitNewReplyProductFeedbackReaction(selectedReplyOnProductFeedback, 1);
   }
 
@@ -583,18 +504,29 @@ export class ProductDetailComponent implements OnInit {
    *
    * @param selectedReplyOnProductFeedback - selectedReplyOnProductFeedback
    */
-  public dislikeReplyOnProductFeedback(selectedReplyOnProductFeedback: ReplyOnProductFeedback) {
+  public dislikeReplyOnProductFeedback(selectedReplyOnProductFeedback: ReplyOnProductFeedback): void {
     if (selectedReplyOnProductFeedback.isLikeClicked === false) {
       return;
     }
-    if (selectedReplyOnProductFeedback.nLikes > 0 && selectedReplyOnProductFeedback.isReacted) {
-      selectedReplyOnProductFeedback.nLikes -= 1;
+    if (selectedReplyOnProductFeedback.numberOfLikes > 0 && selectedReplyOnProductFeedback.isReacted) {
+      selectedReplyOnProductFeedback.numberOfLikes -= 1;
     }
-    selectedReplyOnProductFeedback.nDislikes += 1;
+    selectedReplyOnProductFeedback.numberOfDislikes += 1;
     selectedReplyOnProductFeedback.isLikeClicked = false;
     selectedReplyOnProductFeedback.isReacted = true;
-    // submit new reply on product feedback reaction to database
+    // update number of dislikes of reply on product's feedback
+    this.updateReplyOnProductFeedback(selectedReplyOnProductFeedback);
     this.submitNewReplyProductFeedbackReaction(selectedReplyOnProductFeedback, 0);
+  }
+
+  private updateReplyOnProductFeedback(selectedReplyOnProductFeedback: ReplyOnProductFeedback): void {
+    const updateReplyOnProductFeedbackUrl = `${Config.apiBaseUrl}/
+${Config.apiProductManagementPrefix}/
+${Config.apiRepliesOnProductFeedback}`;
+    this.replyOnProductFeedbackService.updateReplyOnProductFeedback(updateReplyOnProductFeedbackUrl, selectedReplyOnProductFeedback)
+      .subscribe((updatedReplyOnProductFeedback: ReplyOnProductFeedback) => {
+        console.log(updatedReplyOnProductFeedback);
+      });
   }
 
   /**
@@ -602,14 +534,17 @@ export class ProductDetailComponent implements OnInit {
    * @param selectedReplyOnProductFeedback - selected reply on product feedback
    * @param reactionValue - reaction's value
    */
-  private submitNewReplyProductFeedbackReaction(selectedReplyOnProductFeedback, reactionValue) {
+  private submitNewReplyProductFeedbackReaction(selectedReplyOnProductFeedback, reactionValue): void {
     // create new reply on product feedback reaction object
     const newReplyOnProductFeedbackReaction = new ReplyOnProductFeedbackReaction();
     newReplyOnProductFeedbackReaction.replyOnProductFeedback = selectedReplyOnProductFeedback;
     newReplyOnProductFeedbackReaction.userProfile = this.selectedUserProfile;
     newReplyOnProductFeedbackReaction.reaction = reactionValue;
-    // submit to the database
-    this.replyOnProductFeedbackReactionService.addNewReplyOnProductFeedbackReaction(newReplyOnProductFeedbackReaction)
+    const addReplyProductFeedbackReactionUrl = `${Config.apiBaseUrl}/
+${Config.apiProductManagementPrefix}/
+${Config.apiReplyOnProductFeedbackReaction}`;
+    this.replyOnProductFeedbackReactionService
+      .addReplyOnProductFeedbackReaction(addReplyProductFeedbackReactionUrl, newReplyOnProductFeedbackReaction)
       .subscribe((insertedReplyOnProductFeedbackReaction: ReplyOnProductFeedbackReaction) => {
         if (insertedReplyOnProductFeedbackReaction) {
           console.log(insertedReplyOnProductFeedbackReaction);
@@ -621,11 +556,11 @@ export class ProductDetailComponent implements OnInit {
    *
    * @param selectedComment - selected comment that user want to reply
    */
-  public showReplyProductFeedbackBox(selectedComment) {
+  public showReplyProductFeedbackBox(selectedComment): void {
     selectedComment.isReplyBoxShown = true;
   }
 
-  public showReplyReplyProductFeedbackBox(selectedReplyComment) {
+  public showReplyReplyProductFeedbackBox(selectedReplyComment): void {
     // find product's feedback and show reply box
     for (const eachProductFeedback of this.productFeedbacksPerPage) {
       if (selectedReplyComment.productFeedback.id === eachProductFeedback.id) {
@@ -637,51 +572,43 @@ export class ProductDetailComponent implements OnInit {
 
   /**
    *
-   * @param replyContent - reply's content
-   * @param selectedComment - selectedComment
+   * @param replyContent - reply's content that user want to reply to selected product's feedback
+   * @param selectedProductFeedback - selected product's feedback that user want to reply
    */
-  public replyToProductFeedback(selectedComment, replyContent) {
-    // create new reply on product' feedback
+  public replyToProductFeedback(selectedProductFeedback: ProductFeedback, replyContent: string): void {
     const newReplyOnProductFeedback = new ReplyOnProductFeedback();
     newReplyOnProductFeedback.replyOnProductFeedbackContent = replyContent;
     newReplyOnProductFeedback.replyOnProductFeedbackStatus = 1;
     newReplyOnProductFeedback.replyOnProductFeedbackCreateDate = new Date();
-    newReplyOnProductFeedback.productFeedback = selectedComment;
+    newReplyOnProductFeedback.productFeedback = selectedProductFeedback;
     newReplyOnProductFeedback.userProfile = this.selectedUserProfile;
-    newReplyOnProductFeedback.nLikes = 0;
-    newReplyOnProductFeedback.nDislikes = 0;
-
-    // add new reply on product feedback to the server
-    this.replyOnProductFeedbackService.addReplyOnProductFeedback(newReplyOnProductFeedback)
+    newReplyOnProductFeedback.numberOfLikes = 0;
+    newReplyOnProductFeedback.numberOfDislikes = 0;
+    const addReplyOnProductFeedbackUrl = `${Config.apiBaseUrl}/${Config.apiProductManagementPrefix}/${Config.apiRepliesOnProductFeedback}`;
+    this.replyOnProductFeedbackService.addReplyOnProductFeedback(addReplyOnProductFeedbackUrl, newReplyOnProductFeedback)
       .subscribe((insertedReplyOnProductFeedback: ReplyOnProductFeedback) => {
         if (insertedReplyOnProductFeedback) {
           console.log(insertedReplyOnProductFeedback);
         }
       });
-
-    // add new reply on client
-    if (selectedComment.replies && selectedComment.replies.length) {
-      selectedComment.replies.push(newReplyOnProductFeedback);
+    if (selectedProductFeedback.replies && selectedProductFeedback.replies.length) {
+      selectedProductFeedback.replies.push(newReplyOnProductFeedback);
     }
-    selectedComment.nReplies += 1;
+    selectedProductFeedback.numberOfReplies += 1;
   }
 
   /**
    * add product to cart
    */
-  public addProductToCart() {
-    // check number of quantity that user want to buy is greater number of quantity in the database or not
+  public addProductToCart(): void {
     if (this.selectedProductQuantity > this.selectedProduct.productQuantity) {
       this.createNotification('error', 'Error', 'Sorry! Your product\'s quantity is exceed number of products in the storage');
       return;
     }
     if (localStorage.getItem(Config.shoppingCart)) {
-      // get current shopping cart list if it existed
       const currentShoppingCart = JSON.parse(localStorage.getItem(Config.shoppingCart));
-      // add product to shopping cart
       this.addProductToShoppingCart(currentShoppingCart);
     } else {
-      // init shopping cart if it is not existed
       this.initShoppingCart();
     }
   }
@@ -690,45 +617,35 @@ export class ProductDetailComponent implements OnInit {
    *
    * @param currentShoppingCart - current shopping cart
    */
-  private addProductToShoppingCart(currentShoppingCart) {
+  private addProductToShoppingCart(currentShoppingCart: any): void {
     let isProductExistedInCurrentShoppingCart = false;
     for (const eachProductShoppingCart of currentShoppingCart) {
       if (eachProductShoppingCart.product.id === this.selectedProduct.id) {
-        // if product existed in the current shopping cart, just increase quantity
         eachProductShoppingCart.quantity += this.selectedProductQuantity;
         isProductExistedInCurrentShoppingCart = true;
         break;
       }
     }
     if (!isProductExistedInCurrentShoppingCart) {
-      // create new shopping cart object
       const productShoppingCart = new ShoppingCart();
       productShoppingCart.product = this.selectedProduct;
       productShoppingCart.quantity = this.selectedProductQuantity;
-      // add product to current shopping cart
       currentShoppingCart.push(productShoppingCart);
     }
-    // save local storage
     localStorage.setItem(Config.shoppingCart, JSON.stringify(currentShoppingCart));
-    // show message to user
     this.createNotification('success', 'Success', `${this.selectedProduct.productName} was added to cart successfully`);
   }
 
   /**
    * init shopping cart
    */
-  private initShoppingCart() {
-    // if current shopping cart does not existed, create new one
+  private initShoppingCart(): void {
     const currentShoppingCart = [];
-    // create shoppingCart object
     const newProductShoppingCart = new ShoppingCart();
     newProductShoppingCart.quantity = 1;
     newProductShoppingCart.product = this.selectedProduct;
-    // add current product to currentShoppingCart
     currentShoppingCart.push(newProductShoppingCart);
-    // save to localStorage
     localStorage.setItem(Config.shoppingCart, JSON.stringify(currentShoppingCart));
-    // show message to user
     this.createNotification('success', 'Success', `${this.selectedProduct.productName} was added to cart successfully`);
   }
 }

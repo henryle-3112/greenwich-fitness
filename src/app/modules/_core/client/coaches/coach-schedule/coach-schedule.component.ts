@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Coach, Membership, ResponseMessage, Training, UserProfile} from '@gw-models/core';
+import {Coach, Membership, Training, UserProfile} from '@gw-models/core';
 import {Config} from '@gw-config/core';
 import {ShareCoachService} from '@gw-services/core/shared/coach/share-coach.service';
 import {Router} from '@angular/router';
@@ -15,32 +15,15 @@ import {MembershipService} from '@gw-services/core/api/coach/membership.service'
   styleUrls: ['./coach-schedule.component.css']
 })
 export class CoachScheduleComponent implements OnInit {
-  // list of trainings
   trainings: Training[];
-
-  // currentPage
-  currentPage = 1;
-
-  // loading component is show ot not
-  loading = true;
-
-  // number trainings per page
+  currentTrainingsPage = 1;
+  isLoadingSpinnerShown = true;
   nTrainingsPerPage: number;
-
-  // total trainings
   totalTrainings: number;
-
-  // selected coach
   selectedCoach: Coach;
-
-  // selected membership
   selectedMembership: Membership;
-
-  // selected user profile
   selectedUserProfile: UserProfile;
-
-  // check current user needs to pay for selected coach after 30 days or not
-  isExpired: boolean;
+  isRelationshipBetweenUserAndCoachExpired: boolean;
 
   /**
    *
@@ -62,30 +45,25 @@ export class CoachScheduleComponent implements OnInit {
   /**
    * init data
    */
-  ngOnInit() {
-    // init number of trainings per page
+  ngOnInit(): void {
     this.nTrainingsPerPage = 8;
-    // get selected coach
     this.getSelectedCoach();
   }
 
   /**
    * get selected coach
    */
-  private getSelectedCoach() {
-    // show loading component
-    this.loading = true;
+  private getSelectedCoach(): void {
+    this.isLoadingSpinnerShown = true;
     this.shareCoachService.currentCoach
       .subscribe(selectedCoach => {
         if (selectedCoach) {
           this.selectedCoach = selectedCoach;
-          // get selected membership
           this.getSelectedUserProfile();
         } else {
           this.router.navigate(['/client']);
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -93,41 +71,42 @@ export class CoachScheduleComponent implements OnInit {
   /**
    * get selected membership
    */
-  private getSelectedUserProfile() {
-    // show loading component
-    this.loading = true;
+  private getSelectedUserProfile(): void {
+    this.isLoadingSpinnerShown = true;
     this.shareUserProfileService.currentUserProfile
       .subscribe(selectedUserProfile => {
         if (selectedUserProfile) {
-          // get selected user profile
           this.selectedUserProfile = selectedUserProfile;
-          // get selected membership
           this.getSelectedMembership();
         } else {
           this.router.navigate(['/client']);
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * get selected membership
    */
-  private getSelectedMembership() {
-    this.membershipService.getMembershipByCoachAndByUserProfile(this.selectedCoach.id, this.selectedUserProfile.id)
+  private getSelectedMembership(): void {
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const selectedCoachId = this.selectedCoach.id;
+    const getMembershipUrl = `${Config.apiBaseUrl}/
+${Config.apiMembershipManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiCoaches}/
+${selectedCoachId}/
+${Config.apiMemberships}`;
+    this.membershipService.getMembership(getMembershipUrl)
       .subscribe((selectedMembership: Membership) => {
         if (selectedMembership) {
           this.selectedMembership = selectedMembership;
           if (this.selectedMembership.status !== 0) {
             this.check30daysIsOverOrNot();
           }
-          // get number of trainings
-          this.getNumberOfTrainings();
-          // get trainings by page
-          this.getTrainingsByPage();
+          this.getTrainings();
         } else {
-          // redirect to client page
           this.router.navigate(['/client']);
         }
       });
@@ -136,11 +115,9 @@ export class CoachScheduleComponent implements OnInit {
   /**
    * check current membership need to payment after 30 days or not
    */
-  private check30daysIsOverOrNot() {
-    // get current date
+  private check30daysIsOverOrNot(): void {
     const currentDate = Utils.getCurrentDate();
     const currentDateObject = new Date(currentDate);
-    // get selected membership start date
     const membershipStartDate = this.selectedMembership.startDate
       .toString()
       .substring(0, 10)
@@ -150,7 +127,7 @@ export class CoachScheduleComponent implements OnInit {
     const diffTime = Math.abs(currentDateObject.getTime() - membershipStartDateObject.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     if (diffDays > 30) {
-      this.isExpired = true;
+      this.isRelationshipBetweenUserAndCoachExpired = true;
       // update status to 0
       this.updateMembershipStatus();
     }
@@ -159,40 +136,36 @@ export class CoachScheduleComponent implements OnInit {
   /**
    * update membership status
    */
-  private updateMembershipStatus() {
-    // show loading component
-    this.loading = true;
+  private updateMembershipStatus(): void {
+    this.isLoadingSpinnerShown = true;
     this.selectedMembership.status = 0;
-    this.membershipService.updateMembership(this.selectedMembership)
+    const updateMembershipUrl = `${Config.apiBaseUrl}/${Config.apiMembershipManagementPrefix}/${Config.apiMemberships}`;
+    this.membershipService.updateMembership(updateMembershipUrl, this.selectedMembership)
       .subscribe((updatedMembership: Membership) => {
         if (updatedMembership) {
           console.log(updatedMembership);
-          // hide loading component
-          this.loading = false;
         }
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * get trainings by current's page
    */
-  private getTrainingsByPage() {
-    // create url to get trainings by current page
-    const currentGetTrainingByPageUrl =
-      `${Config.api}/${Config.apiGetTrainingsByPage}/${this.selectedUserProfile.id}/
-      ${this.selectedCoach.id}/${this.currentPage}`;
-    // show loading component
-    this.loading = true;
-    // get trainings by page and keywords (if existed)
-    this.trainingService.getTrainingsByUserProfileAndByCoachAndPage(currentGetTrainingByPageUrl)
-      .subscribe((trainings: Training[]) => {
-        if (trainings) {
-          this.trainings = [];
-          // assign data to trainings
-          this.trainings = trainings;
-        }
-        // hide loading component
-        this.loading = false;
+  private getTrainings(): void {
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const coachId = this.selectedCoach.id;
+    const getTrainingsUrl = `${Config.apiBaseUrl}/
+${Config.apiTrainingManagementPrefix}/
+${Config.apiTrainings}?
+${Config.userProfileIdParameter}=${selectedUserProfileId}&
+${Config.coachIdParameter}=${coachId}&
+${Config.pageParameter}=${this.currentTrainingsPage}`;
+    this.isLoadingSpinnerShown = true;
+    this.trainingService.getTrainings(getTrainingsUrl)
+      .subscribe(response => {
+        console.log(response);
+        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -200,41 +173,19 @@ export class CoachScheduleComponent implements OnInit {
    *
    * @param event - selected page
    */
-  public trainingsPageChange(event) {
-    // get current's page
-    this.currentPage = event;
-    // get trainings by page
-    this.getTrainingsByPage();
-  }
-
-  /**
-   * get total number of trainings
-   */
-  private getNumberOfTrainings() {
-    // create url to get total number of trainings
-    const currentGetNumberOfTrainingsUrl =
-      `${Config.api}/${Config.apiGetNumberOfTrainings}/${this.selectedUserProfile.id}/${this.selectedCoach.id}`;
-    // showing loading component
-    this.loading = true;
-    // get total number of trainings
-    this.trainingService.countNumberOfTrainingsByUserProfileAndByCoach(currentGetNumberOfTrainingsUrl)
-      .subscribe((responseMessage: ResponseMessage) => {
-        if (responseMessage) {
-          // assign total number of galleries to totalTrainings
-          this.totalTrainings = Number(responseMessage.message);
-        }
-      });
+  public trainingsPageChange(event): void {
+    this.currentTrainingsPage = event;
+    this.getTrainings();
   }
 
   /**
    *
    * @param selectedSchedule - selected schedule
    */
-  private goToScheduleDetail(selectedSchedule) {
+  private goToScheduleDetail(selectedSchedule): void {
     if (selectedSchedule) {
       // go to schedule detail component
       this.router.navigate(['/client/coach/schedule/detail']);
-      // share schedule detail to membership schedule detail component
       this.shareMembershipSchedule.changeMembershipSchedule(selectedSchedule);
     }
   }

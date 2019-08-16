@@ -1,7 +1,8 @@
-<div *ngIf="selectedProduct" [ngClass]="{'opacity-loading': loading}">
+<!--suppress ALL -->
+<div *ngIf="selectedProduct" [ngClass]="{'opacity-loading': isLoadingSpinnerShown}">
 
   <!-- loading component -->
-  <app-loading *ngIf="loading"></app-loading>
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- products detail-->
@@ -27,10 +28,12 @@
         Delivery time: 2-7 days*
       </p>
       <div id="product-quantity">
-        <nz-input-number style="z-index: 2;" [(ngModel)]="selectedProductQuantity" [nzMin]="1" [nzStep]="1"></nz-input-number>
+        <nz-input-number style="z-index: 2;" [(ngModel)]="selectedProductQuantity" [nzMin]="1"
+                         [nzStep]="1"></nz-input-number>
       </div>
       <div class="buttons">
-        <button style="z-index: 2;" nz-button nzType="primary" id="btn-add-to-cart" (click)="addProductToCart()"><i nz-icon nzType="shopping-cart"></i>
+        <button style="z-index: 2;" nz-button nzType="primary" id="btn-add-to-cart" (click)="addProductToCart()"><i
+          nz-icon nzType="shopping-cart"></i>
           Add to Cart
         </button>
       </div>
@@ -53,10 +56,11 @@
         <div class="clear-both"></div>
 
         <!-- add reviews form -->
-        <div id="add-reviews-form" *ngIf="isReviewFormShown">
-          <nz-rate class="mg-top-24" [ngModel]="selectedProductRateValue" (ngModelChange)="onRateChanged($event)"></nz-rate>
+        <div id="add-reviews-form" *ngIf="isProductReviewFormShown">
+          <nz-rate class="mg-top-24" [ngModel]="selectedProductRateValue"
+                   (ngModelChange)="onRateChanged($event)"></nz-rate>
           <br/>
-          <textarea class="mg-top-24" id="reviews-text-area" rows="4" nz-input [(ngModel)]="reviewContent"
+          <textarea class="mg-top-24" id="reviews-text-area" rows="4" nz-input [(ngModel)]="productReviewContent"
                     placeholder="Write Reviews..."></textarea> <br/>
           <button nz-button nzType="primary" id="btn-add-reviews" (click)="addProductReview()">Add Reviews</button>
         </div>
@@ -78,10 +82,10 @@
                 nzTitle="Like"
                 nz-icon
                 type="like"
-                [theme]="comment.isLikeClicked == true ? 'twotone' : 'outline'"
+                [nzTheme]="comment.isLikeClicked == true ? 'twotone' : 'outline'"
                 (click)="likeReplyOnProductFeedback(comment)"
               ></i>
-              <span class="count like">{{ comment?.nLikes }}</span>
+              <span class="count like">{{ comment?.numberOfLikes }}</span>
             </nz-comment-action>
             <nz-comment-action>
               <i
@@ -89,10 +93,10 @@
                 nzTitle="Dislike"
                 nz-icon
                 type="dislike"
-                [theme]="comment.isLikeClicked == false ? 'twotone' : 'outline'"
+                [nzTheme]="comment.isLikeClicked == false ? 'twotone' : 'outline'"
                 (click)="dislikeReplyOnProductFeedback(comment)"
               ></i>
-              <span class="count dislike">{{ comment?.nDislikes }}</span>
+              <span class="count dislike">{{ comment?.numberOfDislikes }}</span>
             </nz-comment-action>
             <nz-comment-action>
               <span (click)="showReplyReplyProductFeedbackBox(comment)">Reply to</span>
@@ -117,10 +121,10 @@
                 nzTitle="Like"
                 nz-icon
                 type="like"
-                [theme]="comment.isLikeClicked == true ? 'twotone' : 'outline'"
+                [nzTheme]="comment.isLikeClicked == true ? 'twotone' : 'outline'"
                 (click)="like(comment)"
               ></i>
-              <span class="count like">{{ comment?.nLikes }}</span>
+              <span class="count like">{{ comment?.numberOfLikes }}</span>
             </nz-comment-action>
             <nz-comment-action>
               <i
@@ -128,16 +132,17 @@
                 nzTitle="Dislike"
                 nz-icon
                 type="dislike"
-                [theme]="comment.isLikeClicked == false ? 'twotone' : 'outline'"
+                [nzTheme]="comment.isLikeClicked == false ? 'twotone' : 'outline'"
                 (click)="dislike(comment)"
               ></i>
-              <span class="count dislike">{{ comment?.nDislikes }}</span>
+              <span class="count dislike">{{ comment?.numberOfDislikes }}</span>
             </nz-comment-action>
             <nz-comment-action>
               <span (click)="showReplyProductFeedbackBox(comment)">Reply to</span>
             </nz-comment-action>
             <nz-comment-action>
-              <span (click)="viewRepliesOfSelectedProductFeedback(comment)">View {{ comment?.nReplies }} replies</span>
+              <span (click)="viewRepliesOfSelectedProductFeedback(comment)">View {{ comment?.numberOfReplies }}
+                replies</span>
             </nz-comment-action>
             <!-- end  product's feedback content -->
 
@@ -176,8 +181,8 @@
 
         <!-- pagination -->
         <nz-pagination
-          *ngIf="isProductFeedbacksAndPaginationShown"
-          [nzPageIndex]="currentPage"
+          *ngIf="productFeedbacks && productFeedbacks.length"
+          [nzPageIndex]="currentProductFeedbacksPage"
           [nzPageSize]="nProductFeedbacksPerPage"
           [nzTotal]="totalProductFeedbacks"
           nzSize="small"

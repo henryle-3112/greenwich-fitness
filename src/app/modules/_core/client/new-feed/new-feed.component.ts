@@ -4,7 +4,6 @@ import {
   NewFeedComment,
   NewFeedCommentReaction,
   NewFeedReaction, ReplyOnNewFeedComment, ReplyOnNewFeedCommentReaction,
-  ResponseMessage,
   UserProfile
 } from '@gw-models/core';
 import {Config} from '@gw-config/core';
@@ -22,29 +21,24 @@ import {ReplyOnNewFeedCommentReactionService} from '@gw-services/core/api/feed/r
   styleUrls: ['./new-feed.component.css']
 })
 export class NewFeedComponent implements OnInit {
-
-  // list of new feeds
   newFeeds: NewFeed[];
-
-  // currentPage
-  currentPage = 1;
-
-  // loading component is show ot not
-  loading = true;
-
-  // search value - return new feeds and change pagination based on keywords
-  searchValue: string;
-
-  // number new feeds per page
+  currentNewFeedsPage;
+  isLoadingSpinnerShown = true;
+  newFeedContentKeywords: string;
   nNewFeedsPerPage: number;
-
-  // total new feeds
   totalNewFeeds: number;
-
-  // user's profile
   selectedUserProfile: UserProfile;
 
-
+  /**
+   *
+   * @param newFeedService - inject newFeedService
+   * @param newFeedReactionService - inject newFeedReactionService
+   * @param shareUserProfileService - inject shareUserProfileService
+   * @param newFeedCommentReactionService - inject newFeedCommentReactionService
+   * @param replyOnNewFeedCommentService - inject replyOnNewFeedCommentService
+   * @param replyOnNewFeedCommentReactionService - inject replyOnNewFeedCommentReactionService
+   * @param newFeedCommentService - inject newFeedCommentService
+   */
   constructor(private newFeedService: NewFeedService,
               private newFeedReactionService: NewFeedReactionService,
               private shareUserProfileService: ShareUserProfileService,
@@ -57,136 +51,109 @@ export class NewFeedComponent implements OnInit {
   /**
    * init data
    */
-  ngOnInit() {
-    // init number of new feeds per page
-    this.nNewFeedsPerPage = 8;
-    // init current search value
-    this.searchValue = '';
-    // get selected user's profile
+  ngOnInit(): void {
+    this.currentNewFeedsPage = Config.currentPage;
+    this.nNewFeedsPerPage = Config.numberItemsPerPage;
+    this.newFeedContentKeywords = '';
     this.getSelectedUserProfile();
   }
 
   /**
    * get selected user's profile
    */
-  public getSelectedUserProfile() {
-    // show loading component
-    this.loading = true;
+  public getSelectedUserProfile(): void {
+    this.isLoadingSpinnerShown = true;
     this.shareUserProfileService.currentUserProfile
       .subscribe(selectedUserProfile => {
         if (selectedUserProfile) {
           this.selectedUserProfile = selectedUserProfile;
-          // get total number of new feeds
-          this.getNumberOfNewFeeds();
-          // get new feeds by page
-          this.getNewFeedsByPage();
+          this.getNewFeeds();
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * get new feeds by current's page
    */
-  private getNewFeedsByPage() {
-    // create url to get new feeds by current page
-    let currentGetNewFeedsByStatusAndByPageUrl = `${Config.api}/${Config.apiGetNewFeedsdByStatusAndByPage}/1/${this.currentPage}`;
-    // if search value is not equal to '', then include keywords to the url
-    if (this.searchValue.localeCompare('') !== 0) {
-      currentGetNewFeedsByStatusAndByPageUrl += `?keyword=${this.searchValue.toLowerCase()}`;
+  private getNewFeeds(): void {
+    const newFeedStatus = 1;
+    let getNewFeedsUrl = `${Config.apiBaseUrl}/
+${Config.apiNewFeedManagementPrefix}/
+${Config.apiNewFeeds}?
+${Config.pageParameter}=${this.currentNewFeedsPage}&
+${Config.statusParameter}=${newFeedStatus}`;
+    if (this.newFeedContentKeywords.localeCompare('') !== 0) {
+      getNewFeedsUrl += `&${Config.searchParameter}=${this.newFeedContentKeywords.toLowerCase()}`;
     }
-    // show loading component
-    this.loading = true;
-    // get new feeds by page and keywords (if existed)
-    this.newFeedService.getNewFeedsByStatusAndByPage(currentGetNewFeedsByStatusAndByPageUrl)
-      .subscribe((newFeeds: NewFeed[]) => {
-        if (newFeeds) {
-          console.log(newFeeds);
-          this.newFeeds = [];
-          // assign data to newFeeds
-          this.newFeeds = newFeeds;
-          // load number of replies and reactions (how many replies, how many likee and how many dislikes)
-          this.loadNumberOfRepliesAndReactions();
-          // load which new feeds that user liked or disliked
-          this.loadNewFeedsUserLikedOrDisliked();
-        }
-        // hide loading component
-        this.loading = false;
+    this.isLoadingSpinnerShown = true;
+    this.newFeedService.getNewFeeds(getNewFeedsUrl)
+      .subscribe(response => {
+        this.newFeeds = response.body;
+        this.totalNewFeeds = Number(response.headers.get(Config.headerXTotalCount));
+        this.getNewFeedReactionsByUser();
+        this.isLoadingSpinnerShown = false;
       });
-  }
-
-  /**
-   * load number of replies and reactions
-   */
-  private loadNumberOfRepliesAndReactions() {
-    // get each new feed and find number of replies and number of reactions (likes and dislikes)
-    this.newFeeds.map(eachNewFeed => {
-      // count number of likes
-      this.newFeedReactionService.countNumberOfNewFeedReactions(eachNewFeed, 1)
-        .subscribe((nLikes: ResponseMessage) => {
-          if (nLikes) {
-            eachNewFeed.nLikes = Number(nLikes.message);
-          } else {
-            eachNewFeed.nLikes = 0;
-          }
-        });
-      // count number of dislikes
-      this.newFeedReactionService.countNumberOfNewFeedReactions(eachNewFeed, 0)
-        .subscribe((nDisLikes: ResponseMessage) => {
-          if (nDisLikes) {
-            eachNewFeed.nDislikes = Number(nDisLikes.message);
-          } else {
-            eachNewFeed.nDislikes = 0;
-          }
-        });
-      // count number of new feed comments
-      this.newFeedCommentService.countNumberOfNewFeedCommentsByNewFeedAndByStatus(eachNewFeed, 1)
-        .subscribe((nReplies: ResponseMessage) => {
-          if (nReplies) {
-            eachNewFeed.nReplies = Number(nReplies.message);
-          } else {
-            eachNewFeed.nReplies = 0;
-          }
-        });
-    });
   }
 
   /**
    * load new feeds user liked or disliked
    */
-  private loadNewFeedsUserLikedOrDisliked() {
-    console.log(`Selected User Profile: `);
-    console.log(this.selectedUserProfile);
-    this.newFeedReactionService.getNewFeedReactionsByUserProfile(this.selectedUserProfile)
+  private getNewFeedReactionsByUser(): void {
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const getNewFeedReactionsUrl = `${Config.apiBaseUrl}/
+${Config.apiNewFeedManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiNewFeedReactions}`;
+    this.newFeedReactionService.getNewFeedReactions(getNewFeedReactionsUrl)
       .subscribe((newFeedReactions: NewFeedReaction[]) => {
         if (newFeedReactions) {
-          for (const eachNewFeedReaction of newFeedReactions) {
-            for (const eachNewFeed of this.newFeeds) {
-              if (eachNewFeedReaction.newFeed.id === eachNewFeed.id) {
-                eachNewFeed.isLikeClicked = eachNewFeedReaction.reaction === 1;
-                break;
-              }
-            }
-          }
+          this.showNewFeedsUserLikedDisliked(newFeedReactions);
         }
       });
   }
 
   /**
    *
+   * @param newFeedReactions - newfeeds that user liked and disliked
+   */
+  private showNewFeedsUserLikedDisliked(newFeedReactions: NewFeedReaction[]): void {
+    for (const eachNewFeedReaction of newFeedReactions) {
+      for (const eachNewFeed of this.newFeeds) {
+        if (eachNewFeedReaction.newFeed.id === eachNewFeed.id) {
+          this.changeNewFeedReactionStatus(eachNewFeed, eachNewFeedReaction);
+          break;
+        }
+      }
+    }
+  }
+
+  /**
+   *
+   * @param selectedNewFeed - newfeed that its reaction will be changed
+   * @param selectedNewFeedReaction - reaction's value that will be set to selected newfeed
+   */
+  private changeNewFeedReactionStatus(selectedNewFeed: NewFeed, selectedNewFeedReaction: NewFeedReaction): void {
+    selectedNewFeed.isReacted = true;
+    selectedNewFeed.isLikeClicked = selectedNewFeedReaction.reaction === 1;
+  }
+
+  /**
+   *
    * @param selectedNewFeed - new feed that user want to like
    */
-  likeNewFeed(selectedNewFeed: NewFeed) {
+  likeNewFeed(selectedNewFeed: NewFeed): void {
     if (selectedNewFeed.isLikeClicked) {
       return;
     }
-    if (selectedNewFeed.nDislikes > 0) {
-      selectedNewFeed.nDislikes -= 1;
+    if (selectedNewFeed.numberOfDislikes > 0 && selectedNewFeed.isReacted) {
+      selectedNewFeed.numberOfDislikes -= 1;
     }
-    selectedNewFeed.nLikes += 1;
+    selectedNewFeed.numberOfLikes += 1;
+    // update number of likes of selected new feed
+    this.updateNewFeed(selectedNewFeed);
     selectedNewFeed.isLikeClicked = true;
-    // submit new feed reaction to database server
     this.submitNewFeedReactionToServer(selectedNewFeed, 1);
   }
 
@@ -194,56 +161,63 @@ export class NewFeedComponent implements OnInit {
    *
    * @param selectedNewFeed - new feed that user want to dislike
    */
-  dislikeNewFeed(selectedNewFeed: NewFeed) {
+  dislikeNewFeed(selectedNewFeed: NewFeed): void {
     if (!selectedNewFeed.isLikeClicked) {
       return;
     }
-    if (selectedNewFeed.nLikes > 0) {
-      selectedNewFeed.nLikes -= 1;
+    if (selectedNewFeed.numberOfLikes > 0 && selectedNewFeed.isReacted) {
+      selectedNewFeed.numberOfLikes -= 1;
     }
-    selectedNewFeed.nDislikes += 1;
+    selectedNewFeed.numberOfDislikes += 1;
+    // update number of dislikes of selected new feed
+    this.updateNewFeed(selectedNewFeed);
     selectedNewFeed.isLikeClicked = false;
-    // submit new feed reaction to database server
     this.submitNewFeedReactionToServer(selectedNewFeed, 0);
   }
+
+  /**
+   *
+   * @param selectedNewFeed - newfeed that will be updated
+   */
+  private updateNewFeed(selectedNewFeed: NewFeed): void {
+    const updateNewFeedUrl = `${Config.apiBaseUrl}/${Config.apiNewFeedManagementPrefix}/${Config.apiNewFeeds}`;
+    this.newFeedService.updateNewFeed(updateNewFeedUrl, selectedNewFeed).subscribe();
+  }
+
 
   /**
    *
    * @param selectedNewFeed - selected new feed
    * @param reactionValue - reaction value that user react to selected new feed
    */
-  private submitNewFeedReactionToServer(selectedNewFeed: NewFeed, reactionValue: number) {
-    // create new feed reaction object
+  private submitNewFeedReactionToServer(selectedNewFeed: NewFeed, reactionValue: number): void {
     const newFeedReaction = new NewFeedReaction();
     newFeedReaction.reaction = reactionValue;
     newFeedReaction.newFeed = selectedNewFeed;
     newFeedReaction.userProfile = this.selectedUserProfile;
-    // submit new feed reaction to server
-    this.newFeedReactionService.addNewFeedReaction(newFeedReaction)
-      .subscribe((insertedNewFeedReaction: NewFeedReaction) => {
-        if (insertedNewFeedReaction) {
-          console.log(insertedNewFeedReaction);
-        }
-      });
+    const addNewFeedReactionUrl = `${Config.apiBaseUrl}/${Config.apiNewFeedManagementPrefix}/${Config.apiNewFeedReactions};`;
+    this.newFeedReactionService.addNewFeedReaction(addNewFeedReactionUrl, newFeedReaction).subscribe();
   }
 
   /**
    *
    * @param selectedNewFeed - new feed that user want to new feed
    */
-  public viewNewFeedCommentsOfSelectedNewFeed(selectedNewFeed: NewFeed) {
+  public viewNewFeedCommentsOfSelectedNewFeed(selectedNewFeed: NewFeed): void {
     if (!selectedNewFeed.replies) {
-      // show add new feed comment box
       selectedNewFeed.isReplyBoxShown = true;
-      //  get new feed comment by selected new feed and status
-      this.newFeedCommentService.getNewFeedCommentsByNewFeedAndStatus(selectedNewFeed, 1)
+      const newFeedCommentStatus = 1;
+      const getNewFeedCommentsUrl = `${Config.apiBaseUrl}/
+${Config.apiNewFeedManagementPrefix}/
+${Config.apiNewFeeds}/
+${selectedNewFeed.id}/
+${Config.apiNewFeedComments}?
+${Config.statusParameter}=${newFeedCommentStatus}`;
+      this.newFeedCommentService.getNewFeedComments(getNewFeedCommentsUrl)
         .subscribe((newFeedComments: NewFeedComment[]) => {
           if (newFeedComments) {
             selectedNewFeed.replies = newFeedComments;
-            // load number of likes and dislikes of new feed comment
-            this.loadNumberOfRepliesAndReactionsOfSelectedNewFeedComment(selectedNewFeed);
-            // check which reply on product's feedback that current user liked and disliked
-            this.loadNewFeedCommentUserLikedAndDisliked(selectedNewFeed);
+            this.getNewFeedCommentReactionsByUser(selectedNewFeed.replies);
           }
         });
     }
@@ -251,73 +225,65 @@ export class NewFeedComponent implements OnInit {
 
   /**
    *
-   * @param selectedNewFeed - selected new feed
+   * @param newFeedComments - newfeed's comments that will be check which comments that user liked and disliked
    */
-  private loadNumberOfRepliesAndReactionsOfSelectedNewFeedComment(selectedNewFeed) {
-    selectedNewFeed.replies.map(eachNewFeedComment => {
-      // count number of likes
-      this.newFeedCommentReactionService.countNumberOfNewFeedCommentReactionsByNewFeedCommentAndReaction(eachNewFeedComment, 1)
-        .subscribe((nLikes: ResponseMessage) => {
-          if (nLikes) {
-            eachNewFeedComment.nLikes = Number(nLikes.message);
-          } else {
-            eachNewFeedComment.nLikes = 0;
-          }
-        });
-      // count number of dislikes
-      this.newFeedCommentReactionService.countNumberOfNewFeedCommentReactionsByNewFeedCommentAndReaction(eachNewFeedComment, 0)
-        .subscribe((nDisLike: ResponseMessage) => {
-          if (nDisLike) {
-            eachNewFeedComment.nDislikes = Number(nDisLike.message);
-          } else {
-            eachNewFeedComment.nDislikes = 0;
-          }
-        });
-      // count number of replies
-      this.replyOnNewFeedCommentService.countNumberOfRepliesOnNewFeedCommentByNewFeedCommentAndStatus(eachNewFeedComment, 1)
-        .subscribe((nReplies: ResponseMessage) => {
-          if (nReplies) {
-            eachNewFeedComment.nReplies = Number(nReplies.message);
-          } else {
-            eachNewFeedComment.nReplies = 0;
-          }
-        });
-    });
-  }
-
-  /**
-   *
-   * @param selectedNewFeed - selected new feed
-   */
-  private loadNewFeedCommentUserLikedAndDisliked(selectedNewFeed) {
-    this.newFeedCommentReactionService.getNewFeedCommentReactionsByUserProfile(this.selectedUserProfile)
+  private getNewFeedCommentReactionsByUser(newFeedComments: NewFeedComment[]): void {
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const getNewFeedCommentReactionsUrl = `${Config.apiBaseUrl}/
+${Config.apiNewFeedManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiNewFeedCommentReactions}`;
+    this.newFeedCommentReactionService.getNewFeedCommentReactions(getNewFeedCommentReactionsUrl)
       .subscribe((newFeedCommentReactions: NewFeedCommentReaction[]) => {
         if (newFeedCommentReactions) {
-          for (const eachNewFeedCommentReaction of newFeedCommentReactions) {
-            for (const eachNewFeedComment of selectedNewFeed.replies) {
-              if (eachNewFeedCommentReaction.newFeedComment.id === eachNewFeedComment.id) {
-                eachNewFeedComment.isLikeClicked = eachNewFeedCommentReaction.reaction === 1;
-              }
-            }
-          }
+          this.showNewFeedCommentsUserLikedDisliked(newFeedComments, newFeedCommentReactions);
         }
       });
   }
 
   /**
    *
-   * @param selectedNewFeedComment - selected new feed comment
+   * @param newFeedComments - newfeed's comments that will be checked which comments user liked and disliked
+   * @param newFeedCommentReactions - newfeed's comments that user liked and disliked
    */
-  public likeNewFeedComment(selectedNewFeedComment: NewFeedComment) {
+  private showNewFeedCommentsUserLikedDisliked(newFeedComments: NewFeedComment[],
+                                               newFeedCommentReactions: NewFeedCommentReaction[]): void {
+    for (const eachNewFeedCommentReaction of newFeedCommentReactions) {
+      for (const eachNewFeedComment of newFeedComments) {
+        if (eachNewFeedCommentReaction.newFeedComment.id === eachNewFeedComment.id) {
+          this.changeNewFeedCommentReactionStatus(eachNewFeedComment, eachNewFeedCommentReaction);
+        }
+      }
+    }
+  }
+
+  /**
+   *
+   * @param selectedNewFeedComment - newfeed's comment that its reaction will be changed
+   * @param selectedNewFeedCommentReaction - reaction's value that will be set to selected newfeed
+   */
+  private changeNewFeedCommentReactionStatus(selectedNewFeedComment: NewFeedComment,
+                                             selectedNewFeedCommentReaction: NewFeedCommentReaction): void {
+    selectedNewFeedComment.isReacted = true;
+    selectedNewFeedComment.isLikeClicked = selectedNewFeedCommentReaction.reaction === 1;
+  }
+
+  /**
+   *
+   * @param selectedNewFeedComment - selected new feed comment that user liked
+   */
+  public likeNewFeedComment(selectedNewFeedComment: NewFeedComment): void {
     if (selectedNewFeedComment.isLikeClicked) {
       return;
     }
-    if (selectedNewFeedComment.nDislikes > 0) {
-      selectedNewFeedComment.nDislikes -= 1;
+    if (selectedNewFeedComment.numberOfDislikes > 0 && selectedNewFeedComment.isReacted) {
+      selectedNewFeedComment.numberOfDislikes -= 1;
     }
-    selectedNewFeedComment.nLikes += 1;
+    selectedNewFeedComment.numberOfLikes += 1;
+    // update number of likes of selected newfeed's comment
+    this.updateNewFeedComment(selectedNewFeedComment);
     selectedNewFeedComment.isLikeClicked = true;
-    // submit new feed comment reaction to database server
     this.submitNewFeedCommentReactionToServer(selectedNewFeedComment, 1);
   }
 
@@ -325,17 +291,29 @@ export class NewFeedComponent implements OnInit {
    *
    * @param selectedNewFeedComment - selected new feed comment
    */
-  public dislikeNewFeedComment(selectedNewFeedComment: NewFeedComment) {
+  public dislikeNewFeedComment(selectedNewFeedComment: NewFeedComment): void {
     if (!selectedNewFeedComment.isLikeClicked) {
       return;
     }
-    if (selectedNewFeedComment.nLikes > 0) {
-      selectedNewFeedComment.nLikes -= 1;
+    if (selectedNewFeedComment.numberOfLikes > 0 && selectedNewFeedComment.isReacted) {
+      selectedNewFeedComment.numberOfLikes -= 1;
     }
-    selectedNewFeedComment.nDislikes += 1;
+    selectedNewFeedComment.numberOfDislikes += 1;
+    // update number of dislikes of selected newfeed's comment
+    this.updateNewFeedComment(selectedNewFeedComment);
     selectedNewFeedComment.isLikeClicked = true;
-    // submit new feed comment reaction to database server
     this.submitNewFeedCommentReactionToServer(selectedNewFeedComment, 0);
+  }
+
+  /**
+   *
+   * @param selectedNewFeedComment - newfeeds' comment that will be updated
+   */
+  private updateNewFeedComment(selectedNewFeedComment: NewFeedComment): void {
+    const updateNewFeedCommentUrl = `${Config.apiBaseUrl}/
+${Config.apiNewFeedManagementPrefix}/
+${Config.apiNewFeedComments}`;
+    this.newFeedCommentService.updateNewFeedComment(updateNewFeedCommentUrl, selectedNewFeedComment).subscribe();
   }
 
   /**
@@ -343,26 +321,22 @@ export class NewFeedComponent implements OnInit {
    * @param selectedNewFeedComment - selected new feed comment
    * @param reactionValue - reaction value
    */
-  private submitNewFeedCommentReactionToServer(selectedNewFeedComment: NewFeedComment, reactionValue: number) {
-    // create new feed comment reaction object
+  private submitNewFeedCommentReactionToServer(selectedNewFeedComment: NewFeedComment, reactionValue: number): void {
     const newFeedCommentReaction = new NewFeedCommentReaction();
     newFeedCommentReaction.reaction = reactionValue;
     newFeedCommentReaction.newFeedComment = selectedNewFeedComment;
     newFeedCommentReaction.userProfile = this.selectedUserProfile;
-    this.newFeedCommentReactionService.addNewFeedCommentReaction(newFeedCommentReaction)
-      .subscribe((insertedNewFeedCommentReaction: NewFeedCommentReaction) => {
-        if (insertedNewFeedCommentReaction) {
-          console.log(insertedNewFeedCommentReaction);
-        }
-      });
+    const addNewFeedCommentReactionUrl = `${Config.apiBaseUrl}/
+${Config.apiNewFeedManagementPrefix}/
+${Config.apiNewFeedCommentReactions}`;
+    this.newFeedCommentReactionService.addNewFeedCommentReaction(addNewFeedCommentReactionUrl, newFeedCommentReaction).subscribe();
   }
 
   /**
    *
    * @param selectedNewFeedComment - selected new's feed's comment
    */
-  public showReplyNewFeedCommentBox(selectedNewFeedComment: NewFeedComment) {
-    // find new feed comment and show reply box
+  public showReplyNewFeedCommentBox(selectedNewFeedComment: NewFeedComment): void {
     selectedNewFeedComment.isReplyBoxShown = true;
   }
 
@@ -371,44 +345,43 @@ export class NewFeedComponent implements OnInit {
    * @param selectedNewFeedComment - selected new feed comment
    * @param replyNewFeedCommentContent = reply new feed comment content
    */
-  public replyToNewFeedComment(selectedNewFeedComment: NewFeedComment, replyNewFeedCommentContent: string) {
-    // create new reply on new feed comment object
+  public replyToNewFeedComment(selectedNewFeedComment: NewFeedComment, replyNewFeedCommentContent: string): void {
     const replyOnNewFeedComment = new ReplyOnNewFeedComment();
     replyOnNewFeedComment.newFeedComment = selectedNewFeedComment;
     replyOnNewFeedComment.replyOnNewFeedCommentContent = replyNewFeedCommentContent;
     replyOnNewFeedComment.replyOnNewFeedCommentStatus = 1;
     replyOnNewFeedComment.replyOnNewFeedCommentCreatedDate = new Date();
     replyOnNewFeedComment.userProfile = this.selectedUserProfile;
-    replyOnNewFeedComment.nLikes = 0;
-    replyOnNewFeedComment.nDislikes = 0;
-
-    this.replyOnNewFeedCommentService.addReplyOnNewFeedComment(replyOnNewFeedComment)
-      .subscribe((insertedReplyOnNewFeedComment: ReplyOnNewFeedComment) => {
-        if (insertedReplyOnNewFeedComment) {
-          console.log(insertedReplyOnNewFeedComment);
-        }
-      });
-
+    replyOnNewFeedComment.numberOfLikes = 0;
+    replyOnNewFeedComment.numberOfDislikes = 0;
+    const addReplyOnNewFeedCommentUrl = `${Config.apiBaseUrl}/${Config.apiNewFeedManagementPrefix}/${Config.apiRepliesOnNewFeedComment}`;
+    this.replyOnNewFeedCommentService.addReplyOnNewFeedComment(addReplyOnNewFeedCommentUrl, replyOnNewFeedComment).subscribe();
+    selectedNewFeedComment.numberOfReplies += 1;
+    // update number of replies of newfeed's comment
+    this.updateNewFeedComment(selectedNewFeedComment);
     if (selectedNewFeedComment.replies && selectedNewFeedComment.replies.length) {
       selectedNewFeedComment.replies.push(replyOnNewFeedComment);
     }
-    selectedNewFeedComment.nReplies += 1;
   }
 
   /**
    *
    * @param selectedNewFeedComment - selected new's feed's comment
    */
-  public viewRepliesOfSelectedNewFeedComment(selectedNewFeedComment: NewFeedComment) {
+  public viewRepliesOfSelectedNewFeedComment(selectedNewFeedComment: NewFeedComment): void {
     if (!selectedNewFeedComment.replies) {
-      this.replyOnNewFeedCommentService.getRepliesOnNewFeedCommentByNewFeedCommentAndStatus(selectedNewFeedComment, 1)
+      const replyOnNewFeedCommentStatus = 1;
+      const getRepliesOnNewFeedComment = `${Config.apiBaseUrl}/
+${Config.apiNewFeedManagementPrefix}/
+${Config.apiNewFeedComments}/
+${selectedNewFeedComment.id}/
+${Config.apiRepliesOnNewFeedComment}?
+${Config.statusParameter}=${replyOnNewFeedCommentStatus}`;
+      this.replyOnNewFeedCommentService.getRepliesOnNewFeedComment(getRepliesOnNewFeedComment)
         .subscribe((repliesOnNewFeedComment: ReplyOnNewFeedComment[]) => {
           if (repliesOnNewFeedComment) {
             selectedNewFeedComment.replies = repliesOnNewFeedComment;
-            // load number of likes and dislikes of replies on new feed comment
-            this.loadNumberOfReplyOnNewFeedCommentReactions(selectedNewFeedComment);
-            // check which reply on product's feedback that current user liked and disliked
-            this.loadRepliesOnNewFeedCommentUserLikedAndDisliked(selectedNewFeedComment);
+            this.getReplyOnNewFeedCommentReactionsByUser(selectedNewFeedComment.replies);
           }
         });
     }
@@ -416,72 +389,66 @@ export class NewFeedComponent implements OnInit {
 
   /**
    *
-   * @param selectedNewFeedComment - selected new feed comment
+   * @param repliesOnNewFeedComment - replies on newfeed's comment that will be check user liked or disliked
    */
-  private loadNumberOfReplyOnNewFeedCommentReactions(selectedNewFeedComment: NewFeedComment) {
-    selectedNewFeedComment.replies.map(replyOnNewFeedComment => {
-      // count number of likes
-      this.replyOnNewFeedCommentReactionService.countNumberOfNewFeedCommentReactionsByReplyOnNewFeedCommentAndReaction(
-        replyOnNewFeedComment,
-        1
-      )
-        .subscribe((nLikes: ResponseMessage) => {
-          if (nLikes) {
-            replyOnNewFeedComment.nLikes = Number(nLikes.message);
-          } else {
-            replyOnNewFeedComment.nLikes = 0;
-          }
-        });
-
-      // count number of dislikes
-      this.replyOnNewFeedCommentReactionService.countNumberOfNewFeedCommentReactionsByReplyOnNewFeedCommentAndReaction(
-        replyOnNewFeedComment,
-        0
-      )
-        .subscribe((nDisLikes: ResponseMessage) => {
-          if (nDisLikes) {
-            replyOnNewFeedComment.nDislikes = Number(nDisLikes.message);
-          } else {
-            replyOnNewFeedComment.nDislikes = 0;
-          }
-        });
-    });
-  }
-
-  /**
-   *
-   * @param selectedNewFeedComment - selected new feed comment
-   */
-  private loadRepliesOnNewFeedCommentUserLikedAndDisliked(selectedNewFeedComment: NewFeedComment) {
-    this.replyOnNewFeedCommentReactionService.getReplyOnNewFeedCommentReactionsByUserProfile(this.selectedUserProfile)
+  private getReplyOnNewFeedCommentReactionsByUser(repliesOnNewFeedComment: ReplyOnNewFeedComment[]): void {
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const getReplyOnNewFeedCommentReactionUrl = `${Config.apiBaseUrl}/
+${Config.apiNewFeedManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiReplyOnNewFeedCommentReactions}`;
+    this.replyOnNewFeedCommentReactionService.getReplyOnNewFeedCommentReactions(getReplyOnNewFeedCommentReactionUrl)
       .subscribe((replyOnNewFeedCommentReactions: ReplyOnNewFeedCommentReaction[]) => {
         if (replyOnNewFeedCommentReactions) {
-          for (const eachReplyOnNewFeedCommentReaction of replyOnNewFeedCommentReactions) {
-            for (const eachReplyOnNewFeedComment of selectedNewFeedComment.replies) {
-              if (eachReplyOnNewFeedCommentReaction.replyOnNewFeedComment.id === eachReplyOnNewFeedComment.id) {
-                eachReplyOnNewFeedComment.isLikeClicked = eachReplyOnNewFeedCommentReaction.reaction === 1;
-                break;
-              }
-            }
-          }
+          this.showRepliesOnNewFeedCommentUserLikedDisliked(repliesOnNewFeedComment, replyOnNewFeedCommentReactions);
         }
       });
   }
 
   /**
    *
-   * @param selectedReplyOnNewFeedComment - selected reply on new feed comment
+   * @param repliesOnNewFeedComment - replies on newfeed's comment that will be checked which replies user liked and disliked
+   * @param replyOnNewFeedCommentReactions - replies on newfeed's comment that user liked and disliked
    */
-  public likeReplyOnNewFeedComment(selectedReplyOnNewFeedComment: ReplyOnNewFeedComment) {
+  private showRepliesOnNewFeedCommentUserLikedDisliked(repliesOnNewFeedComment: ReplyOnNewFeedComment[],
+                                                       replyOnNewFeedCommentReactions: ReplyOnNewFeedCommentReaction[]): void {
+    for (const eachReplyOnNewFeedCommentReaction of replyOnNewFeedCommentReactions) {
+      for (const eachReplyOnNewFeedComment of repliesOnNewFeedComment) {
+        if (eachReplyOnNewFeedCommentReaction.replyOnNewFeedComment.id === eachReplyOnNewFeedComment.id) {
+          this.changeReplyOnNewFeedCommentReactionStatus(eachReplyOnNewFeedComment, eachReplyOnNewFeedCommentReaction);
+          break;
+        }
+      }
+    }
+  }
+
+  /**
+   *
+   * @param selectedReplyOnNewFeedComment - reply on newfeed's comment that will be set reaction value
+   * @param selectedReplyOnNewFeedCommentReaction - reaction's value that will be set to reply on newfeed's comment
+   */
+  private changeReplyOnNewFeedCommentReactionStatus(selectedReplyOnNewFeedComment: ReplyOnNewFeedComment,
+                                                    selectedReplyOnNewFeedCommentReaction: ReplyOnNewFeedCommentReaction): void {
+    selectedReplyOnNewFeedComment.isReacted = true;
+    selectedReplyOnNewFeedComment.isLikeClicked = selectedReplyOnNewFeedCommentReaction.reaction === 1;
+  }
+
+  /**
+   *
+   * @param selectedReplyOnNewFeedComment - selected reply on new feed comment that user want to like
+   */
+  public likeReplyOnNewFeedComment(selectedReplyOnNewFeedComment: ReplyOnNewFeedComment): void {
     if (selectedReplyOnNewFeedComment.isLikeClicked) {
       return;
     }
-    if (selectedReplyOnNewFeedComment.nDislikes > 0) {
-      selectedReplyOnNewFeedComment.nDislikes -= 1;
+    if (selectedReplyOnNewFeedComment.numberOfDislikes > 0 && selectedReplyOnNewFeedComment.isReacted) {
+      selectedReplyOnNewFeedComment.numberOfDislikes -= 1;
     }
-    selectedReplyOnNewFeedComment.nLikes += 1;
+    selectedReplyOnNewFeedComment.numberOfLikes += 1;
+    // update number of likes of reply on newfeed's comment
+    this.updateReplyOnNewFeedComment(selectedReplyOnNewFeedComment);
     selectedReplyOnNewFeedComment.isLikeClicked = true;
-    // submit reply on new feed comment reaction to database server
     this.submitReplyOnNewFeedCommentReactionToServer(selectedReplyOnNewFeedComment, 1);
   }
 
@@ -489,48 +456,58 @@ export class NewFeedComponent implements OnInit {
    *
    * @param selectedReplyOnNewFeedComment - selected reply on new feed comment
    */
-  public dislikeReplyOnNewFeedComment(selectedReplyOnNewFeedComment: ReplyOnNewFeedComment) {
+  public dislikeReplyOnNewFeedComment(selectedReplyOnNewFeedComment: ReplyOnNewFeedComment): void {
     if (!selectedReplyOnNewFeedComment.isLikeClicked) {
       return;
     }
-    if (selectedReplyOnNewFeedComment.nLikes > 0) {
-      selectedReplyOnNewFeedComment.nLikes -= 1;
+    if (selectedReplyOnNewFeedComment.numberOfLikes > 0 && selectedReplyOnNewFeedComment.isReacted) {
+      selectedReplyOnNewFeedComment.numberOfLikes -= 1;
     }
-    selectedReplyOnNewFeedComment.nDislikes += 1;
+    selectedReplyOnNewFeedComment.numberOfDislikes += 1;
+    // update number of dislikes of reply on newfeed's comment
+    this.updateReplyOnNewFeedComment(selectedReplyOnNewFeedComment);
     selectedReplyOnNewFeedComment.isLikeClicked = false;
-    // submit reply on new feed comment reaction to database server
     this.submitReplyOnNewFeedCommentReactionToServer(selectedReplyOnNewFeedComment, 0);
   }
 
   /**
    *
-   * @param selectedReplyOnNewFeedComment - selected reply on new feed comment
-   * @param reactionValue - reaction value
+   * @param selectedReplyOnNewFeedComment - reply on newfeed's comment that will be updated
    */
-  private submitReplyOnNewFeedCommentReactionToServer(selectedReplyOnNewFeedComment: ReplyOnNewFeedComment, reactionValue: number) {
-    // create reply on new feed comment reaction object
-    const replyOnNewFeedCommentReaction = new ReplyOnNewFeedCommentReaction();
-    replyOnNewFeedCommentReaction.reaction = reactionValue;
-    replyOnNewFeedCommentReaction.replyOnNewFeedComment = selectedReplyOnNewFeedComment;
-    replyOnNewFeedCommentReaction.userProfile = this.selectedUserProfile;
-
-    // add replyOnNewFeedCommentReaction to server
-    this.replyOnNewFeedCommentReactionService.addReplyOnNewFeedCommentReaction(replyOnNewFeedCommentReaction)
-      .subscribe((insertedNewFeedCommentReaction: ReplyOnNewFeedCommentReaction) => {
-        if (insertedNewFeedCommentReaction) {
-          console.log(insertedNewFeedCommentReaction);
-        }
-      });
+  private updateReplyOnNewFeedComment(selectedReplyOnNewFeedComment: ReplyOnNewFeedComment): void {
+    const updateReplyOnNewFeedCommentUrl = `${Config.apiBaseUrl}/
+${Config.apiNewFeedManagementPrefix}/
+${Config.apiRepliesOnNewFeedComment}`;
+    this.replyOnNewFeedCommentService
+      .updateReplyOnNewFeedComment(updateReplyOnNewFeedCommentUrl, selectedReplyOnNewFeedComment)
+      .subscribe();
   }
 
   /**
    *
-   * @param selectedReplyOnNewFeedComment - selected reply on new feed comment
+   * @param selectedReplyOnNewFeedComment - selected reply on new feed comment that user has reacted
+   * @param reactionValue - reaction value that user has reacted to reply on newfeed's comment
    */
-  public showReplyRelyNewFeedCommentBox(selectedReplyOnNewFeedComment: ReplyOnNewFeedComment) {
-    // check new feed comment is found or not
+  private submitReplyOnNewFeedCommentReactionToServer(selectedReplyOnNewFeedComment: ReplyOnNewFeedComment,
+                                                      reactionValue: number): void {
+    const replyOnNewFeedCommentReaction = new ReplyOnNewFeedCommentReaction();
+    replyOnNewFeedCommentReaction.reaction = reactionValue;
+    replyOnNewFeedCommentReaction.replyOnNewFeedComment = selectedReplyOnNewFeedComment;
+    replyOnNewFeedCommentReaction.userProfile = this.selectedUserProfile;
+    const addReplyOnNewFeedCommentReactionUrl = `${Config.apiBaseUrl}/
+${Config.apiNewFeedManagementPrefix}/
+${Config.apiReplyOnNewFeedCommentReactions}`;
+    this.replyOnNewFeedCommentReactionService
+      .addReplyOnNewFeedCommentReaction(addReplyOnNewFeedCommentReactionUrl, replyOnNewFeedCommentReaction)
+      .subscribe();
+  }
+
+  /**
+   *
+   * @param selectedReplyOnNewFeedComment - selected reply on new feed comment that user want to reply
+   */
+  public showReplyRelyNewFeedCommentBox(selectedReplyOnNewFeedComment: ReplyOnNewFeedComment): void {
     let isNewFeedCommentFound = false;
-    // find new feed comment and show reply box
     for (const eachNewFeed of this.newFeeds) {
       if (eachNewFeed.replies && eachNewFeed.replies.length) {
         for (const eachNewFeedComment of eachNewFeed.replies) {
@@ -552,84 +529,50 @@ export class NewFeedComponent implements OnInit {
    * @param selectedNewFeed - selected new feed
    * @param newFeedCommentContent - new feed comment content
    */
-  public addNewFeedComment(selectedNewFeed: NewFeed, newFeedCommentContent: string) {
-    // create new feed comment object
+  public addNewFeedComment(selectedNewFeed: NewFeed, newFeedCommentContent: string): void {
     const newFeedComment = new NewFeedComment();
     newFeedComment.newFeed = selectedNewFeed;
     newFeedComment.newFeedCommentContent = newFeedCommentContent;
     newFeedComment.newFeedCommentCreatedDate = new Date();
     newFeedComment.newFeedCommentStatus = 1;
     newFeedComment.userProfile = this.selectedUserProfile;
-    newFeedComment.nLikes = 0;
-    newFeedComment.nDislikes = 0;
-
-    // add new feed comment to the server
+    newFeedComment.numberOfLikes = 0;
+    newFeedComment.numberOfDislikes = 0;
     this.addNewFeedCommentToServer(newFeedComment);
-
-    // add new feed comment to selected new feed
+    selectedNewFeed.numberOfComments += 1;
+    // update number of comments of selected newfeed
+    this.updateNewFeed(selectedNewFeed);
     if (selectedNewFeed.replies && selectedNewFeed.replies.length) {
       selectedNewFeed.replies.push(newFeedComment);
     }
-    selectedNewFeed.nReplies += 1;
   }
 
   /**
-   * add new feed comment to server
+   *
+   * @param newFeedComment - newfeed's comment that will be added
    */
-  private addNewFeedCommentToServer(newFeedComment: NewFeedComment) {
-    this.newFeedCommentService.addNewFeedComment(newFeedComment)
-      .subscribe((insertedNewFeedComment: NewFeedComment) => {
-        if (insertedNewFeedComment) {
-          console.log(insertedNewFeedComment);
-        }
-      });
+  private addNewFeedCommentToServer(newFeedComment: NewFeedComment): void {
+    const addNewFeedCommentUrl = `${Config.apiBaseUrl}/${Config.apiNewFeedManagementPrefix}/${Config.apiNewFeedComments}`;
+    this.newFeedCommentService.addNewFeedComment(addNewFeedCommentUrl, newFeedComment).subscribe();
   }
 
   /**
    *
    * @param event - selected page
    */
-  public newFeedPageChange(event) {
-    // get current's page
-    this.currentPage = event;
-    // get newfeeds by page
-    this.getNewFeedsByPage();
+  public newFeedPageChange(event): void {
+    this.currentNewFeedsPage = event;
+    this.getNewFeeds();
   }
 
   /**
    *
    * @param keyword - keyword that user-account type on the search box
    */
-  public searchNewFeed(keyword) {
-    // set current search keyword - user-account search newfeeds by user's name and change pagination based on keyword
-    this.searchValue = keyword;
-    // reset current page
-    this.currentPage = 1;
-    // change pagination
-    this.getNumberOfNewFeeds();
-    this.getNewFeedsByPage();
-  }
-
-  /**
-   * get total number of new feeds
-   */
-  private getNumberOfNewFeeds() {
-    // create url to get total number of new feeds
-    let currentGetNumberOfNewFeedsByStatusUrl = `${Config.api}/${Config.apiGetNumberOfNewFeedsByStatus}/1`;
-    // if search value is not equal to '', then include keywords to the url
-    if (this.searchValue.localeCompare('') !== 0) {
-      currentGetNumberOfNewFeedsByStatusUrl += `?keyword=${this.searchValue.toLowerCase()}`;
-    }
-    // showing loading component
-    this.loading = true;
-    // get total number of newfeeds
-    this.newFeedService.getNumberOfNewFeedsByStatus(currentGetNumberOfNewFeedsByStatusUrl)
-      .subscribe((responseMessage: ResponseMessage) => {
-        if (responseMessage) {
-          // assign total number of galleries to totalGallery
-          this.totalNewFeeds = Number(responseMessage.message);
-        }
-      });
+  public searchNewFeed(keyword): void {
+    this.newFeedContentKeywords = keyword;
+    this.currentNewFeedsPage = 1;
+    this.getNewFeeds();
   }
 
 }

@@ -1,9 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {PostTag, ResponseMessage, Tag} from '@gw-models/core';
+import {Post, PostTag, Tag} from '@gw-models/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {SharePostService} from '@gw-services/core/shared/post/share-post.service';
 import {PostTagService} from '@gw-services/core/api/post/post-tag.service';
 import {ShareTagService} from '@gw-services/core/shared/tag/share-tag.service';
+import {Config} from '@gw-config/core';
 
 @Component({
   selector: 'app-blog-tag',
@@ -11,23 +12,11 @@ import {ShareTagService} from '@gw-services/core/shared/tag/share-tag.service';
   styleUrls: ['./blog-tag.component.css']
 })
 export class BlogTagComponent implements OnInit {
-
-  // list of post tag
   postsByTag: PostTag[];
-
-  // check loading component is showing or not
-  loading: boolean;
-
-  // current page
-  currentPage: number;
-
-  // get selected tag
+  isLoadingSpinnerShown: boolean;
+  currentPostsPage: number;
   selectedTag: Tag;
-
-  // number posts per page
   nPostsPerPage: number;
-
-  // total posts
   totalPosts: number;
 
   /**
@@ -45,101 +34,75 @@ export class BlogTagComponent implements OnInit {
               private sharePostService: SharePostService) {
   }
 
-  ngOnInit() {
-    // init data
+  ngOnInit(): void {
     this.initData();
-    // get selected tag
     this.getSelectedTag();
+  }
+
+  /**
+   * init data
+   */
+  private initData(): void {
+    this.nPostsPerPage = Config.numberItemsPerPage;
+    this.currentPostsPage = Config.currentPage;
   }
 
   /**
    * get selected tag
    */
-  private getSelectedTag() {
-    // show loading component
-    this.loading = true;
+  private getSelectedTag(): void {
+    this.isLoadingSpinnerShown = true;
     this.shareTagService.currentTag
       .subscribe(selectedTag => {
-        // get selected tag
-        this.selectedTag = selectedTag;
-        // check selected tag existed or not
-        this.checkTagExistedOrNot();
+        if (selectedTag) {
+          this.selectedTag = selectedTag;
+          this.getPostsByTag();
+        } else {
+          this.router.navigate(['/blog/home']);
+        }
       });
   }
 
   /**
    * get post tags by tag and by page
    */
-  private loadPostTagsByTagAndByPage() {
-    // get posts
-    this.postTagService.getPostTagsByTagIdAndByPage(this.selectedTag.id, this.currentPage, 1)
-      .subscribe(posts => {
-        // get posts
-        this.postsByTag = posts;
-        // hide loading component
-        this.loading = false;
+  private getPostsByTag(): void {
+    const selectedTagId = this.selectedTag.id;
+    const postStatus = 1;
+    const getPostsByTagUrl = `${Config.apiBaseUrl}/
+${Config.apiPostManagementPrefix}/
+${Config.apiTags}/
+${selectedTagId}/
+${Config.apiPosts}?
+${Config.pageParameter}=${this.currentPostsPage}&
+${Config.postStatusParameter}=${postStatus}`;
+    this.postTagService.getPostTags(getPostsByTagUrl)
+      .subscribe(response => {
+        this.postsByTag = response.body;
+        this.totalPosts = Number(response.headers.get(Config.headerXTotalCount));
+        this.isLoadingSpinnerShown = false;
       });
   }
 
-  /**
-   * check tag existed or not
-   */
-  private checkTagExistedOrNot() {
-    if (this.selectedTag == null) {
-      // redirect to home page
-      this.router.navigate(['/blog/home']);
-    } else {
-      // load post by post's tag and by page
-      this.loadPostTagsByTagAndByPage();
-      // load total posts by by
-      this.loadTotalPostsByTag();
-    }
-  }
-
-  /**
-   * init data
-   */
-  private initData() {
-    // init number posts per page
-    this.nPostsPerPage = 8;
-    // init current page
-    this.currentPage = 1;
-  }
-
-  /**
-   * load total posts by tag
-   */
-  private loadTotalPostsByTag() {
-    this.postTagService.getNumberOfPostTagsByTagId(this.selectedTag.id, 1)
-      .subscribe((responseMessage: ResponseMessage) => {
-        if (responseMessage) {
-          this.totalPosts = Number(responseMessage.message);
-        }
-      });
-  }
 
   /**
    *
    * @param event - current page
    */
-  public postsPageChange(event) {
-    // show loading component
-    this.loading = true;
-    // set new page
-    this.currentPage = event;
-    // load new data
-    this.loadPostTagsByTagAndByPage();
+  public postsPageChange(event): void {
+    this.isLoadingSpinnerShown = true;
+    this.currentPostsPage = event;
+    this.getPostsByTag();
   }
 
 
   /**
    *
-   * @param selectedPost - selected post
+   * @param selectedPost - selected post that user want to view
    */
-  public goToPostDetail(selectedPost) {
+  public goToPostDetail(selectedPost: Post): void {
     // share post to other components
     this.sharePostService.changePost(selectedPost);
-    // go to post's detail page
     this.router.navigate([`/blog/post/${selectedPost.postMetaTitle}`]);
   }
 

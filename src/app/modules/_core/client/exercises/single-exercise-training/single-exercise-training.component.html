@@ -1,6 +1,7 @@
-<div nz-row style="width: 100%; height: 100%;" [ngClass]="{'opacity-loading': loading}">
+<!--suppress ALL -->
+<div nz-row style="width: 100%; height: 100%;" [ngClass]="{'opacity-loading': isLoadingSpinnerShown}">
   <!-- loading component -->
-  <app-loading *ngIf="loading"></app-loading>
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- training -->
@@ -36,10 +37,10 @@
   <!-- end training -->
 
   <!-- count down -->
-  <div id="countdown" nz-col nzSpan="24" *ngIf="isCountDown"
+  <div id="countdown" nz-col nzSpan="24" *ngIf="isCountDownScreenShown"
        [ngStyle]="{ 'background-image': 'url(' + backgroundImage + ')'}">
     <div nz-row nzType="flex" style="width: 100%; height: 100%;" nzAlign="middle" nzJustify="center">
-      <h1>{{ currentSeconds }}</h1>
+      <h1>{{ currentCountDownSeconds }}</h1>
     </div>
   </div>
   <!-- end count down -->
@@ -78,7 +79,7 @@
 
     <!-- pagination -->
     <nz-pagination
-      [nzPageIndex]="currentPage"
+      [nzPageIndex]="currentMusicsPage"
       [nzPageSize]="nMusicPerPage"
       [nzTotal]="totalMusic"
       [nzSize]="'small'"
@@ -160,7 +161,7 @@
     </div>
 
     <div id="current-health">
-      <nz-slider [(ngModel)]="currentHealth" nzMax="10" nzMin="1"></nz-slider>
+      <nz-slider [(ngModel)]="currentUserHeathAfterFinished" nzMax="10" nzMin="1"></nz-slider>
     </div>
 
     <div class="title">
@@ -168,7 +169,7 @@
     </div>
 
     <div id="number-of-reps">
-      <nz-input-number [(ngModel)]="nReps" [nzMin]="1" [nzMax]="nMaxReps" [nzStep]="1"></nz-input-number>
+      <nz-input-number [(ngModel)]="nRepsUserDid" [nzMin]="1" [nzMax]="nMaxReps" [nzStep]="1"></nz-input-number>
     </div>
 
     <div class="title">

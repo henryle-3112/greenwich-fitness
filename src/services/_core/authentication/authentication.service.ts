@@ -2,9 +2,8 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
-import {AuthenticationUser, FacebookAccount, GoogleAccount, UserAccount} from '@gw-models/core';
-import {Config} from '@gw-config/core';
-// httpOptions to change content-type to application/json
+import {AuthenticationUser, FacebookAccount, GoogleAccount} from '@gw-models/core';
+
 const httpOptions = {
   headers: new HttpHeaders({'Content-Type': 'application/json'})
 };
@@ -14,29 +13,28 @@ export class AuthenticationService {
   private currentUserSubject: BehaviorSubject<AuthenticationUser>;
   public currentUser: Observable<AuthenticationUser>;
 
-  /**
-   *
-   * @param http - innject http to interact with the server
-   */
+
   constructor(private http: HttpClient) {
     this.currentUserSubject = new BehaviorSubject<AuthenticationUser>(JSON.parse(localStorage.getItem('currentUser')));
     this.currentUser = this.currentUserSubject.asObservable();
   }
 
+  /**
+   * return current authenticated user
+   */
   public get currentUserValue(): AuthenticationUser {
     return this.currentUserSubject.value;
   }
 
   /**
    *
-   * @param username - user-account's name
-   * @param password - user-account's password
+   * @param url - url that will be used to login
+   * @param username - user's name that will be used to login
+   * @param password - user's password that will be used to login
    */
-  login(username: string, password: string) {
-    return this.http.post<any>(`${Config.api}/${Config.apiLogin}`, {userName: username, password: password})
+  login(url: string, username: string, password: string) {
+    return this.http.post<any>(url, {userName: username, password: password})
       .pipe(map(response => {
-        // login successful if there's a jwt token in the response
-        console.log(response);
         const responseJson = JSON.parse(response);
         if (responseJson != null && responseJson.userName != null && responseJson.token != null) {
           this.handleLoginSuccessfully(response);
@@ -47,13 +45,13 @@ export class AuthenticationService {
 
   /**
    *
-   * @param facebookAccount - facebookAccount to authenticate
+   * @param url - url that will be used to authenticate facebook's account
+   * @param facebookAccount - facebook's account that will be authenticated
    */
-  loginByFacebook(facebookAccount: FacebookAccount) {
-    return this.http.post<any>(`${Config.api}/${Config.apiLoginByFacebook}`, facebookAccount, httpOptions)
+  loginByFacebook(url: string, facebookAccount: FacebookAccount) {
+    return this.http.post<any>(url, facebookAccount, httpOptions)
       .pipe(map(response => {
         // login successful if there's a jwt token in the response
-        console.log(response);
         const data = JSON.parse(response);
         if (data.message && data.message.localeCompare('failure') === 0) {
           return response;
@@ -66,13 +64,13 @@ export class AuthenticationService {
 
   /**
    *
-   * @param googleAccount - googleAccount to authenticate
+   * @param url - url that will be used to authenticate google's account
+   * @param googleAccount - google's account that will be authenticated
    */
-  loginByGoogle(googleAccount: GoogleAccount) {
-    return this.http.post<any>(`${Config.api}/${Config.apiLoginByGoogle}`, googleAccount, httpOptions)
+  loginByGoogle(url: string, googleAccount: GoogleAccount) {
+    return this.http.post<any>(url, googleAccount, httpOptions)
       .pipe(map(response => {
         // login successful if there's a jwt token in the response
-        console.log(response);
         const data = JSON.parse(response);
         if (data.message && data.message.localeCompare('failure') === 0) {
           return response;
@@ -97,7 +95,6 @@ export class AuthenticationService {
    * @param response - get user-account's information
    */
   private handleLoginSuccessfully(response: any) {
-    // get user-account's information and token.
     const selectedUser = JSON.parse(response);
     const authenticationUser = new AuthenticationUser();
     authenticationUser.userName = selectedUser.userName;
@@ -111,8 +108,6 @@ export class AuthenticationService {
         authenticationUser.roles = authenticationUser.roles + selectedUser.roles[i];
       }
     }
-    console.log(JSON.stringify(authenticationUser));
-    // store user-account details and jwt token in local storage to keep user-account logged in between page refreshes
     localStorage.setItem('currentUser', JSON.stringify(authenticationUser));
     this.currentUserSubject.next(authenticationUser);
   }

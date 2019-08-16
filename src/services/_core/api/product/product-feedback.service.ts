@@ -1,12 +1,10 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Product, ProductFeedback, ResponseMessage, UserAccount} from '@gw-models/core';
+import {ProductFeedback} from '@gw-models/core';
 import {Observable} from 'rxjs';
-import {Config} from '@gw-config/core';
 import {tap} from 'rxjs/operators';
 
 
-// httpOptions to change content-type to application/json
 const httpOptions = {
   headers: new HttpHeaders({'Content-Type': 'application/json'})
 };
@@ -19,25 +17,35 @@ export class ProductFeedbackService {
   constructor(private http: HttpClient) {
   }
 
-  /** POST: get product's feedbacks by product */
-  public getProductFeedbacksByProduct(product: Product, status: number): Observable<ProductFeedback[]> {
-    return this.http.post<ProductFeedback[]>(`${Config.api}/${Config.apiGetProductFeedback}/${status}`, product, httpOptions).pipe(
+  /**
+   *
+   * @param url - url that will be used to get product's feedbacks
+   */
+  public getProductFeedbacks(url: string): Observable<ProductFeedback[]> {
+    return this.http.get<ProductFeedback[]>(url, httpOptions).pipe(
       tap((productFeedbacks: ProductFeedback[]) => console.log(JSON.stringify(productFeedbacks)))
     );
   }
 
-  /** POST: add new product's feedback */
-  public addProductFeedback(productFeedback: ProductFeedback): Observable<ProductFeedback> {
-    return this.http.post<ProductFeedback>(`${Config.api}/${Config.apiAddProductFeedback}`, productFeedback, httpOptions).pipe(
+  /**
+   *
+   * @param url - url that will be used to add product's feedback
+   * @param productFeedback - product's feedback that will be added
+   */
+  public addProductFeedback(url: string, productFeedback: ProductFeedback): Observable<ProductFeedback> {
+    return this.http.post<ProductFeedback>(url, productFeedback, httpOptions).pipe(
       tap((insertedProductFeedback: ProductFeedback) => console.log(JSON.stringify(insertedProductFeedback)))
     );
   }
 
-  /** GET: get product's feedback by user's id and product's id */
-  /* public getProductFeedbackByUserIdAndProductId(userId: number, productId: number): Observable<ProductFeedback> {
-    return this.http.get<ProductFeedback>(
-      `${Config.api}/${Config.apiGetProductFeedbackByUserIdAndProductId}/${userId}/${productId}`, httpOptions).pipe(
-      tap((productFeedback: ProductFeedback) => console.log(JSON.stringify(productFeedback)))
+  /**
+   *
+   * @param url - url that will be used to update product's feedback
+   * @param productFeedback - product's feedback that will be updated
+   */
+  public updateProductFeedback(url: string, productFeedback: ProductFeedback): Observable<ProductFeedback> {
+    return this.http.put<ProductFeedback>(url, productFeedback, httpOptions).pipe(
+      tap((updatedProductFeedback: ProductFeedback) => console.log(JSON.stringify(updatedProductFeedback)))
     );
-  } */
+  }
 }

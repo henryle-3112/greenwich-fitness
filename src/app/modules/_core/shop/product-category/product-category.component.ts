@@ -1,9 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {Product, ProductCategory, ResponseMessage} from '@gw-models/core';
+import {Product, ProductCategory} from '@gw-models/core';
 import {ProductService} from '@gw-services/core/api/product/product.service';
 import {ShareProductCategoryService} from '@gw-services/core/shared/product-category/share-product-category.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ShareProductService} from '@gw-services/core/shared/product/share-product.service';
+import {Config} from '@gw-config/core';
 
 @Component({
   selector: 'app-product-category',
@@ -11,26 +12,12 @@ import {ShareProductService} from '@gw-services/core/shared/product/share-produc
   styleUrls: ['./product-category.component.css']
 })
 export class ProductCategoryComponent implements OnInit {
-  // list of product's by category
   productsByCategory: Product[];
-
-  // check loading component is showing or not
-  loading: boolean;
-
-  // current page
-  currentPage: number;
-
-  // get selected product's category
+  isLoadingSpinnerShown: boolean;
+  currentProductsByCategoryPage: number;
   selectedProductCategory: ProductCategory;
-
-  // check is product's category or not
-  isProductCategory: boolean;
-
-  // number products per page
-  nProductsPerPage: number;
-
-  // total products
-  totalProducts: number;
+  nProductsByCategoryPerPage: number;
+  totalProductsByCategory: number;
 
   /**
    *
@@ -47,84 +34,66 @@ export class ProductCategoryComponent implements OnInit {
               private shareProductService: ShareProductService) {
   }
 
-  ngOnInit() {
-    // init data
+  ngOnInit(): void {
     this.initData();
-    // get selected product's category
     this.getSelectedProductCategory();
+  }
+
+  /**
+   * init data
+   */
+  private initData(): void {
+    this.nProductsByCategoryPerPage = 8;
+    this.currentProductsByCategoryPage = 1;
   }
 
   /**
    * get selected product's category
    */
-  private getSelectedProductCategory() {
-    // show loading component
-    this.loading = true;
+  private getSelectedProductCategory(): void {
+    this.isLoadingSpinnerShown = true;
     this.shareProductCategoryService.currentProductCategory
       .subscribe(selectedProductCategory => {
-        // get selected product's category
-        this.selectedProductCategory = selectedProductCategory;
-        // check selected product's category existed or not
-        this.checkProductCategoryExistedOrNot();
-      });
-  }
-
-  /**
-   * get products by category and by page
-   */
-  private loadProductsByCategoryAndByPage() {
-    // get products
-    this.productService.getProductsByCategoryAndByPage(this.selectedProductCategory.id, this.currentPage, 1)
-      .subscribe(products => {
-        // get products
-        this.productsByCategory = products;
-        // hide loading component
-        this.loading = false;
+        if (selectedProductCategory) {
+          this.selectedProductCategory = selectedProductCategory;
+          this.checkProductCategoryExistedOrNot();
+        } else {
+          this.router.navigate(['/shop/home']);
+        }
       });
   }
 
   /**
    * check product's category existed or not
    */
-  private checkProductCategoryExistedOrNot() {
-    console.log(`hello`);
-    if (this.selectedProductCategory == null) {
-      // redirect to home page
-      this.router.navigate(['/shop/home']);
-    } else {
-      // check is product's category or not
-      if (this.selectedProductCategory.productCategoryName.localeCompare('About') !== 0 &&
-        this.selectedProductCategory.productCategoryName.localeCompare('Contact') !== 0 &&
-        this.selectedProductCategory.productCategoryName.localeCompare('Privacy Policy') !== 0 &&
-        this.selectedProductCategory.productCategoryName.localeCompare('Home') !== 0) {
-        this.isProductCategory = true;
-      }
-      // load product by category and by page
-      this.loadProductsByCategoryAndByPage();
-      // load total products by category
-      this.loadTotalProductsByCategory();
+  private checkProductCategoryExistedOrNot(): void {
+    // check is product's category or not
+    const isProductCategory = this.selectedProductCategory.productCategoryName.localeCompare('About') !== 0 &&
+      this.selectedProductCategory.productCategoryName.localeCompare('Contact') !== 0 &&
+      this.selectedProductCategory.productCategoryName.localeCompare('Privacy Policy') !== 0 &&
+      this.selectedProductCategory.productCategoryName.localeCompare('Home') !== 0;
+    if (isProductCategory) {
+      this.getProductsByCategory();
     }
   }
 
   /**
-   * init data
+   * get products by category and by page
    */
-  private initData() {
-    // init number products per page
-    this.nProductsPerPage = 8;
-    // init current page
-    this.currentPage = 1;
-  }
-
-  /**
-   * load total products by category
-   */
-  private loadTotalProductsByCategory() {
-    this.productService.getNumberOfProductsByCategory(this.selectedProductCategory.id, 1)
-      .subscribe((responseMessage: ResponseMessage) => {
-        if (responseMessage) {
-          this.totalProducts = Number(responseMessage.message);
-        }
+  private getProductsByCategory(): void {
+    const selectedProductCategoryId = this.selectedProductCategory.id;
+    const productStatus = 1;
+    const getProductsByCategoryUrl = `${Config.apiBaseUrl}/
+${Config.apiProductManagementPrefix}/
+${Config.apiProducts}?
+${Config.categoryIdParameter}=${selectedProductCategoryId}&
+${Config.statusParameter}=${productStatus}&
+${Config.pageParameter}=${this.currentProductsByCategoryPage}`;
+    this.productService.getProducts(getProductsByCategoryUrl)
+      .subscribe(response => {
+        this.productsByCategory = response.body;
+        this.totalProductsByCategory = Number(response.headers.get(Config.headerXTotalCount));
+        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -132,24 +101,20 @@ export class ProductCategoryComponent implements OnInit {
    *
    * @param event - current page
    */
-  public productsPageChange(event) {
-    // show loading component
-    this.loading = true;
-    // set new page
-    this.currentPage = event;
-    // load new data
-    this.loadProductsByCategoryAndByPage();
+  public productsPageChange(event): void {
+    this.isLoadingSpinnerShown = true;
+    this.currentProductsByCategoryPage = event;
+    this.getProductsByCategory();
   }
 
 
   /**
    *
-   * @param selectedProduct - selected product
+   * @param selectedProduct - selected product that user want to view
    */
-  public goToProductDetail(selectedProduct) {
+  public goToProductDetail(selectedProduct): void {
     // share product to other components
     this.shareProductService.changeProduct(selectedProduct);
-    // go to product's detail page
     this.router.navigate([`/shop/product/${selectedProduct.productMetaTitle}`]);
   }
 }

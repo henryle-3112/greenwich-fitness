@@ -6,8 +6,8 @@ export class ReplyOnPostComment {
   postComment?: PostComment;
   userProfile?: UserProfile;
   replyOnPostCommentStatus?: number;
-  nLikes?: number;
-  nDislikes?: number;
+  numberOfLikes?: number;
+  numberOfDislikes?: number;
   isLikeClicked?: boolean;
   replyOnPostCommentCreatedDate?: Date;
   isReacted: boolean;

@@ -10,56 +10,101 @@ import {ShareWorkoutService} from '@gw-services/core/shared/workout/share-workou
   styleUrls: ['./workout.component.css']
 })
 export class WorkoutComponent implements OnInit {
-  // workouts data
   singleExercises: SingleExercise[];
-  // all workouts data
   workouts: Workout[];
-  // search value - return exercises and change pagination based on keywords
-  searchValue: string;
-  // number of workout per page
+  workoutTitleKeywords: string;
   nWorkoutPerPage: number;
-  // loading component is show ot not
-  loading = true;
-  // current page
-  currentPage: number;
-  // total exercises;
+  isLoadingSpinnerShown = true;
+  currentWorkoutsPage: number;
   totalWorkouts: number;
-  // startIndex to get workouts per page
-  startIndex: number;
-  // workouts data per page
   workoutsPerPage: Workout[];
-  // need to create workouts temp to load data base on current page and keywords
   workoutsTemp: Workout[];
-
   // tag active
-  isBeginnerActive: boolean;
-  isIntermediateActive: boolean;
-  isAdvancedActive: boolean;
-  isShortActive: boolean;
-  isMediumActive: boolean;
-  isLongActive: boolean;
-  isFullBodyActive: boolean;
-  isUpperActive: boolean;
-  isCoreActive: boolean;
-  isLowerActive: boolean;
-  isNoDistanceActive: boolean;
-  isNoEquipmentActive: boolean;
-
-  // current workout tag value
+  isBeginnerTagActive: boolean;
+  isIntermediateTagActive: boolean;
+  isAdvancedTagActive: boolean;
+  isShortTagActive: boolean;
+  isMediumTagActive: boolean;
+  isLongTagActive: boolean;
+  isFullBodyTagActive: boolean;
+  isUpperTagActive: boolean;
+  isCoreTagActive: boolean;
+  isLowerTagActive: boolean;
+  isNoDistanceTagActive: boolean;
+  isNoEquipmentTagActive: boolean;
   currentWorkoutTagValue: string;
 
+  /**
+   *
+   * @param readLocalJson - inject readLocalJson
+   * @param router - inject router
+   * @param shareWorkout - inject shareWorkout
+   */
   constructor(private readLocalJson: ReadLocalJsonService,
               private router: Router,
               private shareWorkout: ShareWorkoutService) {
   }
 
   ngOnInit() {
-    // init data
     this.initData();
-    // load workouts
     this.loadSingleExercises();
   }
 
+  /**
+   * init data
+   */
+  private initData() {
+    this.currentWorkoutsPage = 1;
+    this.workoutTitleKeywords = '';
+    this.nWorkoutPerPage = 8;
+    this.currentWorkoutTagValue = '';
+    this.isBeginnerTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isAdvancedTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isShortTagActive = false;
+    this.isMediumTagActive = false;
+    this.isLongTagActive = false;
+    this.isFullBodyTagActive = false;
+    this.isUpperTagActive = false;
+    this.isCoreTagActive = false;
+    this.isLowerTagActive = false;
+    this.isNoDistanceTagActive = false;
+    this.isNoEquipmentTagActive = false;
+  }
+
+  private loadSingleExercises() {
+    this.isLoadingSpinnerShown = true;
+    this.readLocalJson.getJSON('./assets/workouts.json')
+      .subscribe(data => {
+        this.singleExercises = [];
+        const exercises = data.exercises;
+        exercises.map(eachExercise => {
+          const eachSingleExercise = this.createSingleExerciseFromJsonObject(eachExercise);
+          this.singleExercises.push(eachSingleExercise);
+        });
+        this.loadWorkouts();
+      });
+  }
+
+  /**
+   *
+   * @param eachExercise - json object that will be converted to single exercise object
+   */
+  private createSingleExerciseFromJsonObject(eachExercise): SingleExercise {
+    const singleExercise = new SingleExercise();
+    singleExercise.slug = eachExercise.slug;
+    singleExercise.title = eachExercise.title;
+    singleExercise.smallMobileRetinaPictureUrl = eachExercise.picture_urls.small_mobile_retina;
+    singleExercise.largeMobileRetinaPictureUrl = eachExercise.picture_urls.large_mobile_retina;
+    singleExercise.loopVideoUrl = eachExercise.loop_video_urls.webp;
+    singleExercise.videoUrl = eachExercise.video_urls.mp4;
+    return singleExercise;
+  }
+
+  /**
+   * load workouts
+   */
   private loadWorkouts() {
     this.readLocalJson.getJSON('./assets/workouts.json')
       .subscribe(data => {
@@ -74,156 +119,103 @@ export class WorkoutComponent implements OnInit {
             }
           }
           if (!isExisted) {
-            const eachSingleWorkout = new Workout();
-
-            eachSingleWorkout.slug = eachWorkout.slug;
-            eachSingleWorkout.title = eachWorkout.title;
-            eachSingleWorkout.roundsCount = Number(eachWorkout.rounds_count);
-            eachSingleWorkout.volumeDescription = eachWorkout.volume_description;
-
-            const focus = eachWorkout.focus;
-            eachSingleWorkout.focus = focus[0];
-
-            eachSingleWorkout.smallMobileRetinaPictureUrl = eachWorkout.picture_urls.small_mobile_retina;
-            eachSingleWorkout.largeMobileRetinaPictureUrl = eachWorkout.picture_urls.large_mobile_retina;
-
-            eachSingleWorkout.detailedRounds = [];
-            const detailedRounds = eachWorkout.detailed_rounds;
-
-            detailedRounds.map(eachDetailedRound => {
-              // create detailed round object
-              const selectedDetailedRound = new DetailedRounds();
-              selectedDetailedRound.exercises = [];
-
-              const exercises = eachDetailedRound.exercises;
-              exercises.map(eachExercise => {
-                // get quantity
-                const dimensions = eachExercise.dimensions;
-                const quantity = dimensions[0].quantity;
-
-                // get exercise
-                const exerciseSlugs = eachExercise.exercise_slug;
-                // create workout exercise object
-                const workoutExercise = new WorkoutExercise();
-                for (const eachSingleExercise of this.singleExercises) {
-                  if (eachSingleExercise.slug.localeCompare(exerciseSlugs) === 0) {
-                    workoutExercise.exercise = eachSingleExercise;
-                    workoutExercise.quantity = quantity;
-                    break;
-                  }
-                }
-                selectedDetailedRound.exercises.push(workoutExercise);
-              });
-
-              eachSingleWorkout.detailedRounds.push(selectedDetailedRound);
-            });
+            const eachSingleWorkout = this.createWorkoutFromJsonObject(eachWorkout);
             this.workouts.push(eachSingleWorkout);
           }
         }
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
         this.totalWorkouts = this.workouts.length;
         this.workoutsTemp = this.workouts;
-        // load workouts per page
         this.loadWorkoutsPerPage();
       });
   }
 
-  private loadSingleExercises() {
-    this.loading = true;
-    this.readLocalJson.getJSON('./assets/workouts.json')
-      .subscribe(data => {
-        this.singleExercises = [];
-        const exercises = data.exercises;
-        exercises.map(eachExercise => {
-          const eachSingleExercise = new SingleExercise();
-          eachSingleExercise.slug = eachExercise.slug;
-          eachSingleExercise.title = eachExercise.title;
-          eachSingleExercise.smallMobileRetinaPictureUrl = eachExercise.picture_urls.small_mobile_retina;
-          eachSingleExercise.largeMobileRetinaPictureUrl = eachExercise.picture_urls.large_mobile_retina;
-          eachSingleExercise.loopVideoUrl = eachExercise.loop_video_urls.webp;
-          eachSingleExercise.videoUrl = eachExercise.video_urls.mp4;
-          this.singleExercises.push(eachSingleExercise);
-        });
-        // load workouts data
-        this.loadWorkouts();
-      });
+  /**
+   *
+   * @param eachWorkout - json object that will be converted to workout object
+   */
+  private createWorkoutFromJsonObject(eachWorkout): Workout {
+    const workout = new Workout();
+    workout.slug = eachWorkout.slug;
+    workout.title = eachWorkout.title;
+    workout.roundsCount = Number(eachWorkout.rounds_count);
+    workout.volumeDescription = eachWorkout.volume_description;
+    const focus = eachWorkout.focus;
+    workout.focus = focus[0];
+    workout.smallMobileRetinaPictureUrl = eachWorkout.picture_urls.small_mobile_retina;
+    workout.largeMobileRetinaPictureUrl = eachWorkout.picture_urls.large_mobile_retina;
+    const detailedRounds = eachWorkout.detailed_rounds;
+    this.setDetailedRoundsForEachWorkout(workout, detailedRounds);
+    return workout;
   }
 
-  private initData() {
-    // set current page
-    this.currentPage = 1;
-    // init searchValue
-    this.searchValue = '';
-    // init number workouts per page
-    this.nWorkoutPerPage = 8;
-    // init current tag value
-    this.currentWorkoutTagValue = '';
-
-    this.isBeginnerActive = false;
-    this.isIntermediateActive = false;
-    this.isAdvancedActive = false;
-    this.isIntermediateActive = false;
-    this.isShortActive = false;
-    this.isMediumActive = false;
-    this.isLongActive = false;
-    this.isFullBodyActive = false;
-    this.isUpperActive = false;
-    this.isCoreActive = false;
-    this.isLowerActive = false;
-    this.isNoDistanceActive = false;
-    this.isNoEquipmentActive = false;
+  /**
+   *
+   * @param workout - workout that will be set detailed rounds
+   * @param detailedRounds - detailed rounds that will be set to workout
+   */
+  private setDetailedRoundsForEachWorkout(workout: Workout, detailedRounds) {
+    workout.detailedRounds = [];
+    detailedRounds.map(eachDetailedRound => {
+      const selectedDetailedRound = new DetailedRounds();
+      selectedDetailedRound.exercises = [];
+      const exercises = eachDetailedRound.exercises;
+      exercises.map(eachExercise => {
+        const dimensions = eachExercise.dimensions;
+        const quantity = dimensions[0].quantity;
+        const exerciseSlugs = eachExercise.exercise_slug;
+        const workoutExercise = new WorkoutExercise();
+        for (const eachSingleExercise of this.singleExercises) {
+          if (eachSingleExercise.slug.localeCompare(exerciseSlugs) === 0) {
+            workoutExercise.exercise = eachSingleExercise;
+            workoutExercise.quantity = quantity;
+            break;
+          }
+        }
+        selectedDetailedRound.exercises.push(workoutExercise);
+      });
+      workout.detailedRounds.push(selectedDetailedRound);
+    });
   }
 
   public workoutPageChange(event) {
-    // change current page
-    this.currentPage = event;
-    // show loading
-    this.loading = true;
-    // reload data based on keywords
+    this.currentWorkoutsPage = event;
+    this.isLoadingSpinnerShown = true;
     this.reloadWorkoutsTemp();
-    // load data for new page
     this.loadWorkoutsPerPage();
   }
 
   public searchWorkouts(keyword) {
-    // reset current page
-    this.currentPage = 1;
-    // change search value
-    this.searchValue = keyword;
-    // reload data based on keywords and tags
+    this.currentWorkoutsPage = 1;
+    this.workoutTitleKeywords = keyword;
     this.reloadWorkoutsTemp();
-    // load data for new page
     this.loadWorkoutsPerPage();
   }
 
   private loadWorkoutsPerPage() {
-    // init startIndex
-    this.startIndex = ((this.currentPage - 1) * 8) + 1;
-    // get workouts data per page
-    this.workoutsPerPage = this.workoutsTemp.slice(this.startIndex - 1, this.startIndex + 7);
-    this.loading = false;
+    const startIndex = ((this.currentWorkoutsPage - 1) * 8) + 1;
+    this.workoutsPerPage = this.workoutsTemp.slice(startIndex - 1, startIndex + 7);
+    this.isLoadingSpinnerShown = false;
   }
 
   private reloadWorkoutsTemp() {
-    // console.log(`Current Workout Tag Value: ${this.currentWorkoutTagValue}`);
-    // console.log(`Current Search Value: ${this.searchValue}`);
-    if (this.searchValue.localeCompare('') === 0 && this.currentWorkoutTagValue.localeCompare('') === 0) {
+    if (this.workoutTitleKeywords.localeCompare('') === 0 && this.currentWorkoutTagValue.localeCompare('') === 0) {
       this.workoutsTemp = this.workouts;
-    } else if (this.searchValue.localeCompare('') !== 0 && this.currentWorkoutTagValue.localeCompare('') !== 0) {
+    } else if (this.workoutTitleKeywords.localeCompare('') !== 0 && this.currentWorkoutTagValue.localeCompare('') !== 0) {
       this.workoutsTemp = [];
       this.workouts.map(eachWorkout => {
         if (
           eachWorkout.title &&
           eachWorkout.focus &&
-          eachWorkout.title.includes(this.searchValue) &&
+          eachWorkout.title.includes(this.workoutTitleKeywords) &&
           eachWorkout.focus.includes(this.currentWorkoutTagValue)) {
           this.workoutsTemp.push(eachWorkout);
         }
       });
-    } else if (this.searchValue.localeCompare('') !== 0) {
+    } else if (this.workoutTitleKeywords.localeCompare('') !== 0) {
       this.workoutsTemp = [];
       this.workouts.map(eachWorkout => {
-        if (eachWorkout.title.includes(this.searchValue)) {
+        if (eachWorkout.title.includes(this.workoutTitleKeywords)) {
           this.workoutsTemp.push(eachWorkout);
         }
       });
@@ -241,206 +233,51 @@ export class WorkoutComponent implements OnInit {
   public handleTagActive(tag: string) {
     switch (tag) {
       case 'beginner':
-        this.isBeginnerActive = true;
-        this.isIntermediateActive = false;
-        this.isAdvancedActive = false;
-        this.isIntermediateActive = false;
-        this.isShortActive = false;
-        this.isMediumActive = false;
-        this.isLongActive = false;
-        this.isFullBodyActive = false;
-        this.isUpperActive = false;
-        this.isCoreActive = false;
-        this.isLowerActive = false;
-        this.isNoDistanceActive = false;
-        this.isNoEquipmentActive = false;
-        this.currentWorkoutTagValue = 'beginner';
+        this.activeBeginnerTag();
         this.tagChanged();
         break;
       case 'intermediate':
-        this.isBeginnerActive = false;
-        this.isIntermediateActive = true;
-        this.isAdvancedActive = false;
-        this.isShortActive = false;
-        this.isMediumActive = false;
-        this.isLongActive = false;
-        this.isFullBodyActive = false;
-        this.isUpperActive = false;
-        this.isCoreActive = false;
-        this.isLowerActive = false;
-        this.isNoDistanceActive = false;
-        this.isNoEquipmentActive = false;
-        this.currentWorkoutTagValue = 'intermediate';
+        this.activeIntermediateTag();
         this.tagChanged();
         break;
       case 'advanced':
-        this.isBeginnerActive = false;
-        this.isIntermediateActive = false;
-        this.isAdvancedActive = true;
-        this.isIntermediateActive = false;
-        this.isShortActive = false;
-        this.isMediumActive = false;
-        this.isLongActive = false;
-        this.isFullBodyActive = false;
-        this.isUpperActive = false;
-        this.isCoreActive = false;
-        this.isLowerActive = false;
-        this.isNoDistanceActive = false;
-        this.isNoEquipmentActive = false;
-        this.currentWorkoutTagValue = 'advanced';
+        this.activeAdvancedTag();
         this.tagChanged();
         break;
       case 'short':
-        this.isBeginnerActive = false;
-        this.isIntermediateActive = false;
-        this.isAdvancedActive = false;
-        this.isIntermediateActive = false;
-        this.isShortActive = true;
-        this.isMediumActive = false;
-        this.isLongActive = false;
-        this.isFullBodyActive = false;
-        this.isUpperActive = false;
-        this.isCoreActive = false;
-        this.isLowerActive = false;
-        this.isNoDistanceActive = false;
-        this.isNoEquipmentActive = false;
-        this.currentWorkoutTagValue = 'short';
+        this.activeShortTag();
         this.tagChanged();
         break;
       case 'medium':
-        this.isBeginnerActive = false;
-        this.isIntermediateActive = false;
-        this.isAdvancedActive = false;
-        this.isIntermediateActive = false;
-        this.isShortActive = false;
-        this.isMediumActive = true;
-        this.isLongActive = false;
-        this.isFullBodyActive = false;
-        this.isUpperActive = false;
-        this.isCoreActive = false;
-        this.isLowerActive = false;
-        this.isNoDistanceActive = false;
-        this.isNoEquipmentActive = false;
-        this.currentWorkoutTagValue = 'medium';
+        this.activeMediumTag();
         this.tagChanged();
         break;
       case 'long':
-        this.isBeginnerActive = false;
-        this.isIntermediateActive = false;
-        this.isAdvancedActive = false;
-        this.isIntermediateActive = false;
-        this.isShortActive = false;
-        this.isMediumActive = false;
-        this.isLongActive = true;
-        this.isFullBodyActive = false;
-        this.isUpperActive = false;
-        this.isCoreActive = false;
-        this.isLowerActive = false;
-        this.isNoDistanceActive = false;
-        this.isNoEquipmentActive = false;
-        this.currentWorkoutTagValue = 'long';
+        this.activeLongTag();
         this.tagChanged();
         break;
       case 'full_body':
-        this.isBeginnerActive = false;
-        this.isIntermediateActive = false;
-        this.isAdvancedActive = false;
-        this.isIntermediateActive = false;
-        this.isShortActive = false;
-        this.isMediumActive = false;
-        this.isLongActive = false;
-        this.isFullBodyActive = true;
-        this.isUpperActive = false;
-        this.isCoreActive = false;
-        this.isLowerActive = false;
-        this.isNoDistanceActive = false;
-        this.isNoEquipmentActive = false;
-        this.currentWorkoutTagValue = 'full_body';
+        this.activeFullBodyTag();
         this.tagChanged();
         break;
       case 'upper':
-        this.isBeginnerActive = false;
-        this.isIntermediateActive = false;
-        this.isAdvancedActive = false;
-        this.isIntermediateActive = false;
-        this.isShortActive = false;
-        this.isMediumActive = false;
-        this.isLongActive = false;
-        this.isFullBodyActive = false;
-        this.isUpperActive = true;
-        this.isCoreActive = false;
-        this.isLowerActive = false;
-        this.isNoDistanceActive = false;
-        this.isNoEquipmentActive = false;
-        this.currentWorkoutTagValue = 'upper';
+        this.activeUpperTag();
         this.tagChanged();
         break;
       case 'core':
-        this.isBeginnerActive = false;
-        this.isIntermediateActive = false;
-        this.isAdvancedActive = false;
-        this.isIntermediateActive = false;
-        this.isShortActive = false;
-        this.isMediumActive = false;
-        this.isLongActive = false;
-        this.isFullBodyActive = false;
-        this.isUpperActive = false;
-        this.isCoreActive = true;
-        this.isLowerActive = false;
-        this.isNoDistanceActive = false;
-        this.isNoEquipmentActive = false;
-        this.currentWorkoutTagValue = 'core';
+        this.activeCoreTag();
         this.tagChanged();
         break;
       case 'lower':
-        this.isBeginnerActive = false;
-        this.isIntermediateActive = false;
-        this.isAdvancedActive = false;
-        this.isIntermediateActive = false;
-        this.isShortActive = false;
-        this.isMediumActive = false;
-        this.isLongActive = false;
-        this.isFullBodyActive = false;
-        this.isUpperActive = false;
-        this.isCoreActive = false;
-        this.isLowerActive = true;
-        this.isNoDistanceActive = false;
-        this.isNoEquipmentActive = false;
-        this.currentWorkoutTagValue = 'lower';
+        this.activeLowerTag();
         this.tagChanged();
         break;
       case 'no_distance':
-        this.isBeginnerActive = false;
-        this.isIntermediateActive = false;
-        this.isAdvancedActive = false;
-        this.isIntermediateActive = false;
-        this.isShortActive = false;
-        this.isMediumActive = false;
-        this.isLongActive = false;
-        this.isFullBodyActive = false;
-        this.isUpperActive = false;
-        this.isCoreActive = false;
-        this.isLowerActive = false;
-        this.isNoDistanceActive = true;
-        this.isNoEquipmentActive = false;
-        this.currentWorkoutTagValue = 'no_distance';
+        this.activeNoDistanceTag();
         this.tagChanged();
         break;
       case 'no_equipment':
-        this.isBeginnerActive = false;
-        this.isIntermediateActive = false;
-        this.isAdvancedActive = false;
-        this.isIntermediateActive = false;
-        this.isShortActive = false;
-        this.isMediumActive = false;
-        this.isLongActive = false;
-        this.isFullBodyActive = false;
-        this.isUpperActive = false;
-        this.isCoreActive = false;
-        this.isLowerActive = false;
-        this.isNoDistanceActive = false;
-        this.isNoEquipmentActive = true;
-        this.currentWorkoutTagValue = 'no_equipment';
+        this.activeNoEquipmentTag();
         this.tagChanged();
         break;
       default:
@@ -448,19 +285,254 @@ export class WorkoutComponent implements OnInit {
     }
   }
 
+  /**
+   * active beginner tag
+   */
+  private activeBeginnerTag() {
+    this.isBeginnerTagActive = true;
+    this.isIntermediateTagActive = false;
+    this.isAdvancedTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isShortTagActive = false;
+    this.isMediumTagActive = false;
+    this.isLongTagActive = false;
+    this.isFullBodyTagActive = false;
+    this.isUpperTagActive = false;
+    this.isCoreTagActive = false;
+    this.isLowerTagActive = false;
+    this.isNoDistanceTagActive = false;
+    this.isNoEquipmentTagActive = false;
+    this.currentWorkoutTagValue = 'beginner';
+  }
+
+  /**
+   * active intermediate tag
+   */
+  private activeIntermediateTag() {
+    this.isBeginnerTagActive = false;
+    this.isIntermediateTagActive = true;
+    this.isAdvancedTagActive = false;
+    this.isShortTagActive = false;
+    this.isMediumTagActive = false;
+    this.isLongTagActive = false;
+    this.isFullBodyTagActive = false;
+    this.isUpperTagActive = false;
+    this.isCoreTagActive = false;
+    this.isLowerTagActive = false;
+    this.isNoDistanceTagActive = false;
+    this.isNoEquipmentTagActive = false;
+    this.currentWorkoutTagValue = 'intermediate';
+  }
+
+  /**
+   * active advanced tag
+   */
+  private activeAdvancedTag() {
+    this.isBeginnerTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isAdvancedTagActive = true;
+    this.isIntermediateTagActive = false;
+    this.isShortTagActive = false;
+    this.isMediumTagActive = false;
+    this.isLongTagActive = false;
+    this.isFullBodyTagActive = false;
+    this.isUpperTagActive = false;
+    this.isCoreTagActive = false;
+    this.isLowerTagActive = false;
+    this.isNoDistanceTagActive = false;
+    this.isNoEquipmentTagActive = false;
+    this.currentWorkoutTagValue = 'advanced';
+  }
+
+  /**
+   * active short tag
+   */
+  private activeShortTag() {
+    this.isBeginnerTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isAdvancedTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isShortTagActive = true;
+    this.isMediumTagActive = false;
+    this.isLongTagActive = false;
+    this.isFullBodyTagActive = false;
+    this.isUpperTagActive = false;
+    this.isCoreTagActive = false;
+    this.isLowerTagActive = false;
+    this.isNoDistanceTagActive = false;
+    this.isNoEquipmentTagActive = false;
+    this.currentWorkoutTagValue = 'short';
+  }
+
+  /**
+   * active medium tag
+   */
+  private activeMediumTag() {
+    this.isBeginnerTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isAdvancedTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isShortTagActive = false;
+    this.isMediumTagActive = true;
+    this.isLongTagActive = false;
+    this.isFullBodyTagActive = false;
+    this.isUpperTagActive = false;
+    this.isCoreTagActive = false;
+    this.isLowerTagActive = false;
+    this.isNoDistanceTagActive = false;
+    this.isNoEquipmentTagActive = false;
+    this.currentWorkoutTagValue = 'medium';
+  }
+
+  /**
+   * active long tag
+   */
+  private activeLongTag() {
+    this.isBeginnerTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isAdvancedTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isShortTagActive = false;
+    this.isMediumTagActive = false;
+    this.isLongTagActive = true;
+    this.isFullBodyTagActive = false;
+    this.isUpperTagActive = false;
+    this.isCoreTagActive = false;
+    this.isLowerTagActive = false;
+    this.isNoDistanceTagActive = false;
+    this.isNoEquipmentTagActive = false;
+    this.currentWorkoutTagValue = 'long';
+  }
+
+  /**
+   * active full body tag
+   */
+  private activeFullBodyTag() {
+    this.isBeginnerTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isAdvancedTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isShortTagActive = false;
+    this.isMediumTagActive = false;
+    this.isLongTagActive = false;
+    this.isFullBodyTagActive = true;
+    this.isUpperTagActive = false;
+    this.isCoreTagActive = false;
+    this.isLowerTagActive = false;
+    this.isNoDistanceTagActive = false;
+    this.isNoEquipmentTagActive = false;
+    this.currentWorkoutTagValue = 'full_body';
+  }
+
+  /**
+   * active upper tag
+   */
+  private activeUpperTag() {
+    this.isBeginnerTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isAdvancedTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isShortTagActive = false;
+    this.isMediumTagActive = false;
+    this.isLongTagActive = false;
+    this.isFullBodyTagActive = false;
+    this.isUpperTagActive = true;
+    this.isCoreTagActive = false;
+    this.isLowerTagActive = false;
+    this.isNoDistanceTagActive = false;
+    this.isNoEquipmentTagActive = false;
+    this.currentWorkoutTagValue = 'upper';
+  }
+
+  /**
+   * active core tag
+   */
+  private activeCoreTag() {
+    this.isBeginnerTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isAdvancedTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isShortTagActive = false;
+    this.isMediumTagActive = false;
+    this.isLongTagActive = false;
+    this.isFullBodyTagActive = false;
+    this.isUpperTagActive = false;
+    this.isCoreTagActive = true;
+    this.isLowerTagActive = false;
+    this.isNoDistanceTagActive = false;
+    this.isNoEquipmentTagActive = false;
+    this.currentWorkoutTagValue = 'core';
+  }
+
+  /**
+   * active lower tag
+   */
+  private activeLowerTag() {
+    this.isBeginnerTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isAdvancedTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isShortTagActive = false;
+    this.isMediumTagActive = false;
+    this.isLongTagActive = false;
+    this.isFullBodyTagActive = false;
+    this.isUpperTagActive = false;
+    this.isCoreTagActive = false;
+    this.isLowerTagActive = true;
+    this.isNoDistanceTagActive = false;
+    this.isNoEquipmentTagActive = false;
+    this.currentWorkoutTagValue = 'lower';
+  }
+
+  /**
+   * active no distance tag
+   */
+  private activeNoDistanceTag() {
+    this.isBeginnerTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isAdvancedTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isShortTagActive = false;
+    this.isMediumTagActive = false;
+    this.isLongTagActive = false;
+    this.isFullBodyTagActive = false;
+    this.isUpperTagActive = false;
+    this.isCoreTagActive = false;
+    this.isLowerTagActive = false;
+    this.isNoDistanceTagActive = true;
+    this.isNoEquipmentTagActive = false;
+    this.currentWorkoutTagValue = 'no_distance';
+  }
+
+  /**
+   * active no equipment tag
+   */
+  private activeNoEquipmentTag() {
+    this.isBeginnerTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isAdvancedTagActive = false;
+    this.isIntermediateTagActive = false;
+    this.isShortTagActive = false;
+    this.isMediumTagActive = false;
+    this.isLongTagActive = false;
+    this.isFullBodyTagActive = false;
+    this.isUpperTagActive = false;
+    this.isCoreTagActive = false;
+    this.isLowerTagActive = false;
+    this.isNoDistanceTagActive = false;
+    this.isNoEquipmentTagActive = true;
+    this.currentWorkoutTagValue = 'no_equipment';
+  }
+
   private tagChanged() {
-    // reset current page
-    this.currentPage = 1;
-    // reload data based on keywords and tags
+    this.currentWorkoutsPage = 1;
     this.reloadWorkoutsTemp();
-    // load data for new page
     this.loadWorkoutsPerPage();
   }
 
   public goToWorkoutDetail(selectedWorkout) {
     // pass selected workout to workout detail component
     this.shareWorkout.changeWorkout(selectedWorkout);
-    // go to workout detail component
     const workoutDetailUrl = `/client/workout/${selectedWorkout.slug}`;
     this.router.navigate([workoutDetailUrl]);
   }

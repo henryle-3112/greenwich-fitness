@@ -1,11 +1,9 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {CoachFeedback, ReplyOnCoachFeedback, ResponseMessage} from '@gw-models/core';
+import {ReplyOnCoachFeedback} from '@gw-models/core';
 import {Observable} from 'rxjs';
-import {Config} from '@gw-config/core';
 import {tap} from 'rxjs/operators';
 
-// httpOptions to change content-type to application/json
 const httpOptions = {
   headers: new HttpHeaders({'Content-Type': 'application/json'})
 };
@@ -18,27 +16,36 @@ export class ReplyOnCoachFeedbackService {
   constructor(private http: HttpClient) {
   }
 
-  /** POST: get number of coach feedback replies */
-  public countNumberOfCoachFeedbackReplies(coachFeedback: CoachFeedback, status: number): Observable<ResponseMessage> {
-    return this.http.post<ResponseMessage>(
-      `${Config.api}/${Config.apiCountNumberOfCoachFeedbackReplies}/${status}`, coachFeedback, httpOptions).pipe(
-      tap((responseMessage: ResponseMessage) => console.log(JSON.stringify(responseMessage)))
-    );
-  }
 
-  /** POST: get replies on selected coach feedback */
-  public getRepliesOnSelectedCoachFeedback(coachFeedback: CoachFeedback, status: number): Observable<ReplyOnCoachFeedback[]> {
-    return this.http.post<ReplyOnCoachFeedback[]>(
-      `${Config.api}/${Config.apiGetRepliesOnSelectedCoachFeedback}/${status}`, coachFeedback, httpOptions).pipe(
+  /**
+   *
+   * @param url - url that will be used to get replies on coach's feedback
+   */
+  public getRepliesOnCoachFeedback(url: string): Observable<ReplyOnCoachFeedback[]> {
+    return this.http.get<ReplyOnCoachFeedback[]>(url, httpOptions).pipe(
       tap((repliesOnCoachFeedback: ReplyOnCoachFeedback[]) => console.log(JSON.stringify(repliesOnCoachFeedback)))
     );
   }
 
-  /** POST: add new reply on coach's feedback */
-  public addReplyOnCoachFeedback(replyOnCoachFeedback: ReplyOnCoachFeedback): Observable<ReplyOnCoachFeedback> {
-    return this.http.post<ReplyOnCoachFeedback>(
-      `${Config.api}/${Config.apiAddNewReplyOnCoachFeedback}`, replyOnCoachFeedback, httpOptions).pipe(
+  /**
+   *
+   * @param url - url that will be used to add reply on coach's feedback
+   * @param replyOnCoachFeedback - reply on coach's feedback that will be added
+   */
+  public addReplyOnCoachFeedback(url: string, replyOnCoachFeedback: ReplyOnCoachFeedback): Observable<ReplyOnCoachFeedback> {
+    return this.http.post<ReplyOnCoachFeedback>(url, replyOnCoachFeedback, httpOptions).pipe(
       tap((insertedReplyOnCoachFeedback: ReplyOnCoachFeedback) => console.log(JSON.stringify(insertedReplyOnCoachFeedback)))
+    );
+  }
+
+  /**
+   *
+   * @param url - url that will be used to update reply on coach's feedback
+   * @param replyOnCoachFeedback - reply on coach's feedback that will be updated
+   */
+  public updateReplyOnCoachFeedback(url: string, replyOnCoachFeedback: ReplyOnCoachFeedback): Observable<ReplyOnCoachFeedback> {
+    return this.http.put<ReplyOnCoachFeedback>(url, replyOnCoachFeedback, httpOptions).pipe(
+      tap((updatedReplyOnCoachFeedback: ReplyOnCoachFeedback) => console.log(JSON.stringify(updatedReplyOnCoachFeedback)))
     );
   }
 }

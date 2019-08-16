@@ -1,11 +1,12 @@
+<!--suppress ALL -->
 <div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;">
   <!-- loading component -->
-  <app-loading *ngIf="loading"></app-loading>
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- search box-->
-  <nz-input-group [nzSuffix]="suffixIconSearch" [ngClass]="{'mg-bottom-24': true, 'width-50': true}">
-    <input type="text" nz-input placeholder="Name..." #searchBox  (keyup.enter)="searchGallery(searchBox.value)"/>
+  <nz-input-group *ngIf="galleries && galleries.length" [nzSuffix]="suffixIconSearch" [ngClass]="{'mg-bottom-24': true, 'width-50': true}">
+    <input type="text" nz-input placeholder="Name..." #searchBox (keyup.enter)="searchGallery(searchBox.value)"/>
   </nz-input-group>
   <ng-template #suffixIconSearch>
     <i nz-icon type="search"></i>
@@ -14,7 +15,7 @@
 
   <!-- custom list -->
   <nz-list [nzDataSource]="galleries" [nzRenderItem]="item" [nzItemLayout]="'horizontal'"
-           [ngClass]="{'opacity-loading': loading, 'mg-bottom-24': true}">
+           [ngClass]="{'opacity-loading': isLoadingSpinnerShown, 'mg-bottom-24': true}">
     <ng-template #item let-item>
       <nz-list-item>
         <nz-list-item-meta
@@ -32,9 +33,10 @@
 
   <!-- pagination -->
   <nz-pagination
-    [nzPageIndex]="currentPage"
+    *ngIf="galleries && galleries.length"
+    [nzPageIndex]="currentGalleriesPage"
     [nzPageSize]="nGalleryPerPage"
-    [nzTotal]="totalGallery"
+    [nzTotal]="totalGalleries"
     [nzSize]="'small'"
     (nzPageIndexChange)="galleryPageChange($event)"></nz-pagination>
   <!-- end pagination -->

@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {Coach, ResponseMessage, UserProfile} from '@gw-models/core';
-import {CoachService} from '@gw-services/core/api/coach/coach.service';
+import {Coach, UserProfile} from '@gw-models/core';
 import {ShareCoachService} from '@gw-services/core/shared/coach/share-coach.service';
 import {Router} from '@angular/router';
 import {Config} from '@gw-config/core';
 import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import {MembershipService} from '@gw-services/core/api/coach/membership.service';
 
 @Component({
   selector: 'app-user-coach',
@@ -12,36 +12,21 @@ import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/sha
   styleUrls: ['./user-coach.component.css']
 })
 export class UserCoachComponent implements OnInit {
-
-  // list of coaches
   coaches: Coach[];
-
-  // currentPage
-  currentPage = 1;
-
-  // loading component is show ot not
-  loading = true;
-
-  // search value - return coaches and change pagination based on keywords
-  searchValue: string;
-
-  // number coach per page
+  currentCoachesPage;
+  isLoadingSpinnerShown = true;
+  coachFullNameKeywords: string;
   nCoachesPerPage: number;
-
-  // total coaches
   totalCoaches: number;
-
-  // selected user's profile
   selectedUserProfile: UserProfile;
 
   /**
-   *
-   * @param coachService - inject coach service to interact with coach's data
-   * @param shareCoachService - inject share coach service to share selected coach to other component
+   * @param membershipService - inject membershipService
+   * @param shareCoachService - inject ShareCoachService
    * @param router - inject router
    * @param shareUserProfile - inject shareUserProfile
    */
-  constructor(private coachService: CoachService,
+  constructor(private membershipService: MembershipService,
               private shareCoachService: ShareCoachService,
               private shareUserProfile: ShareUserProfileService,
               private router: Router) {
@@ -50,27 +35,22 @@ export class UserCoachComponent implements OnInit {
   /**
    * init data
    */
-  ngOnInit() {
-    // init number of coaches per page
-    this.nCoachesPerPage = 8;
-    // init current search value
-    this.searchValue = '';
-    // get selected user's profile
+  ngOnInit(): void {
+    this.currentCoachesPage = Config.currentPage;
+    this.nCoachesPerPage = Config.numberItemsPerPage;
+    this.coachFullNameKeywords = '';
     this.getSelectedUserProfile();
   }
 
   /**
    * get selected user's profile
    */
-  private getSelectedUserProfile() {
+  private getSelectedUserProfile(): void {
     this.shareUserProfile.currentUserProfile
       .subscribe(selectedUserProfile => {
         if (selectedUserProfile) {
           this.selectedUserProfile = selectedUserProfile;
-          // get total number of coaches
-          this.getNumberOfCoaches();
-          // get coaches by page
-          this.getCoachesByPage();
+          this.getCoaches();
         } else {
           this.router.navigate(['/client']);
         }
@@ -80,27 +60,24 @@ export class UserCoachComponent implements OnInit {
   /**
    * get coaches by current's page
    */
-  private getCoachesByPage() {
-    // create url to get coaches by current page
-    let currentGetCoachesByUserProfileByPageUrl =
-      `${Config.api}/${Config.apiGetCoachesByUserProfileAndByPage}/${this.selectedUserProfile.id}/${this.currentPage}`;
-    // if search value is not equal to '', then include keywords to the url
-    if (this.searchValue.localeCompare('') !== 0) {
-      currentGetCoachesByUserProfileByPageUrl += `?keyword=${this.searchValue.toLowerCase()}`;
-      console.log(currentGetCoachesByUserProfileByPageUrl);
+  private getCoaches(): void {
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const membershipStatus = 1;
+    let getCoachesUrl = `${Config.apiBaseUrl}/
+${Config.apiMembershipManagementPrefix}/
+${Config.apiMembershipCoaches}?
+${Config.userProfileIdParameter}=${selectedUserProfileId}&
+${Config.statusParameter}=${membershipStatus}&
+${Config.pageParameter}=${this.currentCoachesPage}`;
+    if (this.coachFullNameKeywords.localeCompare('') !== 0) {
+      getCoachesUrl += `?${Config.searchParameter}=${this.coachFullNameKeywords.toLowerCase()}`;
     }
-    // show loading component
-    this.loading = true;
-    // get coaches by page and keywords (if existed)
-    this.coachService.getCoachesByUserProfileAndByPage(currentGetCoachesByUserProfileByPageUrl)
-      .subscribe((response: Coach[]) => {
-        if (response) {
-          this.coaches = [];
-          // assign data to coaches
-          this.coaches = response;
-        }
-        // hide loading component
-        this.loading = false;
+    this.isLoadingSpinnerShown = true;
+    this.membershipService.getCoaches(getCoachesUrl)
+      .subscribe(response => {
+        this.coaches = response.body;
+        this.totalCoaches = Number(response.headers.get(Config.headerXTotalCount));
+        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -108,58 +85,28 @@ export class UserCoachComponent implements OnInit {
    *
    * @param event - selected page
    */
-  public coachesPageChange(event) {
-    // get current's page
-    this.currentPage = event;
-    // get coaches by page
-    this.getCoachesByPage();
+  public coachesPageChange(event): void {
+    this.currentCoachesPage = event;
+    this.getCoaches();
   }
 
   /**
    *
    * @param keyword - keyword that user-account type on the search box
    */
-  public searchCoach(keyword) {
-    // set current search keyword - user-account search coaches by name and change pagination based on keyword
-    this.searchValue = keyword;
-    // reset current page
-    this.currentPage = 1;
-    // change pagination
-    this.getNumberOfCoaches();
-    this.getCoachesByPage();
-  }
-
-  /**
-   * get total number of coaches
-   */
-  private getNumberOfCoaches() {
-    // create url to get total number of coaches
-    let currentGetNumberOfCoachesUrl =
-      `${Config.api}/${Config.apiGetNumberOfCoachesByUserProfileAndByPage}/${this.selectedUserProfile.id}`;
-    // if search value is not equal to '', then include keywords to the url
-    if (this.searchValue.localeCompare('') !== 0) {
-      currentGetNumberOfCoachesUrl += `?keyword=${this.searchValue.toLowerCase()}`;
-    }
-    // showing loading component
-    this.loading = true;
-    // get total number of coaches
-    this.coachService.getTotalCoachesByUserProfileAndByPage(currentGetNumberOfCoachesUrl)
-      .subscribe((responseMessage: ResponseMessage) => {
-        if (responseMessage) {
-          // assign total number of galleries to totalGallery
-          this.totalCoaches = Number(responseMessage.message);
-        }
-      });
+  public searchCoach(keyword): void {
+    this.coachFullNameKeywords = keyword;
+    this.currentCoachesPage = 1;
+    this.getCoaches();
   }
 
   /**
    *
    * @param selectedCoach - selected coach that user want to view information
    */
-  public goToCoachDetail(selectedCoach) {
+  public goToCoachDetail(selectedCoach): void {
     // pass selected coach to coach detail component
     this.shareCoachService.changeCoach(selectedCoach);
-    // go to coach detail component
     this.router.navigate(['/client/coach/detail']);
   }
 

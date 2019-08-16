@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Notification, ResponseMessage, UserProfile} from '@gw-models/core';
+import {Notification, UserProfile} from '@gw-models/core';
 import {Config} from '@gw-config/core';
 import {NotificationService} from '@gw-services/core/api/notification/notification.service';
 import {Router} from '@angular/router';
@@ -11,26 +11,12 @@ import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/sha
   styleUrls: ['./notification.component.css']
 })
 export class NotificationComponent implements OnInit {
-
-  // list of notifications
   notifications: Notification[];
-
-  // currentPage
-  currentPage = 1;
-
-  // loading component is show ot not
-  loading = true;
-
-  // search value - return notifications and change pagination based on keywords
-  searchValue: string;
-
-  // number notification per page
+  currentNotificationsPage = 1;
+  isLoadingSpinnerShown = true;
+  notificationContentKeywords: string;
   nNotificationsPerPage: number;
-
-  // total notification
   totalNotification: number;
-
-  // selected user profile
   selectedUserProfile: UserProfile;
 
   /**
@@ -47,26 +33,20 @@ export class NotificationComponent implements OnInit {
   /**
    * init data
    */
-  ngOnInit() {
-    // init number of notifications per page
+  ngOnInit(): void {
     this.nNotificationsPerPage = 8;
-    // init current search value
-    this.searchValue = '';
-    // get selected user's profile
+    this.notificationContentKeywords = '';
     this.getSelectedUserProfile();
   }
 
   /**
    * get selected user's profile
    */
-  private getSelectedUserProfile() {
+  private getSelectedUserProfile(): void {
     this.shareUserProfileService.currentUserProfile
       .subscribe(selectedUserProfile => {
         if (selectedUserProfile) {
           this.selectedUserProfile = selectedUserProfile;
-          // get total number of notifications
-          this.getNumberOfNotifications();
-          // get notifications by page
           this.getNotificationsByPage();
         } else {
           this.router.navigate(['/client']);
@@ -77,27 +57,28 @@ export class NotificationComponent implements OnInit {
   /**
    * get notifications by current's page
    */
-  private getNotificationsByPage() {
-    // create url to get notifications by current page
-    let getNotificationsByPageUrl = `${Config.api}/
-${Config.apiGetNotificationsByUserProfileIdAndByPage}/
-${this.selectedUserProfile.id}/${this.currentPage}`;
-    // if search value is not equal to '', then include keywords to the url
-    if (this.searchValue.localeCompare('') !== 0) {
-      getNotificationsByPageUrl += `?keyword=${this.searchValue.toLowerCase()}`;
+  private getNotificationsByPage(): void {
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const notificationStatus = 1;
+    let getNotificationsUrl = `${Config.apiBaseUrl}/
+${Config.apiNotificationManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiNotifications}?
+${Config.pageParameter}=${this.currentNotificationsPage}&
+${Config.statusParameter}=${notificationStatus}`;
+    if (this.notificationContentKeywords.localeCompare('') !== 0) {
+      getNotificationsUrl += `&${Config.searchParameter}=${this.notificationContentKeywords.toLowerCase()}`;
     }
-    // show loading component
-    this.loading = true;
-    // get notifications by page and keywords (if existed)
-    this.notificationService.getNotificationsByUserProfileIdAndByPage(getNotificationsByPageUrl)
-      .subscribe((response: Notification[]) => {
-        if (response) {
-          this.notifications = [];
-          // assign data to notifications
-          this.notifications = response;
-        }
-        // hide loading component
-        this.loading = false;
+    this.isLoadingSpinnerShown = true;
+    this.notificationService.getNotifications(getNotificationsUrl)
+      .subscribe(response => {
+        // if (response) {
+        //   this.notifications = [];
+        //   this.notifications = response;
+        // }
+        console.log(response);
+        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -105,10 +86,8 @@ ${this.selectedUserProfile.id}/${this.currentPage}`;
    *
    * @param event - selected page
    */
-  public notificationsPageChange(event) {
-    // get current's page
-    this.currentPage = event;
-    // get notifications by page
+  public notificationsPageChange(event): void {
+    this.currentNotificationsPage = event;
     this.getNotificationsByPage();
   }
 
@@ -116,35 +95,9 @@ ${this.selectedUserProfile.id}/${this.currentPage}`;
    *
    * @param keyword - keyword that user-account type on the search box
    */
-  public searchNotifications(keyword) {
-    // set current search keyword - user-account search notifications by name and change pagination based on keyword
-    this.searchValue = keyword;
-    // reset current page
-    this.currentPage = 1;
-    // change pagination
-    this.getNumberOfNotifications();
+  public searchNotifications(keyword): void {
+    this.notificationContentKeywords = keyword;
+    this.currentNotificationsPage = 1;
     this.getNotificationsByPage();
-  }
-
-  /**
-   * get total number of notifications
-   */
-  private getNumberOfNotifications() {
-    // create url to get total number of notifications
-    let currentGetNumberOfNotificationsUrl = `${Config.api}/${Config.apiCountNotificationsByUserProfileId}/${this.selectedUserProfile.id}`;
-    // if search value is not equal to '', then include keywords to the url
-    if (this.searchValue.localeCompare('') !== 0) {
-      currentGetNumberOfNotificationsUrl += `?keyword=${this.searchValue.toLowerCase()}`;
-    }
-    // showing loading component
-    this.loading = true;
-    // get total number of notifications
-    this.notificationService.getNumberOfNotificationsByUserProfileId(currentGetNumberOfNotificationsUrl)
-      .subscribe((responseMessage: ResponseMessage) => {
-        if (responseMessage) {
-          // assign total number of galleries to total notifications
-          this.totalNotification = Number(responseMessage.message);
-        }
-      });
   }
 }

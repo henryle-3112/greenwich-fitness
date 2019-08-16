@@ -7,8 +7,8 @@ export class ReplyOnCoachFeedback {
   replyOnCoachFeedbackStatus?: number;
   coachFeedback?: CoachFeedback;
   userProfile?: UserProfile;
-  nLikes?: number;
-  nDislikes?: number;
+  numberOfLikes?: number;
+  numberOfDislikes?: number;
   isLikeClicked?: boolean;
   isReacted?: boolean;
 }

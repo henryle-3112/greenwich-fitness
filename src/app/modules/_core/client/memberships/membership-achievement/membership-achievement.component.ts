@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ResponseMessage, UserAchievement} from '@gw-models/core';
+import {UserAchievement} from '@gw-models/core';
 import {UserAchievementService} from '@gw-services/core/api/user/user-achievement.service';
 import {AuthenticationService} from '@gw-services/core/authentication/authentication.service';
 import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
@@ -13,31 +13,20 @@ import {Router} from '@angular/router';
   styleUrls: ['./membership-achievement.component.css']
 })
 export class MembershipAchievementComponent implements OnInit {
-
-  // list of user-account's achievements
   userAchievements: UserAchievement[];
-  // currentPage
-  currentPage = 1;
-  // loading component is show ot not
-  loading = true;
-  // number user-account's achievements per page
+  currentUserAchievementsPage = 1;
+  isLoadingSpinnerShown = true;
   nUserAchievementsPerPage: number;
-  // total user-account's achievements
   totalUserAchievements: number;
-
-  // user-account's id
   selectedUserProfileId: number;
-
-  // is hide pagination
-  isHidePagination: boolean;
 
   /**
    *
-   * @param userAchievementService - inject user-account's achievement's service to interact with user-account's achievemenet's data
-   * @param authentication - inject authentication service to get current user-account's information
+   * @param userAchievementService - inject userAchievementService
    * @param shareMembershipService - inject shareMembershipService
    * @param router - inject router
-   * @param shareUserProfileService - inject share user-account's profile service to get user-account's profile information
+   * @param authentication - inject authentication
+   * @param shareUserProfileService - inject shareUserProfileService
    */
   constructor(private userAchievementService: UserAchievementService,
               private shareMembershipService: ShareMembershipService,
@@ -49,26 +38,20 @@ export class MembershipAchievementComponent implements OnInit {
   /**
    * init data
    */
-  ngOnInit() {
-    // get selected membership
+  ngOnInit(): void {
     this.getSelectedMembership();
-    // init number user-account achievements per page
     this.nUserAchievementsPerPage = 8;
   }
 
   /**
    * get selected membership
    */
-  private getSelectedMembership() {
+  private getSelectedMembership(): void {
     this.shareMembershipService.currentMembership
       .subscribe(selectedMembership => {
         if (selectedMembership) {
-          // get selected user's profile's id
           this.selectedUserProfileId = selectedMembership.userProfile.id;
-          // get number of user-account's achievements
-          this.getNumberOfUserAchievements();
-          // get user-account achievement's by page
-          this.getUserAchievementsByPage();
+          this.getUserAchievements();
         } else {
           this.router.navigate(['/client']);
         }
@@ -78,39 +61,25 @@ export class MembershipAchievementComponent implements OnInit {
   /**
    * get user-account's achievement's by page
    */
-  private getUserAchievementsByPage() {
-    // create user-account's achievement's url to get user-account's achievements' page
-    const currentGetUserAchievementsByPageUrl =
-      `${Config.api}/achievements/${String(this.selectedUserProfileId)}/paging/${this.currentPage}`;
-    // show loading component
-    this.loading = true;
-    // call user-account's achievment's service to get user-account's achievements by page
-    this.userAchievementService.getUserAchievemnetsByPage(currentGetUserAchievementsByPageUrl)
-      .subscribe((response: UserAchievement[]) => {
-        if (response) {
-          // current user-account's achievements
-          this.userAchievements = [];
-          // assign user-account's achievements
-          this.userAchievements = response;
-          // hide pagination if number of user-account's achievements per page is greater than toatl user-account's achievements
-          this.isHidePagination = this.nUserAchievementsPerPage > this.userAchievements.length;
-        }
-        // hide loading component
-        this.loading = false;
-      });
-  }
-
-  /**
-   * get total user-account's achievements
-   */
-  private getNumberOfUserAchievements() {
-    const currentGetNumberOfUserAchievementsUrl = `${Config.api}/${Config.apiGetNumberOfUserAchievements}/${this.selectedUserProfileId}`;
-    this.loading = true;
-    this.userAchievementService.getTotalUserAchievements(currentGetNumberOfUserAchievementsUrl)
-      .subscribe((responseMessage: ResponseMessage) => {
-        if (responseMessage) {
-          this.totalUserAchievements = Number(responseMessage.message);
-        }
+  private getUserAchievements(): void {
+    this.isLoadingSpinnerShown = true;
+    const getUserAchievementsUrl = `${Config.apiBaseUrl}/
+${Config.apiUserManagementPrefix}/
+${Config.apiUserAchievements}?
+${Config.userProfileIdParameter}=${this.selectedUserProfileId}&
+${Config.pageParameter}=${this.currentUserAchievementsPage}`;
+    this.userAchievementService.getUserAchievements(getUserAchievementsUrl)
+      .subscribe(response => {
+        // if (response) {
+        //   // current user-account's achievements
+        //   this.userAchievements = [];
+        //   // assign user-account's achievements
+        //   this.userAchievements = response;
+        //   // hide pagination if number of user-account's achievements per page is greater than toatl user-account's achievements
+        //   this.isHidePagination = this.nUserAchievementsPerPage > this.userAchievements.length;
+        // }
+        console.log(response);
+        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -118,11 +87,9 @@ export class MembershipAchievementComponent implements OnInit {
    *
    * @param event - selected page
    */
-  public userAchievementsPageChange(event) {
-    // get current's page
-    this.currentPage = event;
-    // get galleries by page
-    this.getUserAchievementsByPage();
+  public userAchievementsPageChange(event): void {
+    this.currentUserAchievementsPage = event;
+    this.getUserAchievements();
   }
 
 }

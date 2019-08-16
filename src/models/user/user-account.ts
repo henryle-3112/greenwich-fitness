@@ -4,9 +4,9 @@ export class UserAccount {
   userName?: string;
   password?: string;
   passwordReminderToken?: string;
-  passwordReminderExpired?: Date;
+  // passwordReminderExpired?: Date;
   emailConfirmationToken?: string;
   userProfile: UserProfile;
   userAccountStatus: UserAccountStatus;
-  registrationTime?: Date;
+  // registrationTime?: Date;
 }

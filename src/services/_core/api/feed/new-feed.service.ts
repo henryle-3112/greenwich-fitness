@@ -1,13 +1,11 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {Config} from '@gw-config/core';
-import {tap} from 'rxjs/operators';
-import {NewFeed, ResponseMessage} from '@gw-models/core';
+import {NewFeed} from '@gw-models/core';
 
-// httpOptions to change content-type to application/json
 const httpOptions = {
-  headers: new HttpHeaders({'Content-Type': 'application/json'})
+  headers: new HttpHeaders({'Content-Type': 'application/json'}),
+  observe: 'response' as 'body'
 };
 
 @Injectable({
@@ -18,26 +16,27 @@ export class NewFeedService {
   constructor(private http: HttpClient) {
   }
 
-  /** POST: add new newfeed */
-  public addNewFeed(newFeed: NewFeed): Observable<NewFeed> {
-    return this.http.post<NewFeed>(`${Config.api}/${Config.apiAddNewFeed}`, newFeed, httpOptions).pipe(
-      tap((insertedNewFeed: NewFeed) => console.log(JSON.stringify(insertedNewFeed)))
-    );
+  /**
+   *
+   * @param url - url that will be used to add newfeed
+   * @param newFeed - newfeed that will be added
+   */
+  public addNewFeed(url: string, newFeed: NewFeed): Observable<NewFeed> {
+    return this.http.post<NewFeed>(url, newFeed, httpOptions);
   }
 
 
   /** GET: get new feeds by status and by page */
-  public getNewFeedsByStatusAndByPage(url): Observable<NewFeed[]> {
-    return this.http.get<NewFeed[]>(
-      url, httpOptions).pipe(
-      tap((newFeeds: NewFeed[]) => console.log(JSON.stringify(newFeeds)))
-    );
+  public getNewFeeds(url): Observable<HttpResponse<NewFeed[]>> {
+    return this.http.get<HttpResponse<NewFeed[]>>(url, httpOptions);
   }
 
-  /** GET: get number of new feeds by status */
-  public getNumberOfNewFeedsByStatus(url): Observable<ResponseMessage> {
-    return this.http.get<ResponseMessage>(url, httpOptions).pipe(
-      tap((responseMessage: ResponseMessage) => console.log(JSON.stringify(responseMessage)))
-    );
+  /**
+   *
+   * @param url - url that will be used to update newfeed
+   * @param newFeed - newfeed that will be updated
+   */
+  public updateNewFeed(url: string, newFeed: NewFeed): Observable<NewFeed> {
+    return this.http.put<NewFeed>(url, newFeed, httpOptions);
   }
 }

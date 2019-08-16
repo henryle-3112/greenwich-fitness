@@ -1,11 +1,8 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {NewFeed, NewFeedComment, ResponseMessage} from '@gw-models/core';
+import {NewFeedComment} from '@gw-models/core';
 import {Observable} from 'rxjs';
-import {Config} from '@gw-config/core';
-import {tap} from 'rxjs/operators';
 
-// httpOptions to change content-type to application/json
 const httpOptions = {
   headers: new HttpHeaders({'Content-Type': 'application/json'})
 };
@@ -18,27 +15,29 @@ export class NewFeedCommentService {
   constructor(private http: HttpClient) {
   }
 
-  /** POST: add new newfeed */
-  public getNewFeedCommentsByNewFeedAndStatus(newFeed: NewFeed, status: number): Observable<NewFeedComment[]> {
-    return this.http.post<NewFeedComment[]>(
-      `${Config.api}/${Config.apiGetNewFeedCommentsByNewFeedAndStatus}/${status}`, newFeed, httpOptions).pipe(
-      tap((newFeedComments: NewFeedComment[]) => console.log(JSON.stringify(newFeedComments)))
-    );
+  /**
+   *
+   * @param url - url that will be used to get newfeed's comments
+   */
+  public getNewFeedComments(url: string): Observable<NewFeedComment[]> {
+    return this.http.get<NewFeedComment[]>(url, httpOptions);
   }
 
-  /** POST: add new new feed comment */
-  public addNewFeedComment(newFeedComment: NewFeedComment): Observable<NewFeedComment> {
-    return this.http.post<NewFeedComment>(
-      `${Config.api}/${Config.apiAddNewFeedComment}`, newFeedComment, httpOptions).pipe(
-      tap((insertedNewFeedComment: NewFeedComment) => console.log(JSON.stringify(insertedNewFeedComment)))
-    );
+  /**
+   *
+   * @param url - url that will be used to add newfeed's comment
+   * @param newFeedComment - newfeed's comment that will be added
+   */
+  public addNewFeedComment(url: string, newFeedComment: NewFeedComment): Observable<NewFeedComment> {
+    return this.http.post<NewFeedComment>(url, newFeedComment, httpOptions);
   }
 
-  /** POST: add new new feed comment */
-  public countNumberOfNewFeedCommentsByNewFeedAndByStatus(newFeed: NewFeed, status: number): Observable<ResponseMessage> {
-    return this.http.post<ResponseMessage>(
-      `${Config.api}/${Config.apiCountNumberOfNewFeedCommentsByNewFeedAndByStatus}/${status}`, newFeed, httpOptions).pipe(
-      tap((responseMessage: ResponseMessage) => console.log(JSON.stringify(responseMessage)))
-    );
+  /**
+   *
+   * @param url - url that will be used to update newfeed's comment
+   * @param newFeedComment - newfeed's comment that will be updated
+   */
+  public updateNewFeedComment(url: string, newFeedComment: NewFeedComment): Observable<NewFeedComment> {
+    return this.http.put<NewFeedComment>(url, newFeedComment, httpOptions);
   }
 }

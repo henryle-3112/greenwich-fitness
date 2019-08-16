@@ -1,10 +1,8 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {ProductPayment} from '@gw-models/core';
-import {Config} from '@gw-config/core';
 import {tap} from 'rxjs/operators';
 
-// httpOptions to change content-type to application/json
 const httpOptions = {
   headers: new HttpHeaders({'Content-Type': 'application/json'})
 };
@@ -19,10 +17,11 @@ export class ProductPaymentService {
 
   /**
    *
-   * @param productPayment - product's payment
+   * @param url - url that will be used to add product payment
+   * @param productPayment - product payment that will be added
    */
-  public addProductPayment(productPayment: ProductPayment) {
-    return this.http.post<ProductPayment>(`${Config.api}/${Config.apiAddProductPayment}`, productPayment, httpOptions).pipe(
+  public addProductPayment(url: string, productPayment: ProductPayment) {
+    return this.http.post<ProductPayment>(url, productPayment, httpOptions).pipe(
       tap((insertedProductPayment: ProductPayment) => console.log(insertedProductPayment))
     );
   }

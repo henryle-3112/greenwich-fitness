@@ -10,7 +10,8 @@ import {
   ProductOrderDetail,
   ProductPayment,
   ShoppingCart,
-  UserProfile
+  UserProfile,
+  Notification
 } from '@gw-models/core';
 import {ProductOrderService} from '@gw-services/core/api/product/product-order.service';
 import {ProductOrderDetailService} from '@gw-services/core/api/product/product-order-detail.service';
@@ -20,6 +21,7 @@ import {CoachPaymentService} from '@gw-services/core/api/payment/coach-payment.s
 import {CoachRateService} from '@gw-services/core/api/coach/coach-rate.service';
 import {MembershipService} from '@gw-services/core/api/coach/membership.service';
 import {CoachMembershipNotificationService} from '@gw-services/core/api/notification/coach-membership-notification.service';
+import {NotificationService} from '@gw-services/core/api/notification/notification.service';
 
 @Component({
   selector: 'app-payment-alert',
@@ -27,50 +29,25 @@ import {CoachMembershipNotificationService} from '@gw-services/core/api/notifica
   styleUrls: ['./payment-alert.component.css']
 })
 export class PaymentAlertComponent implements OnInit {
-
-  // check loading component is showing or not
-  loading: boolean;
-
-  // check payment is successfully or not
+  isLoadingSpinnerShown: boolean;
   isPaymentSuccessfully: boolean;
-
-  // check what user want to pay
   checkWhatUserWantToPay: string;
-
-  // get payment id
   paymentId: string;
-
-  // get payer id
   payerId: string;
-
-  // token
-  token: string;
-
-  // shopping cart products
+  paymentToken: string;
   shoppingCartProducts: ShoppingCart[];
-
-  // selected user's profile
   selectedUserProfile: UserProfile;
-
-  // total price of shopping carts
-  totalPrice: number;
-
-  // coffeti interval to show coffeti animation
-  coffetiInterval: any;
-
-  // selected coach that user want to hire
+  totalShoppingCartPrice: number;
+  coffetiAnimationInterval: any;
   selectedCoach: Coach;
-
-  // coach averate rating
-  rateAverage: number;
-
-  // coach membership notification
   selectedCoachMembershipNotification: CoachMembershipNotification;
+  totalCoachPayment: number;
 
 
   /**
    *
    * @param paymentService - inject paymentService
+   * @param notificationService - inject notificationService
    * @param productPaymentService - inject productPaymentService
    * @param coachMembershipNotificationService - inject coachMembershipNotificationService
    * @param coachPaymentService - inject coachPaymentService
@@ -82,6 +59,7 @@ export class PaymentAlertComponent implements OnInit {
    * @param productOrderDetailService - inject productOrderDetailService
    */
   constructor(private paymentService: PaymentService,
+              private notificationService: NotificationService,
               private productPaymentService: ProductPaymentService,
               private coachMembershipNotificationService: CoachMembershipNotificationService,
               private coachPaymentService: CoachPaymentService,
@@ -94,24 +72,21 @@ export class PaymentAlertComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.paymentId = params['paymentId'];
       this.payerId = params['PayerID'];
-      this.token = params['token'];
+      this.paymentToken = params['paymentToken'];
     });
   }
 
-  ngOnInit() {
-    if (typeof this.paymentId === 'undefined' || typeof this.payerId === 'undefined' || typeof this.token === 'undefined') {
-      // if query url parameters does not existed, redirect to feed
-      // redirect to client feed page
+  ngOnInit(): void {
+    const isPaymentParametersNotExisted = typeof this.paymentId === 'undefined' ||
+      typeof this.payerId === 'undefined' ||
+      typeof this.paymentToken === 'undefined';
+    if (isPaymentParametersNotExisted) {
       this.router.navigate(['/client/feed']);
     } else {
-      // get what user want to pay
       if (localStorage.getItem(Config.checkWhatUserWantToPay)) {
-        // get selected user profile
         this.getSelectedUserProfile();
-        // check what user want to buy/hire
         this.checkWhatUserWantToBuy();
       } else {
-        // redirect to client feed page
         this.router.navigate(['/client/feed']);
       }
     }
@@ -120,16 +95,11 @@ export class PaymentAlertComponent implements OnInit {
   /**
    * check what user want to buy
    */
-  private checkWhatUserWantToBuy() {
+  private checkWhatUserWantToBuy(): void {
     this.checkWhatUserWantToPay = localStorage.getItem(Config.checkWhatUserWantToPay);
     if (this.checkWhatUserWantToPay.localeCompare('product') === 0) {
-      // get products from shopping cart
       this.getProductsFromShoppingCart();
     } else if (this.checkWhatUserWantToPay.localeCompare('coach') === 0) {
-      // init rate average
-      this.rateAverage = 0;
-      // user want to hire coach
-      // get selected coach that user want to hire
       this.getSelectedCoach();
     }
   }
@@ -137,38 +107,39 @@ export class PaymentAlertComponent implements OnInit {
   /**
    * get selected coach
    */
-  private getSelectedCoach() {
+  private getSelectedCoach(): void {
     if (localStorage.getItem(Config.currentCoach)) {
       this.selectedCoach = JSON.parse(localStorage.getItem(Config.currentCoach));
       console.log(this.selectedCoach);
-      // get selected coach membership notification
+      this.getTotalCoachPayment();
       this.getSelectedCoachMembershipNotification();
     } else {
-      // clear coach membership notification
-      localStorage.removeItem(Config.currentCoachMembershipNotification);
-      // clear current coach
-      localStorage.removeItem(Config.currentCoach);
-      // clear current user from local storage
-      localStorage.removeItem(Config.currentUserProfile);
-      // redirect to client feed page
+      this.removeDataFromLocalStorage();
       this.router.navigate(['/client/feed']);
     }
   }
 
-  private getSelectedCoachMembershipNotification() {
+  /**
+   * get total coach payment
+   */
+  private getTotalCoachPayment(): void {
+    if (localStorage.getItem(Config.totalCoachPayment)) {
+      this.totalCoachPayment = Number(localStorage.getItem(Config.totalCoachPayment));
+    } else {
+      this.removeDataFromLocalStorage();
+      this.router.navigate(['/client/feed']);
+    }
+  }
+
+  /**
+   * get selected coach membership notification
+   */
+  private getSelectedCoachMembershipNotification(): void {
     if (localStorage.getItem(Config.currentCoachMembershipNotification)) {
       this.selectedCoachMembershipNotification = JSON.parse(localStorage.getItem(Config.currentCoachMembershipNotification));
-      console.log(this.selectedCoachMembershipNotification);
-      // call complete coach payment
       this.callCompleteCoachPayment();
     } else {
-      // clear coach membership notification
-      localStorage.removeItem(Config.currentCoachMembershipNotification);
-      // clear current coach
-      localStorage.removeItem(Config.currentCoach);
-      // clear current user from local storage
-      localStorage.removeItem(Config.currentUserProfile);
-      // redirect to client feed page
+      this.removeDataFromLocalStorage();
       this.router.navigate(['/client/feed']);
     }
   }
@@ -176,73 +147,50 @@ export class PaymentAlertComponent implements OnInit {
   /**
    * call complete coach payment
    */
-  private callCompleteCoachPayment() {
-    // call complete payment
-    // show loading component
-    this.loading = true;
-    this.paymentService.completePayment(
-      this.paymentId,
-      this.payerId)
+  private callCompleteCoachPayment(): void {
+    this.isLoadingSpinnerShown = true;
+    const completePaymentUrl = `${Config.apiBaseUrl}/
+${Config.apiPaypalManagementPrefix}/
+${Config.apiCompletePayment}?
+${Config.paymentIdParameter}=${this.paymentId}&
+${Config.payerIdParameter}=${this.payerId}`;
+    this.paymentService.completePayment(completePaymentUrl)
       .subscribe((response: any) => {
-        console.log(response);
         if (response.status.localeCompare('success') === 0) {
-          // show success message to user
           this.isPaymentSuccessfully = true;
-          // get rating average
-          this.getCoachRateAverage();
-          // add membership
           this.addMembership();
         } else {
-          // show error message to user
           this.isPaymentSuccessfully = false;
-          // clear coach membership notification
-          localStorage.removeItem(Config.currentCoachMembershipNotification);
-          // clear current coach
-          localStorage.removeItem(Config.currentCoach);
-          // clear current user from local storage
-          localStorage.removeItem(Config.currentUserProfile);
+          this.removeDataFromLocalStorage();
         }
-        // hide loading component
-        this.loading = false;
-      });
-  }
-
-  /**
-   * get coach's rate's average
-   */
-  private getCoachRateAverage() {
-    // show loading component
-    this.loading = true;
-    this.coachRateService.getCoachRateAverage(this.selectedCoach.id)
-      .subscribe(rateAverage => {
-        if (rateAverage) {
-          this.rateAverage = Number(rateAverage.message);
-        }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * add membership
    */
-  private addMembership() {
-    // show loading component
-    this.loading = true;
-    // check membership existed or not
-    this.membershipService.getMembershipByCoachAndByUserProfile(this.selectedCoach.id, this.selectedUserProfile.id)
+  private addMembership(): void {
+    this.isLoadingSpinnerShown = true;
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const selectedCoachId = this.selectedCoach.id;
+    const getMembershipUrl = `${Config.apiBaseUrl}/
+${Config.apiMembershipManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiCoaches}/
+${selectedCoachId}/
+${Config.apiMemberships}`;
+    this.membershipService.getMembership(getMembershipUrl)
       .subscribe((selectedMembership: Membership) => {
         if (selectedMembership) {
           selectedMembership.status = 1;
           selectedMembership.startDate = new Date();
-          // update selected membership
           this.updateMembership(selectedMembership);
         } else {
-          // add membership to server
           this.addMembershipToServer();
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -250,22 +198,16 @@ export class PaymentAlertComponent implements OnInit {
    *
    * @param selectedMembership - selected membership that user want to update
    */
-  private updateMembership(selectedMembership: Membership) {
-    // show loading component
-    this.loading = true;
-    this.membershipService.updateMembership(selectedMembership)
+  private updateMembership(selectedMembership: Membership): void {
+    this.isLoadingSpinnerShown = true;
+    const updateMembershipUrl = `${Config.apiBaseUrl}/${Config.apiMembershipManagementPrefix}/${Config.apiMemberships}`;
+    this.membershipService.updateMembership(updateMembershipUrl, selectedMembership)
       .subscribe((updatedMembership: Membership) => {
         if (updatedMembership) {
           this.addCoachPaymentToServer(updatedMembership);
         } else {
-          // show error message to user
           this.isPaymentSuccessfully = false;
-          // clear coach membership notification
-          localStorage.removeItem(Config.currentCoachMembershipNotification);
-          // clear current coach
-          localStorage.removeItem(Config.currentCoach);
-          // clear current user from local storage
-          localStorage.removeItem(Config.currentUserProfile);
+          this.removeDataFromLocalStorage();
         }
       });
   }
@@ -273,88 +215,116 @@ export class PaymentAlertComponent implements OnInit {
   /**
    * add membership to server
    */
-  private addMembershipToServer() {
-    // show loading component
-    this.loading = true;
-    // create membership object
+  private addMembershipToServer(): void {
+    this.isLoadingSpinnerShown = true;
     const membership = new Membership();
     membership.userProfile = this.selectedUserProfile;
     membership.coach = this.selectedCoach;
     membership.status = 1;
     membership.startDate = new Date();
-    // add membership to server
-    this.membershipService.addMembership(membership)
+    const addMembershipUrl = `${Config.apiBaseUrl}/${Config.apiMembershipManagementPrefix}/${Config.apiMemberships}`;
+    this.membershipService.addMembership(addMembershipUrl, membership)
       .subscribe((insertedMembership: Membership) => {
         if (insertedMembership) {
           this.addCoachPaymentToServer(insertedMembership);
         } else {
-          // show error message to user
           this.isPaymentSuccessfully = false;
-          // clear coach membership notification
-          localStorage.removeItem(Config.currentCoachMembershipNotification);
-          // clear current coach
-          localStorage.removeItem(Config.currentCoach);
-          // clear current user from local storage
-          localStorage.removeItem(Config.currentUserProfile);
+          this.removeDataFromLocalStorage();
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * add coach payment to server
    */
-  private addCoachPaymentToServer(insertedMembership: Membership) {
-    // show loading component
-    this.loading = true;
-    // create coach payment object
+  private addCoachPaymentToServer(insertedMembership: Membership): void {
+    this.isLoadingSpinnerShown = true;
     const coachPayment = new CoachPayment();
     coachPayment.createdDate = new Date();
     coachPayment.membership = insertedMembership;
     coachPayment.payerId = this.payerId;
     coachPayment.paymentId = this.paymentId;
-    coachPayment.token = this.token;
-    // add coach payment to server
-    this.coachPaymentService.addCoachPayment(coachPayment)
+    coachPayment.token = this.paymentToken;
+    const addCoachPaymentUrl = `${Config.apiBaseUrl}/${Config.apiPaymentManagementPrefix}/${Config.apiCoachesPayment}`;
+    this.coachPaymentService.addCoachPayment(addCoachPaymentUrl, coachPayment)
       .subscribe((insertedCoachPayment: CoachPayment) => {
         if (insertedCoachPayment) {
           this.updateCoachMembershipNotification();
-          // create coffeti object
-          const coffeti = new Coffeti();
-          this.coffetiInterval = setInterval(() => {
-            coffeti.shoot();
-          }, 1000);
-          // show success message to user
+          this.showCoffetiAnimation();
+          this.addNotificationForCoach();
+          this.addNotificationForUser();
           this.isPaymentSuccessfully = true;
-          // clear coach membership notification
-          localStorage.removeItem(Config.currentCoachMembershipNotification);
-          // clear user profile from local storage
-          localStorage.removeItem(Config.currentUserProfile);
-          // clear current coach from local storage
-          localStorage.removeItem(Config.currentCoach);
+          this.removeDataFromLocalStorage();
         } else {
-          // show error message to user
           this.isPaymentSuccessfully = false;
-          // clear coach membership notification
-          localStorage.removeItem(Config.currentCoachMembershipNotification);
-          // clear user profile from local storage
-          localStorage.removeItem(Config.currentUserProfile);
-          // clear current coach from local storage
-          localStorage.removeItem(Config.currentCoach);
+          this.removeDataFromLocalStorage();
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
+      });
+  }
+
+  /**
+   * show coffeti animation
+   */
+  private showCoffetiAnimation(): void {
+    const coffeti = new Coffeti();
+    this.coffetiAnimationInterval = setInterval(() => {
+      coffeti.shoot();
+    }, 1000);
+  }
+
+  /**
+   * add notification for coach
+   */
+  private addNotificationForCoach(): void {
+    const notification = new Notification();
+    notification.userProfile = this.selectedCoach.userProfile;
+    notification.createdDate = new Date();
+    notification.status = 1;
+    notification.content = `${this.selectedUserProfile.fullName} has pay ${this.totalCoachPayment} for you`;
+    this.isLoadingSpinnerShown = true;
+    const addNotificationUrl = `${Config.apiBaseUrl}/${Config.apiNotificationManagementPrefix}/${Config.apiNotifications}`;
+    this.notificationService.addNotification(addNotificationUrl, notification)
+      .subscribe((insertedNotification: Notification) => {
+        if (insertedNotification) {
+          console.log(insertedNotification);
+        }
+        this.isLoadingSpinnerShown = false;
+      });
+  }
+
+  /**
+   * add notification for user
+   */
+  private addNotificationForUser(): void {
+    const notification = new Notification();
+    notification.userProfile = this.selectedUserProfile;
+    notification.createdDate = new Date();
+    notification.status = 1;
+    notification.content = `You has pay ${this.totalCoachPayment} for ${this.selectedCoach.userProfile.fullName}`;
+    this.isLoadingSpinnerShown = true;
+    const addNotificationUrl = `${Config.apiBaseUrl}/${Config.apiNotificationManagementPrefix}/${Config.apiNotifications}`;
+    this.notificationService.addNotification(addNotificationUrl, notification)
+      .subscribe((insertedNotification: Notification) => {
+        if (insertedNotification) {
+          console.log(insertedNotification);
+        }
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * update coach membership notification
    */
-  private updateCoachMembershipNotification() {
+  private updateCoachMembershipNotification(): void {
     // status = 2. It means that user has pay
     this.selectedCoachMembershipNotification.status = 2;
-    this.coachMembershipNotificationService.updateCoachMembershipNotification(this.selectedCoachMembershipNotification)
+    const updateCoachMembershipNotificationUrl = `${Config.apiBaseUrl}/
+${Config.apiNotificationManagementPrefix}/
+${Config.apiCoachMembershipNotifications}`;
+    this.coachMembershipNotificationService
+      .updateCoachMembershipNotification(updateCoachMembershipNotificationUrl, this.selectedCoachMembershipNotification)
       .subscribe((updatedCoachMembershipNotification: CoachMembershipNotification) => {
         console.log(updatedCoachMembershipNotification);
       });
@@ -363,18 +333,11 @@ export class PaymentAlertComponent implements OnInit {
   /**
    * get selected user's profile
    */
-  private getSelectedUserProfile() {
+  private getSelectedUserProfile(): void {
     if (localStorage.getItem(Config.currentUserProfile)) {
       this.selectedUserProfile = JSON.parse(localStorage.getItem(Config.currentUserProfile));
-      console.log(this.selectedUserProfile);
     } else {
-      // clear coach membership notification
-      localStorage.removeItem(Config.currentCoachMembershipNotification);
-      // clear current coach
-      localStorage.removeItem(Config.currentCoach);
-      // clear current user from local storage
-      localStorage.removeItem(Config.currentUserProfile);
-      // redirect to client feed page
+      this.removeDataFromLocalStorage();
       this.router.navigate(['/client/feed']);
     }
   }
@@ -382,23 +345,18 @@ export class PaymentAlertComponent implements OnInit {
   /**
    * get products from shopping cart
    */
-  private getProductsFromShoppingCart() {
+  private getProductsFromShoppingCart(): void {
     if (localStorage.getItem(Config.shoppingCart)) {
-      // init total price
-      this.totalPrice = 0;
-      // init shopping cart products
+      this.totalShoppingCartPrice = 0;
       this.shoppingCartProducts = [];
       const currentShoppingCart = JSON.parse(localStorage.getItem(Config.shoppingCart));
       for (const eachShoppingCart of currentShoppingCart) {
-        this.totalPrice = this.totalPrice + eachShoppingCart.product.productPrice * eachShoppingCart.quantity;
+        this.totalShoppingCartPrice = this.totalShoppingCartPrice + eachShoppingCart.product.productPrice * eachShoppingCart.quantity;
         this.shoppingCartProducts.push(eachShoppingCart);
       }
-      console.log(this.shoppingCartProducts);
       this.callCompleteProductsPayment();
     } else {
-      // clear current user from local storage
-      localStorage.removeItem(Config.currentUserProfile);
-      // redirect client feed page
+      this.removeDataFromLocalStorage();
       this.router.navigate(['/client/feed']);
     }
   }
@@ -406,58 +364,47 @@ export class PaymentAlertComponent implements OnInit {
   /**
    * call complete payment method
    */
-  private callCompleteProductsPayment() {
-    // call complete payment
-    // show loading component
-    this.loading = true;
-    this.paymentService.completePayment(
-      this.paymentId,
-      this.payerId)
+  private callCompleteProductsPayment(): void {
+    this.isLoadingSpinnerShown = true;
+    const completePaymentUrl = `${Config.apiBaseUrl}/
+${Config.apiPaypalManagementPrefix}/
+${Config.apiCompletePayment}?
+${Config.paymentIdParameter}=${this.paymentId}&
+${Config.payerIdParameter}=${this.payerId}`;
+    this.paymentService.completePayment(completePaymentUrl)
       .subscribe((response: any) => {
         console.log(response);
         if (response.status.localeCompare('success') === 0) {
-          // show success message to user
           this.isPaymentSuccessfully = true;
-          // add to product order table on server
           this.addToProductOrder();
         } else {
-          // show error message to user
           this.isPaymentSuccessfully = false;
-          // clear current user from local storage
-          localStorage.removeItem(Config.currentUserProfile);
+          this.removeDataFromLocalStorage();
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * add to product order
    */
-  private addToProductOrder() {
-    // show loading component
-    this.loading = true;
-    // create new product's order object
+  private addToProductOrder(): void {
+    this.isLoadingSpinnerShown = true;
     const newProductOrder = new ProductOrder();
     newProductOrder.productOrderDate = new Date();
     newProductOrder.productOrderStatus = 1;
     newProductOrder.userProfile = this.selectedUserProfile;
-
-    // add new product's order to server
-    this.productOrderService.addProductOrder(newProductOrder)
+    const addProductOrderUrl = `${Config.apiBaseUrl}/${Config.apiProductManagementPrefix}/${Config.apiProductOrders}`;
+    this.productOrderService.addProductOrder(addProductOrderUrl, newProductOrder)
       .subscribe(insertedProductOrder => {
         if (insertedProductOrder) {
           console.log(insertedProductOrder);
-          // add each product to product's order detail
           this.addProductDetails(insertedProductOrder);
         } else {
-          // show error message to user
           this.isPaymentSuccessfully = false;
-          // clear current user profile from local storage
-          localStorage.removeItem(Config.currentUserProfile);
+          this.removeDataFromLocalStorage();
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -465,89 +412,71 @@ export class PaymentAlertComponent implements OnInit {
    *
    * @param insertedProductOrder - inserted product's order
    */
-  private addProductDetails(insertedProductOrder: ProductOrder) {
-    // show loading component
-    this.loading = true;
-    // create list of product order details
+  private addProductDetails(insertedProductOrder: ProductOrder): void {
+    this.isLoadingSpinnerShown = true;
     const productOrderDetails = [];
     for (const eachShoppingCartProduct of this.shoppingCartProducts) {
-      // create new product order detail object
       const productOrderDetail = new ProductOrderDetail();
       productOrderDetail.productOrder = insertedProductOrder;
       productOrderDetail.product = eachShoppingCartProduct.product;
       productOrderDetail.quantity = eachShoppingCartProduct.quantity;
-
-      // add to product order detail list
       productOrderDetails.push(productOrderDetail);
     }
-
-    // add to server
-    this.productOrderDetailService.addProductOrderDetail(productOrderDetails)
+    const addProductOrderDetailsUrl = `${Config.apiBaseUrl}/${Config.apiProductManagementPrefix}/${Config.apiProductOrderDetails}`;
+    this.productOrderDetailService.addProductOrderDetails(addProductOrderDetailsUrl, productOrderDetails)
       .subscribe(insertedProductOrderDetails => {
         if (insertedProductOrderDetails) {
           console.log(insertedProductOrderDetails);
-          // add to product payment table
           this.addProductPaymentToServer(insertedProductOrder);
         } else {
-          // show error message to user
           this.isPaymentSuccessfully = false;
-          // clear user profile from local storage
-          localStorage.removeItem(Config.currentUserProfile);
+          this.removeDataFromLocalStorage();
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * add to product payment server
    */
-  private addProductPaymentToServer(insertedProductOrder: ProductOrder) {
-    // show loading component
-    this.loading = true;
-    // create product payment object
+  private addProductPaymentToServer(insertedProductOrder: ProductOrder): void {
+    this.isLoadingSpinnerShown = true;
     const productPayment = new ProductPayment();
     productPayment.createdDate = new Date();
     productPayment.payerId = this.payerId;
     productPayment.paymentId = this.paymentId;
-    productPayment.token = this.token;
+    productPayment.token = this.paymentToken;
     productPayment.productOrder = insertedProductOrder;
-
-    // add product payment to ser
-    this.productPaymentService.addProductPayment(productPayment)
+    const addProductPaymentUrl = `${Config.apiBaseUrl}/${Config.apiPaymentManagementPrefix}/${Config.apiProductsPayment}`;
+    this.productPaymentService.addProductPayment(addProductPaymentUrl, productPayment)
       .subscribe((insertedProductPayment: ProductPayment) => {
         if (insertedProductPayment) {
-          // create coffeti object
-          const coffeti = new Coffeti();
-          this.coffetiInterval = setInterval(() => {
-            coffeti.shoot();
-          }, 1000);
-          // show success message to user
+          this.showCoffetiAnimation();
           this.isPaymentSuccessfully = true;
-          // clear user profile from local storage
-          localStorage.removeItem(Config.currentUserProfile);
+          this.removeDataFromLocalStorage();
         } else {
-          // show error message to user
           this.isPaymentSuccessfully = false;
-          // clear user profile from local storage
-          localStorage.removeItem(Config.currentUserProfile);
+          this.removeDataFromLocalStorage();
         }
       });
   }
 
   /**
+   * remove data from local storage
+   */
+  private removeDataFromLocalStorage(): void {
+    localStorage.removeItem(Config.totalCoachPayment);
+    localStorage.removeItem(Config.currentCoachMembershipNotification);
+    localStorage.removeItem(Config.currentCoach);
+    localStorage.removeItem(Config.currentUserProfile);
+  }
+
+  /**
    * go to feed
    */
-  private goToFeed() {
-    // clear coach membership notification
-    localStorage.removeItem(Config.currentCoachMembershipNotification);
-    // remove user profile from local storage
-    localStorage.removeItem(Config.currentUserProfile);
-    // remove current coach from local storage
-    localStorage.removeItem(Config.currentCoach);
-    // clear coffeti interval
-    clearInterval(this.coffetiInterval);
-    // redirect to client new feed page
+  private goToFeed(): void {
+    this.removeDataFromLocalStorage();
+    clearInterval(this.coffetiAnimationInterval);
     this.router.navigate(['/client/feed']);
   }
 }

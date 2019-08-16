@@ -1,7 +1,7 @@
-<div nz-row nzGutter="0" *ngIf="selectedPrivacyPolicyContent" [ngClass]="{'opacity-loading': loading}">
+<div nz-row nzGutter="0" *ngIf="selectedPrivacyPolicyContent" [ngClass]="{'opacity-loading': isLoadingSpinnerShown}">
 
   <!-- loading component -->
-  <app-loading *ngIf="loading"></app-loading>
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- about's content-->

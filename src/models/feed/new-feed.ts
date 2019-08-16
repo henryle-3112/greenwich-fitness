@@ -9,11 +9,11 @@ export class NewFeed {
   status: number;
   createdDate?: Date;
   userProfile: UserProfile;
-  //
-  nLikes?: number;
-  nDislikes?: number;
-  nReplies?: number;
+  numberOfLikes?: number;
+  numberOfDislikes?: number;
+  numberOfComments?: number;
   isLikeClicked?: boolean;
   replies: NewFeedComment[];
   isReplyBoxShown?: boolean;
+  isReacted?: boolean;
 }

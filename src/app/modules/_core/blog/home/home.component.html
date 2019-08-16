@@ -1,7 +1,8 @@
-<nz-layout class="height-auto" [ngClass]="{'opacity-loading': loading}">
+<!--suppress ALL -->
+<nz-layout class="height-auto" [ngClass]="{'opacity-loading': isLoadingSpinnerShown}">
 
   <!-- loading component -->
-  <app-loading *ngIf="loading"></app-loading>
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- header -->
@@ -38,7 +39,7 @@
 
     <!-- col menu -->
     <div nz-col class="gutter-row drop-down-menu" nzXs="24" nzSm="24" nzMd="24" nzLg="24" nzXl="24" [@fadeInAnimation]
-         *ngIf="isMenuOpened">
+         *ngIf="isDropDownMenuOpened">
       <div class="gutter-box" style="background-color: #fff; min-height: 280px; padding: 24px;">
         <h3>Menu</h3>
         <nz-divider></nz-divider>
@@ -125,7 +126,7 @@
             (nzOnOk)="handleConfirmSearchPostModal()">
     <!-- post's category selection -->
     <h3 class="mg-bottom-24">Post Category: </h3>
-    <nz-select style="width: 200px;" class="mg-bottom-24" [(ngModel)]="selectedPostCategoryId"
+    <nz-select style="width: 200px;" class="mg-bottom-24" [(ngModel)]="selectedPostCategoryForSearching"
                nzPlaceHolder="Choose Post Category">
       <nz-option *ngFor="let eachPostCategory of postCategoriesSelection" nzValue="{{ eachPostCategory.id }}"
                  nzLabel="{{ eachPostCategory.postCategoryName}}"></nz-option>
@@ -135,7 +136,7 @@
     <!-- post's name input -->
     <h3 class="mg-bottom-24">Post Name: </h3>
     <nz-input-group [nzSuffix]="suffixIconSearch" [ngClass]="{'mg-bottom-24': true}" style="width: 200px;">
-      <input [(ngModel)]="selectedPostName" type="text" nz-input placeholder="Post Name..."/>
+      <input [(ngModel)]="selectedPostNameForSearching" type="text" nz-input placeholder="Post Name..."/>
     </nz-input-group>
     <ng-template #suffixIconSearch>
       <i nz-icon type="search"></i>

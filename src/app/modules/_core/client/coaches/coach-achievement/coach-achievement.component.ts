@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ResponseMessage, UserAchievement} from '@gw-models/core';
+import {UserAchievement} from '@gw-models/core';
 import {UserAchievementService} from '@gw-services/core/api/user/user-achievement.service';
 import {UserAccountService} from '@gw-services/core/api/user/user-account.service';
 import {ShareCoachService} from '@gw-services/core/shared/coach/share-coach.service';
@@ -12,23 +12,12 @@ import {Router} from '@angular/router';
   styleUrls: ['./coach-achievement.component.css']
 })
 export class CoachAchievementComponent implements OnInit {
-
-  // list of user-account's achievements
   userAchievements: UserAchievement[];
-  // currentPage
-  currentPage = 1;
-  // loading component is show ot not
-  loading = true;
-  // number user-account's achievements per page
+  currentUserAchievementsPage: number;
+  isLoadingSpinnerShown = true;
   nUserAchievementsPerPage: number;
-  // total user-account's achievements
   totalUserAchievements: number;
-
-  // user-account's id
   selectedUserProfileId: number;
-
-  // is hide pagination
-  isHidePagination: boolean;
 
   /**
    *
@@ -47,51 +36,41 @@ export class CoachAchievementComponent implements OnInit {
    * init data
    */
   ngOnInit() {
-    // load current user-account information and get user-account's achievements by page
-    this.loadCurrentUserInformation();
-    // init number user-account achievements per page
-    this.nUserAchievementsPerPage = 8;
+    this.currentUserAchievementsPage = Config.currentPage;
+    this.nUserAchievementsPerPage = Config.numberItemsPerPage;
+    this.getSelectedCoach();
   }
 
   /**
-   * get user-account's achievement's by page
+   * get selected coach
    */
-  private getUserAchievementsByPage() {
-    // create user-account's achievement's url to get user-account's achievements' page
-    const currentGetUserAchievementsByPageUrl =
-      `${Config.api}/achievements/${String(this.selectedUserProfileId)}/paging/${this.currentPage}`;
-    console.log(`currentGetUserAchievementsByPageUrl: ${currentGetUserAchievementsByPageUrl}`);
-    // show loading component
-    this.loading = true;
-    // call user-account's achievement's service to get user-account's achievements by page
-    this.userAchievementService.getUserAchievemnetsByPage(currentGetUserAchievementsByPageUrl)
-      .subscribe((response: UserAchievement[]) => {
-        if (response) {
-          console.log(`User Achievements: `);
-          console.log(response);
-          // current user-account's achievements
-          this.userAchievements = [];
-          // assign user-account's achievements
-          this.userAchievements = response;
-          // hide pagination if number of user-account's achievements per page is greater than toatl user-account's achievements
-          this.isHidePagination = this.nUserAchievementsPerPage > this.userAchievements.length;
+  private getSelectedCoach() {
+    this.shareCoachService.currentCoach
+      .subscribe(selectedCoach => {
+        if (selectedCoach) {
+          this.selectedUserProfileId = selectedCoach.userProfile.id;
+          this.getCoachAchievements();
+        } else {
+          this.router.navigate(['/client/coach']);
         }
-        // hide loading component
-        this.loading = false;
       });
   }
 
   /**
-   * get total user-account's achievements
+   * get coach's achievements
    */
-  private getNumberOfUserAchievements() {
-    const currentGetNumberOfUserAchievementsUrl = `${Config.api}/${Config.apiGetNumberOfUserAchievements}/${this.selectedUserProfileId}`;
-    this.loading = true;
-    this.userAchievementService.getTotalUserAchievements(currentGetNumberOfUserAchievementsUrl)
-      .subscribe((responseMessage: ResponseMessage) => {
-        if (responseMessage) {
-          this.totalUserAchievements = Number(responseMessage.message);
-        }
+  private getCoachAchievements() {
+    const getCoachAchievementsUrl = `${Config.apiBaseUrl}/
+${Config.apiUserManagementPrefix}/
+${Config.apiUserAchievements}?
+${Config.userProfileIdParameter}=${this.selectedUserProfileId}&
+${Config.pageParameter}=${this.currentUserAchievementsPage}`;
+    this.isLoadingSpinnerShown = true;
+    this.userAchievementService.getUserAchievements(getCoachAchievementsUrl)
+      .subscribe(response => {
+        this.userAchievements = response.body;
+        this.totalUserAchievements = Number(response.headers.get(Config.headerXTotalCount));
+        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -100,30 +79,9 @@ export class CoachAchievementComponent implements OnInit {
    * @param event - selected page
    */
   public userAchievementsPageChange(event) {
-    // get current's page
-    this.currentPage = event;
-    // get galleries by page
-    this.getUserAchievementsByPage();
+    this.currentUserAchievementsPage = event;
+    this.getCoachAchievements();
   }
 
-  /**
-   * load current user-account's information
-   */
-  private loadCurrentUserInformation() {
-    // get current user-account's profile
-    this.shareCoachService.currentCoach
-      .subscribe(selectedCoach => {
-        if (selectedCoach) {
-          this.selectedUserProfileId = selectedCoach.userProfile.id;
-          console.log(`Coach achievement: ${this.selectedUserProfileId}`);
-          // get number of user-account's achievements
-          this.getNumberOfUserAchievements();
-          // get user-account achievement's by page
-          this.getUserAchievementsByPage();
-        } else {
-          this.router.navigate(['/client/coach']);
-        }
-      });
-  }
 
 }

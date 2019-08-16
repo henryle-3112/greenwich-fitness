@@ -1,4 +1,4 @@
-import {Coach, ReplyOnProductFeedback, UserProfile} from '@gw-models/core';
+import {Coach, ReplyOnCoachFeedback, UserProfile} from '@gw-models/core';
 
 export class CoachFeedback {
   id?: number;
@@ -7,11 +7,11 @@ export class CoachFeedback {
   coachFeedbackContent?: string;
   coachFeedbackCreatedDate?: Date;
   coachFeedbackStatus?: number;
-  nLikes?: number;
-  nDislikes?: number;
-  nReplies?: number;
+  numberOfLikes?: number;
+  numberOfDislikes?: number;
+  numberOfReplies?: number;
   isLikeClicked?: boolean;
-  replies: ReplyOnProductFeedback[];
+  replies: ReplyOnCoachFeedback[];
   isReplyBoxShown?: boolean;
   isReacted?: boolean;
 }

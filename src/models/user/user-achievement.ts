@@ -1,7 +1,7 @@
 import {UserProfile} from '@gw-models/core';
 
 export class UserAchievement {
-  achievementId?: number;
+  // achievementId?: number;
   title?: string;
   time?: string;
   userProfile?: UserProfile;

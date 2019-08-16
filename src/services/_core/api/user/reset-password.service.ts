@@ -1,12 +1,10 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {Config} from '../../../../config/config';
 import {tap} from 'rxjs/operators';
-import {ResponseMessage} from '../../../../models/response/response-message';
-import {UserAccount} from '../../../../models/user/user-account';
+import {ResponseMessage} from '@gw-models/core';
+import {UserAccount} from '@gw-models/core';
 
-// httpOptions to change content-type to application/json
 const httpOptions = {
   headers: new HttpHeaders({'Content-Type': 'application/json'})
 };
@@ -20,16 +18,24 @@ export class ResetPasswordService {
   constructor(private http: HttpClient) {
   }
 
-  /** POST: send email to server to get token to reset password */
-  public sendEmailToResetPassword(email: string): Observable<ResponseMessage> {
-    return this.http.post<ResponseMessage>(`${Config.api}/${Config.apiSendEmailResetPassword}`, email, httpOptions).pipe(
+  /**
+   *
+   * @param url - url that will be used to send email reset password
+   * @param email - email that will be received email reset password
+   */
+  public sendEmailToResetPassword(url: string, email: string): Observable<ResponseMessage> {
+    return this.http.post<ResponseMessage>(url, email, httpOptions).pipe(
       tap((responseMessage: ResponseMessage) => console.log(responseMessage.message))
     );
   }
 
-  /** POST: change password to the server */
-  public changePassword(userAccount: UserAccount): Observable<ResponseMessage> {
-    return this.http.post<ResponseMessage>(`${Config.api}/${Config.apiChangePassword}`, userAccount, httpOptions).pipe(
+  /**
+   *
+   * @param url - url that will be used to change password
+   * @param userAccount - user's account that will be changed its password
+   */
+  public changePassword(url: string, userAccount: UserAccount): Observable<ResponseMessage> {
+    return this.http.post<ResponseMessage>(url, userAccount, httpOptions).pipe(
       tap((responseMessage: ResponseMessage) => console.log(responseMessage.message))
     );
   }

@@ -1,9 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {CoachPaymentService} from '@gw-services/core/api/payment/coach-payment.service';
-import {Coach, UserProfile, CoachPayment, ResponseMessage} from '@gw-models/core';
+import {Coach, UserProfile, CoachPayment} from '@gw-models/core';
 import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
 import {Router} from '@angular/router';
 import {CoachService} from '@gw-services/core/api/coach/coach.service';
+import {Config} from '@gw-config/core';
 
 @Component({
   selector: 'app-revenue',
@@ -11,167 +12,101 @@ import {CoachService} from '@gw-services/core/api/coach/coach.service';
   styleUrls: ['./revenue.component.css']
 })
 export class RevenueComponent implements OnInit {
-
-  // currentPage
-  currentPage = 1;
-
-  // check loading component is showing or not
-  loading: boolean;
-
-  // selected date to view revenue
+  currentRevenuesPage: number;
+  isLoadingSpinnerShown: boolean;
   selectedDateToViewRevenue: Date;
-
-  // selected month to view revenue
   selectedMonthToViewRevenue: number;
-
-  // selected year to view revenue
   selectedYearToViewRevenue: number;
-
-  // number coach payments per page
-  nCoachPaymentsPerPage: number;
-
-  // total coach payments
-  totalCoachPayments: number;
-
-  // selected user's profile
+  nRevenuesPerPage: number;
+  totalRevenues: number;
   selectedUserProfile: UserProfile;
-
-  // check current user is coach or normal user. If user is a coach, then get coach's information
   selectedCoach: Coach;
+  revenues: CoachPayment[];
+  totalCoachRevenues: number;
 
-  // list of coach payments
-  coachPayments: CoachPayment[];
-
-  // total payment by coach id and by month and by year
-  totalPaymentByCoachIdAndMonthAndYear: number;
-
+  /**
+   *
+   * @param coachPaymentService - inject coachPaymentService
+   * @param coachService - inject coachService
+   * @param shareUserProfileService - inject shareUserProfileService
+   * @param router - inject router
+   */
   constructor(private coachPaymentService: CoachPaymentService,
               private coachService: CoachService,
               private shareUserProfileService: ShareUserProfileService,
               private router: Router) {
   }
 
-  ngOnInit() {
-    // init current coach payments
-    this.coachPayments = [];
-    // init number of coach payments per page
-    this.nCoachPaymentsPerPage = 8;
-    // init total number of coach payments
-    this.totalCoachPayments = 0;
-    // get selected user profile
+  ngOnInit(): void {
+    this.revenues = [];
+    this.nRevenuesPerPage = Config.numberItemsPerPage;
+    this.currentRevenuesPage = Config.currentPage;
+    this.totalRevenues = 0;
     this.getSelectedUserProfile();
   }
 
   /**
    * get selected user profile
    */
-  private getSelectedUserProfile() {
-    // show loading component
-    this.loading = true;
+  private getSelectedUserProfile(): void {
+    this.isLoadingSpinnerShown = true;
     this.shareUserProfileService.currentUserProfile
       .subscribe((selectedUserProfile: UserProfile) => {
         if (selectedUserProfile) {
           this.selectedUserProfile = selectedUserProfile;
-          // get selected coach by user profile
           this.getSelectedCoachByUserProfile();
         } else {
-          // redirect to client page
           this.router.navigate(['/client']);
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * get selected coach by user profile
    */
-  private getSelectedCoachByUserProfile() {
-    this.coachService.getCoachByUserProfile(this.selectedUserProfile, 1)
+  private getSelectedCoachByUserProfile(): void {
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const coachStatus = 1;
+    const getCoachUrl = `${Config.apiBaseUrl}/
+${Config.apiCoachManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiCoaches}?
+${Config.statusParameter}=${coachStatus}`;
+    this.coachService.getCoach(getCoachUrl)
       .subscribe((selectedCoach: Coach) => {
         if (selectedCoach) {
           this.selectedCoach = selectedCoach;
           if (this.selectedDateToViewRevenue) {
-            // get number of coach payments
-            this.getNumberOfCoachPaymentsByCoachId();
-            // get list of coach payments by coach id and by page
-            this.getCoachPaymentsByCoachIdAndByPage();
-            // get total payment for selected month and year
-            this.getTotalPaymentByCoachIdAndByMonthAndYear();
+            this.getRevenues();
           }
         } else {
-          // redirect to client page
           this.router.navigate(['/client']);
         }
       });
   }
 
   /**
-   * get number of coach payments by coach id
-   */
-  private getNumberOfCoachPaymentsByCoachId() {
-    // show loading component
-    this.loading = true;
-    // get number of coah payments by coach id
-    this.coachPaymentService.countCoachPaymentsByCoachIdAndByMonthAndByYear(
-      this.selectedCoach.id,
-      this.selectedMonthToViewRevenue,
-      this.selectedYearToViewRevenue
-    )
-      .subscribe((nCoachPayments: ResponseMessage) => {
-        if (nCoachPayments) {
-          this.totalCoachPayments = Number(nCoachPayments.message);
-        }
-        // hide loading component
-        this.loading = false;
-      });
-  }
-
-  /**
    * get coach payment by coach id and by page
    */
-  private getCoachPaymentsByCoachIdAndByPage() {
-    // show loading component
-    this.loading = true;
-    // get coach payments
-    this.coachPaymentService.getCoachPaymentsByCoachIdByMonthByYearByPage(
-      this.selectedCoach.id,
-      this.selectedMonthToViewRevenue,
-      this.selectedYearToViewRevenue,
-      this.currentPage
-    )
-      .subscribe((coachPayments: CoachPayment[]) => {
-        if (coachPayments) {
-          this.coachPayments = coachPayments;
-        }
-        // hide loading component
-        this.loading = false;
-      });
-  }
-
-  /**
-   * get total payment by coach id and by month and by year
-   */
-  private getTotalPaymentByCoachIdAndByMonthAndYear() {
-    // show loading component
-    this.loading = true;
-    // get coach payment
-    this.coachPaymentService.getTotalPaymentByCoachIdAndByMonthAndByYear(
-      this.selectedCoach.id,
-      this.selectedMonthToViewRevenue,
-      this.selectedYearToViewRevenue
-    )
-      .subscribe((totalPayment: ResponseMessage) => {
-        if (totalPayment) {
-          // because the response contains []. For example, [66]. Therefore, we need to get 66
-          // by using substring method
-          this.totalPaymentByCoachIdAndMonthAndYear = Number(
-            totalPayment.message
-              .substring(totalPayment.message.indexOf('[') + 1, totalPayment.message.indexOf(']'))
-          );
-        }
-        // hide loading component
-        this.loading = false;
+  private getRevenues(): void {
+    this.isLoadingSpinnerShown = true;
+    const selectedCoachId = this.selectedCoach.id;
+    const getRevenueUrl = `${Config.apiBaseUrl}/
+${Config.apiPaymentManagementPrefix}/
+${Config.apiCoaches}/
+${selectedCoachId}/
+${Config.apiCoachesPayment}?
+${Config.monthParameter}=${this.selectedMonthToViewRevenue}&
+${Config.yearParameter}=${this.selectedYearToViewRevenue}&
+${Config.pageParameter}=${this.currentRevenuesPage}`;
+    this.coachPaymentService.getCoachPayments(getRevenueUrl)
+      .subscribe(response => {
+        this.revenues = response.body;
+        this.totalRevenues = Number(response.headers.get(Config.headerXTotalCount));
+        this.totalCoachRevenues = Number(response.headers.get(Config.headerXTotalPayment));
+        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -179,21 +114,15 @@ export class RevenueComponent implements OnInit {
    *
    * @param event - month that was selected by users to view their revenue
    */
-  private onMonthChanged(event) {
+  private onMonthChanged(event): void {
     // get month and year to get coach payments list
     this.selectedMonthToViewRevenue = this.selectedDateToViewRevenue.getMonth() + 1;
     this.selectedYearToViewRevenue = this.selectedDateToViewRevenue.getFullYear();
-    // get number of coach payments by coach id, month, year
-    this.getNumberOfCoachPaymentsByCoachId();
-    // get coach payments by coach id, month, year
-    this.getCoachPaymentsByCoachIdAndByPage();
-    // get total payment for selected month and year
-    this.getTotalPaymentByCoachIdAndByMonthAndYear();
+    this.getRevenues();
   }
 
-  public coachPaymentsPageChange(event) {
-    this.currentPage = event;
-    this.getNumberOfCoachPaymentsByCoachId();
-    this.getCoachPaymentsByCoachIdAndByPage();
+  public revenuesPageChange(event): void {
+    this.currentRevenuesPage = event;
+    this.getRevenues();
   }
 }

@@ -1,17 +1,20 @@
+<!--suppress ALL -->
 <!-- layout -->
 <div [ngClass]="{'height-100': true, 'mg-top-72': true, 'pd-left-24': true, 'pd-right-24': true}">
   <!-- loading component -->
-  <app-loading *ngIf="loading"></app-loading>
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
   <!-- message -->
-  <h1 *ngIf="!isPaymentSuccessfully && !loading" class="message">Failure to handle your payment! Please try
+  <h1 *ngIf="!isPaymentSuccessfully && !isLoadingSpinnerShown" class="message">Failure to handle your payment! Please
+    try
     again!</h1>
-  <h1 *ngIf="isPaymentSuccessfully && !loading" class="message">Thank you for your payment! We will contact you
+  <h1 *ngIf="isPaymentSuccessfully && !isLoadingSpinnerShown" class="message">Thank you for your payment! We will
+    contact you
     soon!</h1>
   <!-- message -->
 
   <!-- shopping cart component -->
-  <div nz-row nzGutter="16" *ngIf="checkWhatUserWantToPay == 'product' && !loading" class="mg-top-24">
+  <div nz-row nzGutter="16" *ngIf="checkWhatUserWantToPay == 'product' && !isLoadingSpinnerShown" class="mg-top-24">
     <div nz-col class="gutter-row" nzXs="24" nzSm="24" nzMd="24"
          nzLg="24" nzXl="24">
 
@@ -50,7 +53,7 @@
         <!-- total price -->
         <div id="total-price">
           <h2 id="total-price-title">Total: </h2>
-          <h2 id="total-price-value">{{ totalPrice }}$</h2>
+          <h2 id="total-price-value">{{ totalShoppingCartPrice }}$</h2>
           <div class="clear-both"></div>
         </div>
         <!-- end total price-->
@@ -61,8 +64,9 @@
   <!-- end shopping cart component -->
 
   <!-- coach information -->
-  <div *ngIf="checkWhatUserWantToPay == 'coach' && !loading" nz-row nzType="flex" nzJustify="center" nzAlign="middle"
-       [ngClass]="{'opacity-loading': loading}">
+  <div *ngIf="checkWhatUserWantToPay == 'coach' && !isLoadingSpinnerShown" nz-row nzType="flex" nzJustify="center"
+       nzAlign="middle"
+       [ngClass]="{'opacity-loading': isLoadingSpinnerShown}">
     <!-- avatar -->
     <div id="avatar">
       <img src="{{ selectedCoach.userProfile.avatar}}" alt="{{ selectedCoach.userProfile.fullName}}" id="coach-avatar">
@@ -80,13 +84,13 @@
     <!-- total membership rating -->
     <div id="total-memberships-rating">
       <p>
-        {{ nMemberships }} Memberships Enrolled - {{ rateAverage }} stars
+        {{ selectedCoach.numberOfMemberships }} Memberships Enrolled - {{ selectedCoach.ratingAverage}} stars
       </p>
     </div>
     <!-- end membership rating -->
 
     <!-- average rate-->
-    <nz-rate class="mg-bottom-24" [ngModel]="rateAverage" nzDisabled></nz-rate>
+    <nz-rate class="mg-bottom-24" [ngModel]="selectedCoach.ratingAverage" nzDisabled></nz-rate>
     <!-- end average rate -->
 
   </div>
@@ -94,7 +98,7 @@
 
   <!-- go to feed -->
   <div align="center">
-    <button nz-button [nzType]="'primary'" *ngIf="!loading" (click)="goToFeed()">Go to Feed</button>
+    <button nz-button [nzType]="'primary'" *ngIf="!isLoadingSpinnerShown" (click)="goToFeed()">Go to Feed</button>
   </div>
   <!-- end go to feed -->
 </div>

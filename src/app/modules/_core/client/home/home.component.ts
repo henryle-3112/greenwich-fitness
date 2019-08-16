@@ -32,28 +32,15 @@ import {Router} from '@angular/router';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit, OnDestroy {
-  // check when width of the browser changed
-  private innerWidth: any;
-  // check dropdown menu is opened or not
-  public isMenuOpened = true;
-
+  private browserInnerWidth: any;
+  public isDropDownMenuOpened = true;
   // check login type (login by facebook, google or normal account)
   loginType: string;
-
-  // check loading is showing or not
-  loading: boolean;
-
-  // selected music
+  isLoadingSpinnerShown: boolean;
   selectedMusic: Music;
-
-  // all musics
   musics: Music[];
-
-  player: any;
-
-  // selected user's profile
+  musicPlayer: any;
   selectedUserProfile: UserProfile;
-
   @ViewChild('audioOption') audioPlayerRef: ElementRef;
 
   /**
@@ -82,10 +69,64 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * init data
+   */
+  ngOnInit(): void {
+    this.getSelectedMusic();
+    this.getAllMusics();
+    // clear workout's state and single exercise's state if
+    // user-account go from workout training or single exercise training
+    this.localStorageService.removeWorkoutState();
+    this.localStorageService.removeSingleExericseState();
+    this.browserInnerWidth = window.innerWidth;
+    this.loginType = localStorage.getItem(Config.loginType);
+    this.loadCurrentUserInformation();
+  }
+
+  /**
+   * get selected music
+   */
+  private getSelectedMusic(): void {
+    const that = this;
+    this.shareMusicService.currentMusic
+      .subscribe(selectedMusic => {
+        this.selectedMusic = selectedMusic;
+        if (this.selectedMusic) {
+          that.musicPlayer = <HTMLAudioElement>document.getElementById('music-musicPlayer');
+          if (that.musicPlayer) {
+            that.musicPlayer.onended = function () {
+              that.goToNextMusic();
+            };
+            if (localStorage.getItem(Config.currentSongPosition)) {
+              that.musicPlayer.currentTime = Number(localStorage.getItem(Config.currentSongPosition));
+            } else {
+              that.musicPlayer.currentTime = 0;
+            }
+          }
+        }
+      });
+  }
+
+  /**
+   * get all musics
+   */
+  private getAllMusics(): void {
+    const musicStatus = 1;
+    const getMusicsUrl = `${Config.apiBaseUrl}/
+${Config.apiMusicManagementPrefix}/
+${Config.apiMusics}?
+${Config.statusParameter}=${musicStatus}`;
+    this.musicService.getMusics(getMusicsUrl)
+      .subscribe(response => {
+        this.musics = response.body;
+        this.shareMusicService.changeMusicList(this.musics);
+      });
+  }
+
+  /**
    * go to the next song if the current song has been finished
    */
-  private goToNextMusic() {
-    // auto get the next music
+  private goToNextMusic(): void {
     let nextPosition = 0;
     for (let i = 0; i < this.musics.length; i++) {
       const currentMusic = this.musics[i];
@@ -94,40 +135,17 @@ export class HomeComponent implements OnInit, OnDestroy {
         break;
       }
     }
-    if (nextPosition !== this.musics.length - 1) {
-      this.shareMusicService.changeMusic(this.musics[nextPosition]);
+    if (nextPosition > this.musics.length - 1) {
+      nextPosition = 0;
     }
-  }
-
-  /**
-   * init data
-   */
-  ngOnInit() {
-    // get selected music
-    this.getSelectedMusic();
-    // get all musics
-    this.getAllMusics();
-
-    // clear workout's state and single exercise's state if user-account go from workout training or single exercise training
-    this.localStorageService.removeWorkoutState();
-    this.localStorageService.removeSingleExericseState();
-
-    this.innerWidth = window.innerWidth;
-
-    // get login type
-    this.loginType = localStorage.getItem(Config.loginType);
-
-    // load current user-account's information
-    this.loadCurrentUserInformation();
+    this.shareMusicService.changeMusic(this.musics[nextPosition]);
   }
 
   /**
    * load current user-account's information
    */
-  private loadCurrentUserInformation() {
-    // show loading component
-    this.loading = true;
-    // check login type then load user-account's information
+  private loadCurrentUserInformation(): void {
+    this.isLoadingSpinnerShown = true;
     if (this.loginType.localeCompare('normal') === 0) {
       this.loadNormalAccountInformation();
     } else if (this.loginType.localeCompare('facebook') === 0) {
@@ -140,48 +158,52 @@ export class HomeComponent implements OnInit, OnDestroy {
   /**
    * load normal account information
    */
-  private loadNormalAccountInformation() {
-    // get current user-account's name
+  private loadNormalAccountInformation(): void {
     const authenticatedUserName = this.authentication.currentUserValue.userName;
-    // load user-account's information by user-account's name (load user-account's account and user-account's profile)
-    const getUserAccountByUsernameUrl = `${Config.api}/${Config.apiGetUserAccountByUserName}${authenticatedUserName}`;
-    // get user-account's account information
-    this.userAccountService.getUserAccountByUsername(getUserAccountByUsernameUrl)
+    const getUserAccountUrl = `${Config.apiBaseUrl}/
+${Config.apiUserManagementPrefix}/
+${Config.apiUserAccounts}?
+${Config.userNameParameter}=${authenticatedUserName}`;
+    this.userAccountService.getUserAccount(getUserAccountUrl)
       .subscribe((userAccount: UserAccount) => {
         this.shareUserAccountService.changeUserAccount(userAccount);
         this.shareUserProfileService.changeUserProfile(userAccount.userProfile);
         this.selectedUserProfile = userAccount.userProfile;
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * load facebook account information
    */
-  private loadFacebookAccountInformation() {
-    // get facebook's id
+  private loadFacebookAccountInformation(): void {
     const selectedFacebookId = localStorage.getItem(Config.facebookId);
-    // load user-account's information by facebookId
-    this.facebookAccountService.getFacebookAccountByFacebookId(selectedFacebookId)
+    const getFacebookAccountUrl = `${Config.apiBaseUrl}/
+${Config.apiUserManagementPrefix}/
+${Config.apiFacebookAccount}/
+${selectedFacebookId}`;
+    this.facebookAccountService.getFacebookAccount(getFacebookAccountUrl)
       .subscribe((facebookAccount: FacebookAccount) => {
         this.shareUserProfileService.changeUserProfile(facebookAccount.userProfile);
         this.selectedUserProfile = facebookAccount.userProfile;
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
-   * load google acccount information
+   * load google account information
    */
-  private loadGoogleAccountInformation() {
-    // get google's id
+  private loadGoogleAccountInformation(): void {
     const selectedGoogleId = localStorage.getItem(Config.googleId);
-    // load user-account's information by googleId
-    this.googleAccountService.getGoogleAccountByGoogleId(selectedGoogleId)
+    const getGoogleAccountUrl = `${Config.apiBaseUrl}/
+${Config.apiUserManagementPrefix}/
+${Config.apiGoogleAccount}/
+${selectedGoogleId}`;
+    this.googleAccountService.getGoogleAccount(getGoogleAccountUrl)
       .subscribe((googleAccount: GoogleAccount) => {
         this.shareUserProfileService.changeUserProfile(googleAccount.userProfile);
         this.selectedUserProfile = googleAccount.userProfile;
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -190,7 +212,7 @@ export class HomeComponent implements OnInit, OnDestroy {
    * @param event - event
    */
   openDropDownMenu(event): void {
-    this.isMenuOpened = !this.isMenuOpened;
+    this.isDropDownMenuOpened = !this.isDropDownMenuOpened;
   }
 
   /**
@@ -199,60 +221,15 @@ export class HomeComponent implements OnInit, OnDestroy {
    */
   @HostListener('window:resize', ['$event'])
   onResize(event) {
-    this.innerWidth = window.innerWidth;
-    this.isMenuOpened = innerWidth > 801;
-  }
-
-  /**
-   * get selected music
-   */
-  private getSelectedMusic() {
-    const that = this;
-    this.shareMusicService.currentMusic
-      .subscribe(selectedMusic => {
-        this.selectedMusic = selectedMusic;
-        if (this.selectedMusic) {
-          // get music player instance
-          that.player = <HTMLAudioElement>document.getElementById('music-player');
-          // get current song position
-          // check ended event
-          that.player.onended = function () {
-            that.goToNextMusic();
-          };
-          if (localStorage.getItem(Config.currentSongPosition)) {
-            that.player.currentTime = Number(localStorage.getItem(Config.currentSongPosition));
-          } else {
-            that.player.currentTime = 0;
-          }
-        }
-      });
-  }
-
-
-  /**
-   * get all musics
-   */
-  private getAllMusics() {
-    const getAllMusicsUrl = `${Config.api}/${Config.apiGetAllMusics}`;
-    this.musicService.getAllMusics(getAllMusicsUrl)
-      .subscribe(musics => {
-        this.musics = musics;
-        this.shareMusicService.changeMusicList(musics);
-      });
+    this.browserInnerWidth = window.innerWidth;
+    this.isDropDownMenuOpened = this.browserInnerWidth > 801;
   }
 
   ngOnDestroy(): void {
-    console.log(`Home component was destroyed`);
-    console.log(typeof this.player);
-    console.log(typeof this.player === 'undefined');
-    const isAudioUndefined = typeof this.player === 'undefined';
+    const isAudioUndefined = typeof this.musicPlayer === 'undefined';
     if (!isAudioUndefined) {
-      // pause audio
-      this.player.pause();
-      // get current song position
-      const currentSongPosition = this.player.currentTime;
-      // save current position
-      console.log(`Home Component - Song Current Position: ${currentSongPosition}`);
+      this.musicPlayer.pause();
+      const currentSongPosition = this.musicPlayer.currentTime;
       localStorage.setItem(Config.currentSongPosition, currentSongPosition);
     }
   }
@@ -260,24 +237,22 @@ export class HomeComponent implements OnInit, OnDestroy {
   /**
    * hanlde logout event
    */
-  public logout() {
-    // logout from the system
+  public logout(): void {
     this.authentication.logout();
-    // redirect to login page
     this.router.navigate(['/login']);
   }
 
   /**
    * go to user's profile
    */
-  public goToUserProfile() {
+  public goToUserProfile(): void {
     this.router.navigate(['/client/profile']);
   }
 
   /**
    * go to notification
    */
-  public goToNotification() {
+  public goToNotification(): void {
     this.router.navigate(['/client/notification']);
   }
 }

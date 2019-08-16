@@ -8,6 +8,7 @@ import {Router} from '@angular/router';
 import {ShareMembershipService} from '@gw-services/core/shared/membership/share-membership.service';
 import {CoachService} from '@gw-services/core/api/coach/coach.service';
 import {NzNotificationService} from 'ng-zorro-antd';
+import {Config} from '@gw-config/core';
 
 @Component({
   selector: 'app-add-membership-schedule',
@@ -15,26 +16,13 @@ import {NzNotificationService} from 'ng-zorro-antd';
   styleUrls: ['./add-membership-schedule.component.css']
 })
 export class AddMembershipScheduleComponent implements OnInit {
-
   // data source for transfer component
   dataSource: any[];
-
-  // list exercises and workouts
   listExercisesAndWorkouts: string[];
-
-  // check loading component is showing or not
-  loading: boolean;
-
-  // current date
+  isLoadingSpinnerShown: boolean;
   currentDate: string;
-
-  // selected membership
   selectedMembership: Membership;
-
-  // selected coach
   selectedCoach: Coach;
-
-  // selected trainings
   selectedTrainings: string[];
 
   /**
@@ -57,53 +45,52 @@ export class AddMembershipScheduleComponent implements OnInit {
   ) {
   }
 
-  ngOnInit() {
-    // init selected trainings
+  ngOnInit(): void {
     this.selectedTrainings = [];
-    // get current date
     this.currentDate = Utils.getCurrentDate();
-    // init data source for transfer component
     this.dataSource = [];
-    // get selected user's profile
     this.getSelectedUserProfile();
   }
 
   /**
    * get selected user's profile
    */
-  private getSelectedUserProfile() {
-    // show loading component
-    this.loading = true;
+  private getSelectedUserProfile(): void {
+    this.isLoadingSpinnerShown = true;
     this.shareUserProfileService.currentUserProfile
       .subscribe(selectedUserProfile => {
         if (selectedUserProfile) {
-          // get selected coach
           this.getSelectedCoach(selectedUserProfile);
         } else {
           this.router.navigate(['/client']);
         }
       });
-    // hide loading component
-    this.loading = false;
+    // hide isLoadingSpinnerShown component
+    this.isLoadingSpinnerShown = false;
   }
 
   /**
    * get selected coach
    */
-  private getSelectedCoach(selectedUserProfile) {
-    // show loading component
-    this.loading = true;
-    this.coachService.getCoachByUserProfile(selectedUserProfile, 1)
+  private getSelectedCoach(selectedUserProfile): void {
+    this.isLoadingSpinnerShown = true;
+    const coachStatus = 1;
+    const selectedUserProfileId = selectedUserProfile.id;
+    const getCoachUrl = `${Config.apiBaseUrl}/
+${Config.apiCoachManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiCoaches}?
+${Config.statusParameter}=${coachStatus}`;
+    this.coachService.getCoach(getCoachUrl)
       .subscribe(selectedCoach => {
         if (selectedCoach) {
           this.selectedCoach = selectedCoach;
-          // get selected membership
           this.getSelectedMembership();
         } else {
           this.router.navigate(['/client']);
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
 
   }
@@ -111,54 +98,43 @@ export class AddMembershipScheduleComponent implements OnInit {
   /**
    * get selected membership
    */
-  private getSelectedMembership() {
-    // show loading component
-    this.loading = true;
+  private getSelectedMembership(): void {
+    this.isLoadingSpinnerShown = true;
     this.shareMembershipService.currentMembership
       .subscribe(selectedMembership => {
         if (selectedMembership) {
           this.selectedMembership = selectedMembership;
-          // get data source for transfer component
           this.getDataSourceForTransferComponent();
         } else {
           this.router.navigate(['/client']);
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
   /**
    * get data source for transfer component
    */
-  private getDataSourceForTransferComponent() {
-    // init list exercises and workouts
+  private getDataSourceForTransferComponent(): void {
     this.listExercisesAndWorkouts = [];
-    // load single exercises first
     this.loadSingleExercises();
   }
 
   /**
    * load single exercises
    */
-  private loadSingleExercises() {
-    // show loading component
-    this.loading = true;
-    // load local json
+  private loadSingleExercises(): void {
+    this.isLoadingSpinnerShown = true;
     this.readLocalJson.getJSON('./assets/workouts.json')
       .subscribe(data => {
         const listRepetitions = [10, 25, 50, 100, 250];
-        // get single exericses
         const exercises = data.exercises;
-        // read exercises
         exercises.map(eachExercise => {
           for (const eachExerciseRepetition of listRepetitions) {
             this.listExercisesAndWorkouts.push(String(eachExerciseRepetition) + ' x ' + eachExercise.title);
           }
         });
-        // hide loading component
-        this.loading = false;
-        // load workouts
+        this.isLoadingSpinnerShown = false;
         this.loadWorkouts();
       });
   }
@@ -166,16 +142,15 @@ export class AddMembershipScheduleComponent implements OnInit {
   /**
    * load workouts
    */
-  private loadWorkouts() {
-    // show loading component
-    this.loading = true;
+  private loadWorkouts(): void {
+    // show isLoadingSpinnerShown component
+    this.isLoadingSpinnerShown = true;
     this.readLocalJson.getJSON('./assets/workouts.json')
       .subscribe(data => {
         const listVolumes = ['1 x ', '2 x ', '3 x '];
         const listWorkouts = [];
         const workouts = data.workouts;
         for (const eachWorkout of workouts) {
-          // check current workout existed in the list or not
           let isExisted = false;
           for (const selectedWorkout of listWorkouts) {
             if (selectedWorkout.localeCompare(eachWorkout.title) === 0) {
@@ -184,45 +159,44 @@ export class AddMembershipScheduleComponent implements OnInit {
             }
           }
           if (!isExisted) {
-            // add to list workouts
             listWorkouts.push(eachWorkout.title);
-            // add to listExercisesAndWorkouts
             for (const eachVolume of listVolumes) {
               this.listExercisesAndWorkouts.push(eachVolume + eachWorkout.title);
             }
           }
         }
-        // hide loading component
-        this.loading = false;
-        // get trainings by training's date and user's profile and coach
+        this.isLoadingSpinnerShown = false;
         this.getTrainingsByUserProfileIdAndCoachIdAndTrainingDate();
       });
   }
 
-  private getTrainingsByUserProfileIdAndCoachIdAndTrainingDate() {
-    // show loading component
-    this.loading = true;
-    this.trainingService.getTrainingsByUserProfileIdAndCoachIdAndTrainingDate(
-      this.selectedMembership.userProfile.id,
-      this.selectedCoach.id,
-      this.currentDate
-    ).subscribe((trainings: Training[]) => {
-      if (trainings) {
-        // init data source for transfer component
-        this.initDataSourceForTransferComponent(trainings);
-      } else {
-        this.router.navigate(['/client']);
-      }
-      // hide loading component
-      this.loading = false;
-    });
+  private getTrainingsByUserProfileIdAndCoachIdAndTrainingDate(): void {
+    this.isLoadingSpinnerShown = true;
+    const selectedUserProfileId = this.selectedMembership.userProfile.id;
+    const selectedCoachId = this.selectedCoach.id;
+    const getTrainingUrl = `${Config.apiBaseUrl}/
+${Config.apiTrainingManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiCoaches}/
+${selectedCoachId}?
+${Config.trainingDateParameter}=${this.currentDate}`;
+    this.trainingService.getTrainings(getTrainingUrl)
+      .subscribe(response => {
+        if (response) {
+          console.log(response);
+          // this.initDataSourceForTransferComponent(trainings);
+        } else {
+          this.router.navigate(['/client']);
+        }
+        this.isLoadingSpinnerShown = false;
+      });
   }
 
   /**
    * init data source for transfer component
    */
-  private initDataSourceForTransferComponent(trainings: Training[]) {
-    // init data source for transfer component
+  private initDataSourceForTransferComponent(trainings: Training[]): void {
     this.dataSource = [];
     for (let i = 0; i < this.listExercisesAndWorkouts.length; i++) {
       // if current training existed in the database, then move it to the right column
@@ -238,7 +212,6 @@ export class AddMembershipScheduleComponent implements OnInit {
         title: this.listExercisesAndWorkouts[i],
         direction: isTrainingExisted ? 'right' : ''
       });
-      // add to selected trainings
       if (isTrainingExisted) {
         this.selectedTrainings.push(this.listExercisesAndWorkouts[i]);
       }
@@ -247,6 +220,8 @@ export class AddMembershipScheduleComponent implements OnInit {
 
   // tslint:disable-next-line:no-any
   filterOption(inputValue: string, item: any): boolean {
+    console.log(inputValue);
+    console.log(item);
     return false;
   }
 
@@ -263,7 +238,6 @@ export class AddMembershipScheduleComponent implements OnInit {
     const from = ret.from;
     const to = ret.to;
     const trainings = ret.list;
-    // transfer from left to right
     if (from.localeCompare('left') === 0 && to.localeCompare('right') === 0) {
       for (const eachTraining of trainings) {
         this.selectedTrainings.push(eachTraining.title);
@@ -287,8 +261,7 @@ export class AddMembershipScheduleComponent implements OnInit {
   /**
    * save membership schedule
    */
-  private saveMembershipSchedule() {
-    // create list of training objects from selectedTrainings array
+  private saveMembershipSchedule(): void {
     const listOfTrainings = [];
     for (const eachTrainingTitle of this.selectedTrainings) {
       const training = new Training();
@@ -297,27 +270,26 @@ export class AddMembershipScheduleComponent implements OnInit {
       training.userProfile = this.selectedMembership.userProfile;
       training.status = -1;
       training.trainingDate = this.currentDate;
-      // add to trainings list
       listOfTrainings.push(training);
     }
-    // add list of trainings to the database
     this.addTrainingsToServer(listOfTrainings);
   }
 
-  private addTrainingsToServer(listOfTrainings: Training[]) {
-    // show loading component
-    this.loading = true;
-    this.trainingService.addTrainings(listOfTrainings)
+  /**
+   *
+   * @param listOfTrainings - list of trainings that will be added to membership
+   */
+  private addTrainingsToServer(listOfTrainings: Training[]): void {
+    this.isLoadingSpinnerShown = true;
+    const addTrainingUrl = `${Config.apiBaseUrl}/${Config.apiTrainingManagementPrefix}/${Config.apiTrainings}`;
+    this.trainingService.addTrainings(addTrainingUrl, listOfTrainings)
       .subscribe(trainings => {
         if (trainings) {
-          // show success message to user
           this.createNotification('success', 'Success', 'Your trainings were submitted successfully');
         } else {
-          // show error message to user
           this.createNotification('error', 'Error', 'Failure to submit your trainings');
         }
-        // hide loading component
-        this.loading = false;
+        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -327,7 +299,7 @@ export class AddMembershipScheduleComponent implements OnInit {
    * @param title - title of notification
    * @param content - content of notification
    */
-  createNotification(type: string, title: string, content: string) {
+  createNotification(type: string, title: string, content: string): void {
     this.notification.create(
       type,
       title,

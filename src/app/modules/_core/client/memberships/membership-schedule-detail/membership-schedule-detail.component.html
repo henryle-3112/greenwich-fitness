@@ -1,8 +1,8 @@
 <div nz-row nzType="flex" nzJustify="center" nzAlign="middle"
       style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
-     [ngClass]="{'opacity-loading': loading}">
+     [ngClass]="{'opacity-loading': isLoadingSpinnerShown}">
   <!-- loading component -->
-  <app-loading *ngIf="loading"></app-loading>
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <div id="title">
@@ -13,7 +13,7 @@
 
   <nz-transfer
     [nzDataSource]="dataSource"
-    [nzDisabled]="disabled"
+    [nzDisabled]="isTransferComponentDisabled"
     nzShowSearch
     [nzFilterOption]="filterOption"
     (nzSearchChange)="search($event)"
@@ -22,9 +22,9 @@
   >
   </nz-transfer>
 
-  <div id="cannot-update-msg" *ngIf="disabled">
+  <div id="cannot-update-msg" *ngIf="isTransferComponentDisabled">
     *(you cannot update schedule for this date)
   </div>
 
-  <button nz-button [nzType]="'primary'" id="save-schedule-btn" *ngIf="!disabled" (click)="saveMembershipSchedule()">Save Schedule</button>
+  <button nz-button [nzType]="'primary'" id="save-schedule-btn" *ngIf="!isTransferComponentDisabled" (click)="saveMembershipSchedule()">Save Schedule</button>
 </div>

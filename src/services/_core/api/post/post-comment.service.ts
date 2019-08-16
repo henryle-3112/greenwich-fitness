@@ -1,11 +1,8 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {Config} from '@gw-config/core';
-import {tap} from 'rxjs/operators';
-import {Post, PostComment} from '@gw-models/core';
+import {PostComment} from '@gw-models/core';
 
-// httpOptions to change content-type to application/json
 const httpOptions = {
   headers: new HttpHeaders({'Content-Type': 'application/json'})
 };
@@ -18,17 +15,29 @@ export class PostCommentService {
   constructor(private http: HttpClient) {
   }
 
-  /** POST: get post's comments by post */
-  public getPostCommentsByPost(post: Post, status: number): Observable<PostComment[]> {
-    return this.http.post<PostComment[]>(`${Config.api}/${Config.apiGetPostComments}/${status}`, post, httpOptions).pipe(
-      tap((postComments: PostComment[]) => console.log(JSON.stringify(postComments)))
-    );
+  /**
+   *
+   * @param url - url that will be used to get post's comments
+   */
+  public getPostComments(url: string): Observable<PostComment[]> {
+    return this.http.get<PostComment[]>(url, httpOptions);
   }
 
-  /** POST: add new post's comment */
-  public addPostComment(postComment: PostComment): Observable<PostComment> {
-    return this.http.post<PostComment>(`${Config.api}/${Config.apiAddPostComment}`, postComment, httpOptions).pipe(
-      tap((insertedPostComment: PostComment) => console.log(JSON.stringify(insertedPostComment)))
-    );
+  /**
+   *
+   * @param url - url that will be used to add post's comment
+   * @param postComment - post's comment that will be added
+   */
+  public addPostComment(url: string, postComment: PostComment): Observable<PostComment> {
+    return this.http.post<PostComment>(url, postComment, httpOptions);
+  }
+
+  /**
+   *
+   * @param url - url that will be used to update post's comment
+   * @param postComment - post's comment that will be updated
+   */
+  public updatePostComment(url: string, postComment: PostComment): Observable<PostComment> {
+    return this.http.put<PostComment>(url, postComment, httpOptions);
   }
 }
