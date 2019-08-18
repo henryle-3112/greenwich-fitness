@@ -21,9 +21,7 @@ export class ProductFeedbackReactionService {
    * @param url - url that will be used to get reactions of product's feedback
    */
   public getProductFeedbackReactions(url: string): Observable<ProductFeedbackReaction[]> {
-    return this.http.get<ProductFeedbackReaction[]>(url, httpOptions).pipe(
-      tap((productFeedbackReactions: ProductFeedbackReaction[]) => console.log(JSON.stringify(productFeedbackReactions)))
-    );
+    return this.http.get<ProductFeedbackReaction[]>(url, httpOptions);
   }
 
   /**
@@ -32,8 +30,6 @@ export class ProductFeedbackReactionService {
    * @param productFeedbackReaction - reaction of product's feedback that will be added
    */
   public addNewProductFeedbackReaction(url: string, productFeedbackReaction: ProductFeedbackReaction): Observable<ProductFeedbackReaction> {
-    return this.http.post<ProductFeedbackReaction>(url, productFeedbackReaction, httpOptions).pipe(
-      tap((insertedProductFeedbackReaction: ProductFeedbackReaction) => console.log(JSON.stringify(insertedProductFeedbackReaction)))
-    );
+    return this.http.post<ProductFeedbackReaction>(url, productFeedbackReaction, httpOptions);
   }
 }

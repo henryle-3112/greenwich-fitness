@@ -14,7 +14,7 @@ import {PaymentService} from '@gw-services/core/api/payment/payment.service';
   styleUrls: ['./training-notification.component.css']
 })
 export class TrainingNotificationComponent implements OnInit {
-  currentTrainingNotificationsPage = 1;
+  currentTrainingNotificationsPage: number;
   isLoadingSpinnerShown = true;
   trainingNotificationContentKeywords: string;
   nNotificationsPerPage: number;
@@ -43,7 +43,8 @@ export class TrainingNotificationComponent implements OnInit {
 
   ngOnInit(): void {
     this.coachMembershipNotifications = [];
-    this.nNotificationsPerPage = 8;
+    this.currentTrainingNotificationsPage = Config.currentPage;
+    this.nNotificationsPerPage = Config.numberItemsPerPage;
     this.trainingNotificationContentKeywords = '';
     this.totalTrainingNotifications = 0;
     this.getSelectedUserProfile();
@@ -109,12 +110,8 @@ ${Config.pageParameter}=${this.currentTrainingNotificationsPage}`;
     // get notifications by page and keywords (if existed)
     this.coachMembershipNotificationService.getCoachMembershipNotifications(getTrainingNotificationsUrl)
       .subscribe(response => {
-        // if (coachMembershipNotifications) {
-        //   this.coachMembershipNotifications = [];
-        //   // assign data to coach membership notifications
-        //   this.coachMembershipNotifications = coachMembershipNotifications;
-        // }
-        console.log(response);
+        this.coachMembershipNotifications = response.body;
+        this.totalTrainingNotifications = Number(response.headers.get(Config.headerXTotalCount));
         this.isLoadingSpinnerShown = false;
       });
   }
@@ -136,11 +133,8 @@ ${Config.pageParameter}=${this.currentTrainingNotificationsPage}`;
     // get notifications by page and keywords (if existed)
     this.coachMembershipNotificationService.getCoachMembershipNotifications(getTrainingNotificationsUrl)
       .subscribe(response => {
-        // if (coachMembershipNotifications) {
-        //   this.coachMembershipNotifications = [];
-        //   this.coachMembershipNotifications = coachMembershipNotifications;
-        // }
-        console.log(response);
+        this.coachMembershipNotifications = response.body;
+        this.totalTrainingNotifications = Number(response.headers.get(Config.headerXTotalCount));
         this.isLoadingSpinnerShown = false;
       });
   }
@@ -254,7 +248,6 @@ ${Config.sumParameter}=${totalPayment}`;
           localStorage.setItem(Config.totalCoachPayment, JSON.stringify(totalPayment));
           window.location.href = response.redirect_url;
         }
-        this.isLoadingSpinnerShown = false;
       });
   }
 }

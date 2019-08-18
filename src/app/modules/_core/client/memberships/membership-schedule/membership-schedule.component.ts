@@ -143,11 +143,8 @@ ${Config.statusParameter}=${coachStatus}`;
     this.selectedMembership.status = 0;
     const updateMembershipUrl = `${Config.apiBaseUrl}/${Config.apiMembershipManagementPrefix}/${Config.apiMemberships}`;
     this.membershipService.updateMembership(updateMembershipUrl, this.selectedMembership)
-      .subscribe((updatedMembership: Membership) => {
-        if (updatedMembership) {
-          console.log(updatedMembership);
-          this.isLoadingSpinnerShown = false;
-        }
+      .subscribe(() => {
+        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -166,11 +163,8 @@ ${Config.pageParameter}=${this.currentTrainingsPage}`;
     this.isLoadingSpinnerShown = true;
     this.trainingService.getTrainings(getTrainingsUrl)
       .subscribe(response => {
-        // if (trainings) {
-        //   this.trainings = [];
-        //   this.trainings = trainings;
-        // }
-        console.log(response);
+        this.trainings = response.body;
+        this.totalTrainings = Number(response.headers.get(Config.headerXTotalCount));
         this.isLoadingSpinnerShown = false;
       });
   }

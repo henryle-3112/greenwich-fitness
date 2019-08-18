@@ -187,7 +187,7 @@
     <!-- hire coach button -->
     <button nz-button [nzType]="'primary'" class="hire-coach-btn" (click)="sendHireRequestToCoach();"
             *ngIf="selectedCoach.userProfile.id != selectedUserProfile.id &&
-             !isRelationshipBetweenUserAndCoachExixted &&
+             !isRelationshipBetweenUserAndCoachExisted &&
              !isHireCoachRequestSent"
     >
       Yes, I want {{ selectedCoach.userProfile.fullName }} to be my coach
@@ -196,7 +196,9 @@
 
     <!-- hire coach button -->
     <button nz-button [nzType]="'primary'" class="processing-btn" disabled
-            *ngIf="selectedCoach.userProfile.id != selectedUserProfile.id && !isRelationshipBetweenUserAndCoachExixted && isHireCoachRequestSent"
+            *ngIf="selectedCoach.userProfile.id != selectedUserProfile.id &&
+             !isRelationshipBetweenUserAndCoachExisted &&
+              isHireCoachRequestSent"
     >
       Your request is handling
     </button>

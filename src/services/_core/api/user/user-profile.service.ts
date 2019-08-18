@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {tap} from 'rxjs/operators';
 import {UserProfile} from '@gw-models/core';
 
 const httpOptions = {
@@ -22,8 +21,6 @@ export class UserProfileService {
    * @param userProfile - user's profile that will be updated
    */
   public updateUserProfile(url: string, userProfile: UserProfile): Observable<UserProfile> {
-    return this.http.post<UserProfile>(url, userProfile, httpOptions).pipe(
-      tap((updatedUserProfile: UserProfile) => console.log(JSON.stringify(updatedUserProfile)))
-    );
+    return this.http.put<UserProfile>(url, userProfile, httpOptions);
   }
 }

@@ -6,7 +6,7 @@ import {ImageValidator} from '@gw-services/core/validate/image-validator';
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {CustomValidator} from '@gw-services/core/validate/custom-validator';
-import {NzNotificationService, UploadFile} from 'ng-zorro-antd';
+import {NzNotificationService} from 'ng-zorro-antd';
 import {Observable, Observer} from 'rxjs';
 import {UserAccountStatus} from 'src/models/user/user-account-status';
 import {Config} from '@gw-config/core';
@@ -20,7 +20,6 @@ export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
   isLoadingSpinnerShown = false;
   avatarUrl: string;
-  isImageUploaded = false;
   savedAvatarUrl: string;
 
   /**
@@ -85,19 +84,9 @@ export class RegisterComponent implements OnInit {
       return;
     }
     this.isLoadingSpinnerShown = true;
-    const userAccountStatus = new UserAccountStatus();
-    userAccountStatus.id = 2;
-    userAccountStatus.name = 'EMAIL_NOT_CONFIRMED';
-    const userProfile = new UserProfile();
-    userProfile.fullName = this.f.fullName.value;
-    userProfile.acceptTermsOfService = 1;
-    userProfile.avatar = this.savedAvatarUrl;
-    userProfile.status = 1;
-    const newUserAccount = new UserAccount();
-    newUserAccount.userName = this.f.userName.value;
-    newUserAccount.password = this.f.password.value;
-    newUserAccount.userAccountStatus = userAccountStatus;
-    newUserAccount.userProfile = userProfile;
+    const userAccountStatus = this.createUserAccountStatus();
+    const userProfile = this.createUserProfile();
+    const newUserAccount = this.createUserAccount(userAccountStatus, userProfile);
     const signUpUrl = `${Config.apiBaseUrl}/${Config.apiUserManagementPrefix}/${Config.apiRegister}`;
     this.signUpService.signUp(signUpUrl, newUserAccount).subscribe(
       (responseMessage: ResponseMessage) => {
@@ -109,6 +98,42 @@ export class RegisterComponent implements OnInit {
         this.isLoadingSpinnerShown = false;
       }
     );
+  }
+
+  /**
+   * create user account's status
+   */
+  private createUserAccountStatus(): UserAccountStatus {
+    const userAccountStatus = new UserAccountStatus();
+    userAccountStatus.id = 2;
+    userAccountStatus.name = 'EMAIL_NOT_CONFIRMED';
+    return userAccountStatus;
+  }
+
+  /**
+   * create user profile
+   */
+  private createUserProfile(): UserProfile {
+    const userProfile = new UserProfile();
+    userProfile.fullName = this.f.fullName.value;
+    userProfile.acceptTermsOfService = 1;
+    userProfile.avatar = this.savedAvatarUrl;
+    userProfile.status = 1;
+    return userProfile;
+  }
+
+  /**
+   *
+   * @param userAccountStatus - user's account's status that will be set to user's account
+   * @param userProfile - user's profile that will be set to user's account
+   */
+  private createUserAccount(userAccountStatus: UserAccountStatus, userProfile: UserProfile) {
+    const userAccount = new UserAccount();
+    userAccount.userName = this.f.userName.value;
+    userAccount.password = this.f.password.value;
+    userAccount.userAccountStatus = userAccountStatus;
+    userAccount.userProfile = userProfile;
+    return userAccount;
   }
 
   /**
@@ -188,44 +213,35 @@ export class RegisterComponent implements OnInit {
           observer.complete();
           return;
         }
-
-        observer.next(isJPG && isLt2M && dimensionRes);
-        observer.complete();
+        if (isJPG && isLt2M && dimensionRes) {
+          this.uploadUserAvatarToServer(file);
+        }
       });
     });
   }
 
   /**
-   *
-   * @param info - file info
+   * update user avatar to server
    */
-  handleChange(info: { file: UploadFile }): void {
-    switch (info.file.status) {
-      case 'uploading':
-        this.isLoadingSpinnerShown = true;
-        const formData = new FormData();
-        formData.append('file', info.file.originFileObj);
-        // if image was not uploaded
-        if (!this.isImageUploaded) {
-          const uploadRootLocation = 'user';
-          const uploadFileUrl = `${Config.apiBaseUrl}/${Config.apiUploadManagementPrefix}/${Config.apiUploads}/${uploadRootLocation}`;
-          this.uploadImageService.uploadFile(uploadFileUrl, formData).subscribe(
-            (responseMessage: ResponseMessage) => {
-              if (responseMessage.message.localeCompare('failure') !== 0) {
-                this.savedAvatarUrl = responseMessage.message;
-                this.createNotification('success', 'Success', 'Your avatar was uploaded successfully');
-              } else if (responseMessage.message.localeCompare('failure') === 0) {
-                this.createNotification('error', 'Error', 'Cannot upload your avatar! Please try again!');
-              }
-              ImageValidator.getBase64(info.file.originFileObj, (img: string) => {
-                this.isLoadingSpinnerShown = false;
-                this.avatarUrl = img;
-              });
-            }
-          );
-          this.isImageUploaded = true;
+  private uploadUserAvatarToServer(file: File): void {
+    this.isLoadingSpinnerShown = true;
+    const formData = new FormData();
+    formData.append('file', file);
+    const uploadRootLocation = 'user';
+    const uploadFileUrl = `${Config.apiBaseUrl}/${Config.apiUploadManagementPrefix}/${Config.apiUploads}/${uploadRootLocation}`;
+    this.uploadImageService.uploadFile(uploadFileUrl, formData).subscribe(
+      (responseMessage: ResponseMessage) => {
+        if (responseMessage && responseMessage.message.localeCompare('failure') !== 0) {
+          this.savedAvatarUrl = responseMessage.message;
+          this.createNotification('success', 'Success', 'Your avatar was uploaded successfully');
+        } else if (responseMessage && responseMessage.message.localeCompare('failure') === 0) {
+          this.createNotification('error', 'Error', 'Cannot upload your avatar! Please try again!');
         }
-        break;
-    }
+        ImageValidator.getBase64(file, (img: string) => {
+          this.isLoadingSpinnerShown = false;
+          this.avatarUrl = img;
+        });
+      }
+    );
   }
 }

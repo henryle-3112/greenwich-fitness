@@ -19,9 +19,7 @@ export class PaymentService {
    * @param url - url that will be used to make payment
    */
   public makePayment(url: string) {
-    return this.http.post<Response>(url, {}, httpOptions).pipe(
-      tap((response: Response) => console.log(response))
-    );
+    return this.http.post<Response>(url, {}, httpOptions);
   }
 
   /**
@@ -29,8 +27,6 @@ export class PaymentService {
    * @param url - url that will be used to complete payment
    */
   public completePayment(url: string) {
-    return this.http.post<Response>(url, httpOptions).pipe(
-      tap((response: Response) => console.log(response))
-    );
+    return this.http.post<Response>(url, httpOptions);
   }
 }

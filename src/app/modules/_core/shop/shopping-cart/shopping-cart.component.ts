@@ -116,7 +116,6 @@ export class ShoppingCartComponent implements OnInit {
     newProductOrder.productOrderDate = new Date();
     newProductOrder.productOrderStatus = 0;
     newProductOrder.userProfile = this.selectedUserProfile;
-    const that = this;
     const addProductOrderUrl = `${Config.apiBaseUrl}/${Config.apiProductManagementPrefix}/${Config.apiProductOrders}`;
     this.productOrderService.addProductOrder(addProductOrderUrl, newProductOrder)
       .subscribe(insertedProductOrder => {
@@ -172,7 +171,6 @@ ${Config.sumParameter}=${this.totalShoppingCartPrice}`;
           localStorage.setItem(Config.currentUserProfile, JSON.stringify(this.selectedUserProfile));
           window.location.href = response.redirect_url;
         }
-        this.isLoadingSpinnerShown = false;
       });
   }
 

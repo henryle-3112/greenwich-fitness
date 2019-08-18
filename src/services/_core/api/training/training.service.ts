@@ -4,9 +4,13 @@ import {Training} from '@gw-models/core';
 import {Observable} from 'rxjs';
 import {tap} from 'rxjs/operators';
 
-const httpOptions = {
+const httpFullOptions = {
   headers: new HttpHeaders({'Content-Type': 'application/json'}),
   observe: 'response' as 'body'
+};
+
+const httpOptions = {
+  headers: new HttpHeaders({'Content-Type': 'application/json'})
 };
 
 
@@ -23,9 +27,7 @@ export class TrainingService {
    * @param url - url that will used to get trainings
    */
   public getTrainings(url): Observable<HttpResponse<Training[]>> {
-    return this.http.get<HttpResponse<Training[]>>(url, httpOptions).pipe(
-      tap(response => console.log(response))
-    );
+    return this.http.get<HttpResponse<Training[]>>(url, httpFullOptions);
   }
 
   /**
@@ -34,9 +36,7 @@ export class TrainingService {
    * @param trainings - trainings that will be added
    */
   public addTrainings(url: string, trainings: Training[]): Observable<Training[]> {
-    return this.http.post<Training[]>(url, trainings, httpOptions).pipe(
-      tap((insertedTrainings: Training[]) => console.log(JSON.stringify(insertedTrainings)))
-    );
+    return this.http.post<Training[]>(url, trainings, httpOptions);
   }
 
   /**
@@ -44,9 +44,7 @@ export class TrainingService {
    * @param url - url that will be used to update training
    * @param training - training that will be updated
    */
-  public updateTrainingStatus(url: string, training: Training): Observable<Training> {
-    return this.http.post<Training>(url, training, httpOptions).pipe(
-      tap((updatedTraining: Training) => console.log(JSON.stringify(updatedTraining)))
-    );
+  public updateTraining(url: string, training: Training): Observable<Training> {
+    return this.http.put<Training>(url, training, httpOptions);
   }
 }

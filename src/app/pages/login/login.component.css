@@ -11,6 +11,7 @@
 .facebook-background {
   background-color: #3b5999;
   border-color: #3b5999;
+  width: 100%;
 }
 
 .facebook-background:hover {
@@ -20,6 +21,7 @@
 .google-background {
   background-color: #cd201f;
   border-color: #cd201f;
+  width: 100%;
 }
 
 .google-background:hover {

@@ -72,7 +72,7 @@ export class PaymentAlertComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       this.paymentId = params['paymentId'];
       this.payerId = params['PayerID'];
-      this.paymentToken = params['paymentToken'];
+      this.paymentToken = params['token'];
     });
   }
 
@@ -110,7 +110,6 @@ export class PaymentAlertComponent implements OnInit {
   private getSelectedCoach(): void {
     if (localStorage.getItem(Config.currentCoach)) {
       this.selectedCoach = JSON.parse(localStorage.getItem(Config.currentCoach));
-      console.log(this.selectedCoach);
       this.getTotalCoachPayment();
       this.getSelectedCoachMembershipNotification();
     } else {
@@ -156,7 +155,7 @@ ${Config.paymentIdParameter}=${this.paymentId}&
 ${Config.payerIdParameter}=${this.payerId}`;
     this.paymentService.completePayment(completePaymentUrl)
       .subscribe((response: any) => {
-        if (response.status.localeCompare('success') === 0) {
+        if (response && response.status.localeCompare('success') === 0) {
           this.isPaymentSuccessfully = true;
           this.addMembership();
         } else {
@@ -246,6 +245,7 @@ ${Config.apiMemberships}`;
     coachPayment.payerId = this.payerId;
     coachPayment.paymentId = this.paymentId;
     coachPayment.token = this.paymentToken;
+    coachPayment.sum = this.totalCoachPayment;
     const addCoachPaymentUrl = `${Config.apiBaseUrl}/${Config.apiPaymentManagementPrefix}/${Config.apiCoachesPayment}`;
     this.coachPaymentService.addCoachPayment(addCoachPaymentUrl, coachPayment)
       .subscribe((insertedCoachPayment: CoachPayment) => {
@@ -282,14 +282,11 @@ ${Config.apiMemberships}`;
     notification.userProfile = this.selectedCoach.userProfile;
     notification.createdDate = new Date();
     notification.status = 1;
-    notification.content = `${this.selectedUserProfile.fullName} has pay ${this.totalCoachPayment} for you`;
+    notification.content = `${this.selectedUserProfile.fullName} has pay ${this.totalCoachPayment}$ for you`;
     this.isLoadingSpinnerShown = true;
     const addNotificationUrl = `${Config.apiBaseUrl}/${Config.apiNotificationManagementPrefix}/${Config.apiNotifications}`;
     this.notificationService.addNotification(addNotificationUrl, notification)
-      .subscribe((insertedNotification: Notification) => {
-        if (insertedNotification) {
-          console.log(insertedNotification);
-        }
+      .subscribe(() => {
         this.isLoadingSpinnerShown = false;
       });
   }
@@ -302,14 +299,11 @@ ${Config.apiMemberships}`;
     notification.userProfile = this.selectedUserProfile;
     notification.createdDate = new Date();
     notification.status = 1;
-    notification.content = `You has pay ${this.totalCoachPayment} for ${this.selectedCoach.userProfile.fullName}`;
+    notification.content = `You has pay ${this.totalCoachPayment}$ for ${this.selectedCoach.userProfile.fullName}`;
     this.isLoadingSpinnerShown = true;
     const addNotificationUrl = `${Config.apiBaseUrl}/${Config.apiNotificationManagementPrefix}/${Config.apiNotifications}`;
     this.notificationService.addNotification(addNotificationUrl, notification)
-      .subscribe((insertedNotification: Notification) => {
-        if (insertedNotification) {
-          console.log(insertedNotification);
-        }
+      .subscribe(() => {
         this.isLoadingSpinnerShown = false;
       });
   }
@@ -325,9 +319,7 @@ ${Config.apiNotificationManagementPrefix}/
 ${Config.apiCoachMembershipNotifications}`;
     this.coachMembershipNotificationService
       .updateCoachMembershipNotification(updateCoachMembershipNotificationUrl, this.selectedCoachMembershipNotification)
-      .subscribe((updatedCoachMembershipNotification: CoachMembershipNotification) => {
-        console.log(updatedCoachMembershipNotification);
-      });
+      .subscribe();
   }
 
   /**
@@ -373,7 +365,6 @@ ${Config.paymentIdParameter}=${this.paymentId}&
 ${Config.payerIdParameter}=${this.payerId}`;
     this.paymentService.completePayment(completePaymentUrl)
       .subscribe((response: any) => {
-        console.log(response);
         if (response.status.localeCompare('success') === 0) {
           this.isPaymentSuccessfully = true;
           this.addToProductOrder();
@@ -398,7 +389,6 @@ ${Config.payerIdParameter}=${this.payerId}`;
     this.productOrderService.addProductOrder(addProductOrderUrl, newProductOrder)
       .subscribe(insertedProductOrder => {
         if (insertedProductOrder) {
-          console.log(insertedProductOrder);
           this.addProductDetails(insertedProductOrder);
         } else {
           this.isPaymentSuccessfully = false;
@@ -426,7 +416,6 @@ ${Config.payerIdParameter}=${this.payerId}`;
     this.productOrderDetailService.addProductOrderDetails(addProductOrderDetailsUrl, productOrderDetails)
       .subscribe(insertedProductOrderDetails => {
         if (insertedProductOrderDetails) {
-          console.log(insertedProductOrderDetails);
           this.addProductPaymentToServer(insertedProductOrder);
         } else {
           this.isPaymentSuccessfully = false;

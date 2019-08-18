@@ -117,29 +117,8 @@ ${Config.userProfileIdParameter}=${selectedUserProfileId}`;
           });
           this.createBodyIndexChart();
           this.getCurrentBodyIndex();
-        } else {
-          this.initBodyIndexTheFirstTime();
-          this.isShowingBodyIndexChart = false;
         }
         this.isLoadingSpinnerShown = false;
-      });
-  }
-
-  /**
-   * init body index the first time
-   */
-  private initBodyIndexTheFirstTime(): void {
-    const bodyIndexes = new BodyIndex();
-    bodyIndexes.weight = 70;
-    bodyIndexes.height = 170;
-    bodyIndexes.currentDate = this.currentDate;
-    bodyIndexes.userProfile = this.selectedUserProfile;
-    const updateOrCreateBodyIndexUrl = `${Config.apiBaseUrl}/${Config.apiUserManagementPrefix}/${Config.apiUserBodyIndexes}`;
-    this.bodyIndexService.updateOrCreateBodyIndex(updateOrCreateBodyIndexUrl, bodyIndexes)
-      .subscribe(insertedBodyIndex => {
-        if (insertedBodyIndex) {
-          this.getBodyIndexes();
-        }
       });
   }
 

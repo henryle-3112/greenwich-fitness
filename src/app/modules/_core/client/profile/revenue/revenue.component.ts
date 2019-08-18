@@ -115,10 +115,12 @@ ${Config.pageParameter}=${this.currentRevenuesPage}`;
    * @param event - month that was selected by users to view their revenue
    */
   private onMonthChanged(event): void {
-    // get month and year to get coach payments list
-    this.selectedMonthToViewRevenue = this.selectedDateToViewRevenue.getMonth() + 1;
-    this.selectedYearToViewRevenue = this.selectedDateToViewRevenue.getFullYear();
-    this.getRevenues();
+    if (this.selectedDateToViewRevenue) {
+      // get month and year to get coach payments list
+      this.selectedMonthToViewRevenue = this.selectedDateToViewRevenue.getMonth() + 1;
+      this.selectedYearToViewRevenue = this.selectedDateToViewRevenue.getFullYear();
+      this.getRevenues();
+    }
   }
 
   public revenuesPageChange(event): void {

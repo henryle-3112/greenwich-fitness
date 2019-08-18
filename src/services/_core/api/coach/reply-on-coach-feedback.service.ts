@@ -22,9 +22,7 @@ export class ReplyOnCoachFeedbackService {
    * @param url - url that will be used to get replies on coach's feedback
    */
   public getRepliesOnCoachFeedback(url: string): Observable<ReplyOnCoachFeedback[]> {
-    return this.http.get<ReplyOnCoachFeedback[]>(url, httpOptions).pipe(
-      tap((repliesOnCoachFeedback: ReplyOnCoachFeedback[]) => console.log(JSON.stringify(repliesOnCoachFeedback)))
-    );
+    return this.http.get<ReplyOnCoachFeedback[]>(url, httpOptions);
   }
 
   /**
@@ -33,9 +31,7 @@ export class ReplyOnCoachFeedbackService {
    * @param replyOnCoachFeedback - reply on coach's feedback that will be added
    */
   public addReplyOnCoachFeedback(url: string, replyOnCoachFeedback: ReplyOnCoachFeedback): Observable<ReplyOnCoachFeedback> {
-    return this.http.post<ReplyOnCoachFeedback>(url, replyOnCoachFeedback, httpOptions).pipe(
-      tap((insertedReplyOnCoachFeedback: ReplyOnCoachFeedback) => console.log(JSON.stringify(insertedReplyOnCoachFeedback)))
-    );
+    return this.http.post<ReplyOnCoachFeedback>(url, replyOnCoachFeedback, httpOptions);
   }
 
   /**
@@ -44,8 +40,6 @@ export class ReplyOnCoachFeedbackService {
    * @param replyOnCoachFeedback - reply on coach's feedback that will be updated
    */
   public updateReplyOnCoachFeedback(url: string, replyOnCoachFeedback: ReplyOnCoachFeedback): Observable<ReplyOnCoachFeedback> {
-    return this.http.put<ReplyOnCoachFeedback>(url, replyOnCoachFeedback, httpOptions).pipe(
-      tap((updatedReplyOnCoachFeedback: ReplyOnCoachFeedback) => console.log(JSON.stringify(updatedReplyOnCoachFeedback)))
-    );
+    return this.http.put<ReplyOnCoachFeedback>(url, replyOnCoachFeedback, httpOptions);
   }
 }

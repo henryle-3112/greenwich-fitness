@@ -24,9 +24,7 @@ export class ResetPasswordService {
    * @param email - email that will be received email reset password
    */
   public sendEmailToResetPassword(url: string, email: string): Observable<ResponseMessage> {
-    return this.http.post<ResponseMessage>(url, email, httpOptions).pipe(
-      tap((responseMessage: ResponseMessage) => console.log(responseMessage.message))
-    );
+    return this.http.post<ResponseMessage>(url, email, httpOptions);
   }
 
   /**
@@ -35,8 +33,6 @@ export class ResetPasswordService {
    * @param userAccount - user's account that will be changed its password
    */
   public changePassword(url: string, userAccount: UserAccount): Observable<ResponseMessage> {
-    return this.http.post<ResponseMessage>(url, userAccount, httpOptions).pipe(
-      tap((responseMessage: ResponseMessage) => console.log(responseMessage.message))
-    );
+    return this.http.post<ResponseMessage>(url, userAccount, httpOptions);
   }
 }

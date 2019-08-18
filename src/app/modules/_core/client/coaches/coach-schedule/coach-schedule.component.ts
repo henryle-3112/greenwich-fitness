@@ -46,7 +46,7 @@ export class CoachScheduleComponent implements OnInit {
    * init data
    */
   ngOnInit(): void {
-    this.nTrainingsPerPage = 8;
+    this.nTrainingsPerPage = Config.numberItemsPerPage;
     this.getSelectedCoach();
   }
 
@@ -164,7 +164,8 @@ ${Config.pageParameter}=${this.currentTrainingsPage}`;
     this.isLoadingSpinnerShown = true;
     this.trainingService.getTrainings(getTrainingsUrl)
       .subscribe(response => {
-        console.log(response);
+        this.trainings = response.body;
+        this.totalTrainings = Number(response.headers.get(Config.headerXTotalCount));
         this.isLoadingSpinnerShown = false;
       });
   }

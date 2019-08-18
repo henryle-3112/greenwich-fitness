@@ -22,8 +22,6 @@ export class ActiveAccountService {
    * @param userAccount - user's account that will be activated
    */
   public activeAccount(url: string, userAccount: UserAccount): Observable<ResponseMessage> {
-    return this.http.post<ResponseMessage>(url, userAccount, httpOptions).pipe(
-      tap((responseMessage: ResponseMessage) => console.log(responseMessage.message))
-    );
+    return this.http.post<ResponseMessage>(url, userAccount, httpOptions);
   }
 }

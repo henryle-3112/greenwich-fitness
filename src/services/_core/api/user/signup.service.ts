@@ -1,4 +1,3 @@
-import {tap} from 'rxjs/operators';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {UserAccount, ResponseMessage} from '@gw-models/core';
@@ -22,8 +21,6 @@ export class SignupService {
    * @param userAccount - user's account that will be register
    */
   public signUp(url: string, userAccount: UserAccount): Observable<ResponseMessage> {
-    return this.http.post<ResponseMessage>(url, userAccount, httpOptions).pipe(
-      tap((responseMessage: ResponseMessage) => console.log(responseMessage.message))
-    );
+    return this.http.post<ResponseMessage>(url, userAccount, httpOptions);
   }
 }

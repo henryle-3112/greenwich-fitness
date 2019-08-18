@@ -184,8 +184,7 @@ ${Config.trainingDateParameter}=${this.currentDate}`;
     this.trainingService.getTrainings(getTrainingUrl)
       .subscribe(response => {
         if (response) {
-          console.log(response);
-          // this.initDataSourceForTransferComponent(trainings);
+          this.initDataSourceForTransferComponent(response.body);
         } else {
           this.router.navigate(['/client']);
         }

@@ -12,7 +12,7 @@ import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/sha
 })
 export class NotificationComponent implements OnInit {
   notifications: Notification[];
-  currentNotificationsPage = 1;
+  currentNotificationsPage: number;
   isLoadingSpinnerShown = true;
   notificationContentKeywords: string;
   nNotificationsPerPage: number;
@@ -34,7 +34,8 @@ export class NotificationComponent implements OnInit {
    * init data
    */
   ngOnInit(): void {
-    this.nNotificationsPerPage = 8;
+    this.currentNotificationsPage = Config.currentPage;
+    this.nNotificationsPerPage = Config.numberItemsPerPage;
     this.notificationContentKeywords = '';
     this.getSelectedUserProfile();
   }
@@ -47,7 +48,7 @@ export class NotificationComponent implements OnInit {
       .subscribe(selectedUserProfile => {
         if (selectedUserProfile) {
           this.selectedUserProfile = selectedUserProfile;
-          this.getNotificationsByPage();
+          this.getNotifications();
         } else {
           this.router.navigate(['/client']);
         }
@@ -57,7 +58,7 @@ export class NotificationComponent implements OnInit {
   /**
    * get notifications by current's page
    */
-  private getNotificationsByPage(): void {
+  private getNotifications(): void {
     const selectedUserProfileId = this.selectedUserProfile.id;
     const notificationStatus = 1;
     let getNotificationsUrl = `${Config.apiBaseUrl}/
@@ -73,11 +74,8 @@ ${Config.statusParameter}=${notificationStatus}`;
     this.isLoadingSpinnerShown = true;
     this.notificationService.getNotifications(getNotificationsUrl)
       .subscribe(response => {
-        // if (response) {
-        //   this.notifications = [];
-        //   this.notifications = response;
-        // }
-        console.log(response);
+        this.notifications = response.body;
+        this.totalNotification = Number(response.headers.get(Config.headerXTotalCount));
         this.isLoadingSpinnerShown = false;
       });
   }
@@ -88,7 +86,7 @@ ${Config.statusParameter}=${notificationStatus}`;
    */
   public notificationsPageChange(event): void {
     this.currentNotificationsPage = event;
-    this.getNotificationsByPage();
+    this.getNotifications();
   }
 
   /**
@@ -98,6 +96,6 @@ ${Config.statusParameter}=${notificationStatus}`;
   public searchNotifications(keyword): void {
     this.notificationContentKeywords = keyword;
     this.currentNotificationsPage = 1;
-    this.getNotificationsByPage();
+    this.getNotifications();
   }
 }

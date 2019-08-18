@@ -1,12 +1,15 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
-import {tap} from 'rxjs/operators';
 import {CoachPayment} from '@gw-models/core';
 import {Observable} from 'rxjs';
 
-const httpOptions = {
+const httpFullOptions = {
   headers: new HttpHeaders({'Content-Type': 'application/json'}),
   observe: 'response' as 'body'
+};
+
+const httpOptions = {
+  headers: new HttpHeaders({'Content-Type': 'application/json'})
 };
 
 @Injectable({
@@ -23,9 +26,7 @@ export class CoachPaymentService {
    * @param coachPayment - coach payment that will be added
    */
   public addCoachPayment(url: string, coachPayment: CoachPayment) {
-    return this.http.post<CoachPayment>(url, coachPayment, httpOptions).pipe(
-      tap((insertedProductPayment: CoachPayment) => console.log(insertedProductPayment))
-    );
+    return this.http.post<CoachPayment>(url, coachPayment, httpOptions);
   }
 
   /**
@@ -33,8 +34,6 @@ export class CoachPaymentService {
    * @param url - url that will be used to get coach payments
    */
   public getCoachPayments(url: string): Observable<HttpResponse<CoachPayment[]>> {
-    return this.http.get<HttpResponse<CoachPayment[]>>(url, httpOptions).pipe(
-      tap(response => console.log(response))
-    );
+    return this.http.get<HttpResponse<CoachPayment[]>>(url, httpFullOptions);
   }
 }

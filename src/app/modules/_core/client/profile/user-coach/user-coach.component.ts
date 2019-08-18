@@ -70,7 +70,7 @@ ${Config.userProfileIdParameter}=${selectedUserProfileId}&
 ${Config.statusParameter}=${membershipStatus}&
 ${Config.pageParameter}=${this.currentCoachesPage}`;
     if (this.coachFullNameKeywords.localeCompare('') !== 0) {
-      getCoachesUrl += `?${Config.searchParameter}=${this.coachFullNameKeywords.toLowerCase()}`;
+      getCoachesUrl += `&${Config.searchParameter}=${this.coachFullNameKeywords.toLowerCase()}`;
     }
     this.isLoadingSpinnerShown = true;
     this.membershipService.getCoaches(getCoachesUrl)

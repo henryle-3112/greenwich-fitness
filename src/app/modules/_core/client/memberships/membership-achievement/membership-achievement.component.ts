@@ -70,15 +70,8 @@ ${Config.userProfileIdParameter}=${this.selectedUserProfileId}&
 ${Config.pageParameter}=${this.currentUserAchievementsPage}`;
     this.userAchievementService.getUserAchievements(getUserAchievementsUrl)
       .subscribe(response => {
-        // if (response) {
-        //   // current user-account's achievements
-        //   this.userAchievements = [];
-        //   // assign user-account's achievements
-        //   this.userAchievements = response;
-        //   // hide pagination if number of user-account's achievements per page is greater than toatl user-account's achievements
-        //   this.isHidePagination = this.nUserAchievementsPerPage > this.userAchievements.length;
-        // }
-        console.log(response);
+        this.userAchievements = response.body;
+        this.totalUserAchievements = Number(response.headers.get(Config.headerXTotalCount));
         this.isLoadingSpinnerShown = false;
       });
   }

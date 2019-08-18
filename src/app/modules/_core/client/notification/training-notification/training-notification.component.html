@@ -5,10 +5,6 @@
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
-  <!-- no data component -->
-  <nz-empty *ngIf="!coachMembershipNotifications || coachMembershipNotifications.length <= 0"></nz-empty>
-  <!-- end no data component -->
-
   <!-- search box-->
   <nz-input-group *ngIf="coachMembershipNotifications && coachMembershipNotifications.length" [nzSuffix]="suffixIconSearch" [ngClass]="{'mg-bottom-24': true, 'width-50': true}">
     <input type="text" nz-input placeholder="Name..." #searchBox (keyup.enter)="searchNotifications(searchBox.value)"/>
@@ -42,7 +38,7 @@
                 </button>
               </div>
               <div class="status" *ngIf="item.status != 0">
-                <span *ngIf="item.status == 1">Status: <span class="status-accepted">Accepted</span></span>
+                <span *ngIf="item.status == 1 || item.status == 2">Status: <span class="status-accepted">Accepted</span></span>
                 <span *ngIf="item.status == -1">Status: <span class="status-declined">Declined</span></span>
               </div>
               <div class="notify-message">

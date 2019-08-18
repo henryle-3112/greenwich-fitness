@@ -17,6 +17,7 @@ export class ProductSearchComponent implements OnInit, OnDestroy {
   currentSearchingProductsPage: number;
   nSearchingProductsPerPage: number;
   searchingProducts: Product[];
+  isNoDataShown: boolean;
 
   /**
    *
@@ -32,14 +33,15 @@ export class ProductSearchComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.isNoDataShown = true;
     this.shareMessageService.currentMessage
       .subscribe(message => {
         if (message && message.localeCompare('searchProduct') === 0) {
           this.checkSearchParametersExistedOrNot();
-          this.initData();
         }
       });
   }
+
 
   /**
    * check search parameters existed or not
@@ -51,6 +53,8 @@ export class ProductSearchComponent implements OnInit, OnDestroy {
       !localStorage.getItem(Config.selectedProductMaxPriceForSearching);
     if (isSearchingParametersNotExisted) {
       this.router.navigate(['/shop/home']);
+    } else {
+      this.initData();
     }
   }
 
@@ -58,8 +62,9 @@ export class ProductSearchComponent implements OnInit, OnDestroy {
    * init data
    */
   private initData(): void {
-    this.currentSearchingProductsPage = 1;
-    this.nSearchingProductsPerPage = 8;
+    this.searchingProducts = [];
+    this.currentSearchingProductsPage = Config.currentPage;
+    this.nSearchingProductsPerPage = Config.numberItemsPerPage;
     this.getSearchingProducts();
   }
 
@@ -73,8 +78,7 @@ export class ProductSearchComponent implements OnInit, OnDestroy {
 ${Config.apiProductManagementPrefix}/
 ${Config.apiProducts}?
 ${Config.categoryIdParameter}=&
-${Config.minPriceParameter}=&
-${Config.maxPriceParameter}=&
+${Config.minPriceParameter}=&${Config.maxPriceParameter}=&
 ${Config.searchParameter}=&
 ${Config.pageParameter}=${this.currentSearchingProductsPage}&
 ${Config.statusParameter}=${productStatus}`;
@@ -91,7 +95,7 @@ ${Config.statusParameter}=${productStatus}`;
       getSearchingProductsUrl = getSearchingProductsUrl.replace(
         `${Config.minPriceParameter}=&${Config.maxPriceParameter}=`,
         `${Config.minPriceParameter}=${selectedProductMinPriceForSearching}&
-        ${Config.maxPriceParameter}=${selectedProductMaxPriceForSearching}`);
+${Config.maxPriceParameter}=${selectedProductMaxPriceForSearching}`);
     }
     if (localStorage.getItem(Config.selectedProductNameKeywordsForSearching)) {
       const selectedProductNameForSearching = localStorage.getItem(Config.selectedProductNameKeywordsForSearching);
@@ -101,8 +105,11 @@ ${Config.statusParameter}=${productStatus}`;
     }
     this.productService.getProducts(getSearchingProductsUrl)
       .subscribe(response => {
-        this.searchingProducts = response.body;
-        this.totalSearchingProducts = Number(response.headers.get(Config.headerXTotalCount));
+        if (response) {
+          this.searchingProducts = response.body;
+          this.isNoDataShown = this.searchingProducts.length <= 0;
+          this.totalSearchingProducts = Number(response.headers.get(Config.headerXTotalCount));
+        }
         this.isLoadingSpinnerShown = false;
       });
   }

@@ -12,7 +12,7 @@ import {
   WorkoutExercise
 } from '@gw-models/core';
 import {Config} from '@gw-config/core';
-import {NzModalService, NzNotificationService, UploadFile} from 'ng-zorro-antd';
+import {NzModalService, NzNotificationService} from 'ng-zorro-antd';
 import {ShareSingleExerciseService} from '@gw-services/core/shared/single-exercise/share-single-exercise.service';
 import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
 import {UserAchievementService} from '@gw-services/core/api/user/user-achievement.service';
@@ -66,7 +66,6 @@ export class WorkoutTrainingComponent implements OnInit, OnDestroy {
   userStatus: string;
   saveStatusImageUrl: string;
   statusImageUrl: string;
-  isImageUploaded: boolean;
   isUploadImageLoading: boolean;
   coffetiAnimationInterval: any;
   @ViewChild('audioOption') audioPlayerRef: ElementRef;
@@ -141,9 +140,6 @@ export class WorkoutTrainingComponent implements OnInit, OnDestroy {
           if (that.musicPlayer) {
             that.musicPlayer.onended = function () {
               that.goToNextMusic();
-            };
-            that.musicPlayer.onseeked = function () {
-              console.log(that.musicPlayer.currentTime);
             };
             that.musicPlayer.currentTime = localStorage.getItem(Config.currentSongPosition) ?
               localStorage.getItem(Config.currentSongPosition) : 0;
@@ -477,8 +473,7 @@ ${Config.statusParameter}=${musicStatus}`;
     userAchievement.nreps = this.nRepsUserDid;
     const addUserAchievementUrl = `${Config.apiBaseUrl}/${Config.apiUserManagementPrefix}/${Config.apiUserAchievements}`;
     this.userAchievementService.addUserAchievement(addUserAchievementUrl, userAchievement)
-      .subscribe(insertedUserAchievement => {
-        console.log(insertedUserAchievement);
+      .subscribe(() => {
         // check user start workout from coach schedule or not
         // if yes, update training status before show status modal
         if (this.selectedTraining) {
@@ -521,9 +516,8 @@ ${Config.statusParameter}=${musicStatus}`;
     training.status = 1;
     training.name = this.trainingName;
     const updateTrainingUrl = `${Config.apiBaseUrl}/${Config.apiTrainingManagementPrefix}/${Config.apiTrainings}`;
-    this.trainingService.updateTrainingStatus(updateTrainingUrl, training)
-      .subscribe((updatedTraining: Training) => {
-        console.log(updatedTraining);
+    this.trainingService.updateTraining(updateTrainingUrl, training)
+      .subscribe(() => {
         this.isLoadingSpinnerShown = false;
         this.isStatusModalShown = true;
       });
@@ -706,43 +700,38 @@ ${Config.statusParameter}=${musicStatus}`;
         observer.complete();
         return;
       }
-      observer.next(isJPG && isLt2M);
+      if (isJPG && isLt2M) {
+        this.uploadStatusImage(file);
+      }
     });
   }
 
   /**
    *
-   * @param info - file info
+   * @param file - status's image that will be uploaded
    */
-  handleChange(info: { file: UploadFile }): void {
-    switch (info.file.status) {
-      case 'uploading':
-        this.isUploadImageLoading = true;
-        const formData = new FormData();
-        formData.append('file', info.file.originFileObj);
-        // if image was not uploaded
-        if (!this.isImageUploaded) {
-          const uploadRootLocation = 'status';
-          const uploadFileUrl = `${Config.apiBaseUrl}/${Config.apiUploadManagementPrefix}/${Config.apiUploads}/${uploadRootLocation}`;
-          this.uploadImageService.uploadFile(uploadFileUrl, formData).subscribe(
-            (responseMessage: ResponseMessage) => {
-              if (responseMessage.message.localeCompare('failure') !== 0) {
-                this.saveStatusImageUrl = responseMessage.message;
-                this.createNotification('success', 'Success', 'Your status image was uploaded successfully');
-              } else if (responseMessage.message.localeCompare('failure') === 0) {
-                this.createNotification('error', 'Error', 'Cannot upload your status image! Please try again!');
-              }
-              ImageValidator.getBase64(info.file.originFileObj, (img: string) => {
-                this.isUploadImageLoading = false;
-                this.statusImageUrl = img;
-              });
-            }
-          );
-          this.isImageUploaded = true;
+  private uploadStatusImage(file: File) {
+    this.isUploadImageLoading = true;
+    const formData = new FormData();
+    formData.append('file', file);
+    const uploadRootLocation = 'status';
+    const uploadFileUrl = `${Config.apiBaseUrl}/${Config.apiUploadManagementPrefix}/${Config.apiUploads}/${uploadRootLocation}`;
+    this.uploadImageService.uploadFile(uploadFileUrl, formData).subscribe(
+      (responseMessage: ResponseMessage) => {
+        if (responseMessage.message.localeCompare('failure') !== 0) {
+          this.saveStatusImageUrl = responseMessage.message;
+          this.createNotification('success', 'Success', 'Your status image was uploaded successfully');
+        } else if (responseMessage.message.localeCompare('failure') === 0) {
+          this.createNotification('error', 'Error', 'Cannot upload your status image! Please try again!');
         }
-        break;
-    }
+        ImageValidator.getBase64(file, (img: string) => {
+          this.isUploadImageLoading = false;
+          this.statusImageUrl = img;
+        });
+      }
+    );
   }
+
 
   /**
    *

@@ -49,7 +49,7 @@ export class ActiveAccountComponent implements OnInit {
     const activeUserAccountUrl = `${Config.apiBaseUrl}/${Config.apiUserManagementPrefix}/${Config.apiActiveUserAccount}`;
     this.activeAccountService.activeAccount(activeUserAccountUrl, updatedUserAccount)
       .subscribe((responseMessage: ResponseMessage) => {
-        this.isActivated = responseMessage.message.localeCompare('successfully') === 0;
+        this.isActivated = responseMessage.message.localeCompare('success') === 0;
         if (this.isActivated) {
           this.showCoffetiAnimation();
         }

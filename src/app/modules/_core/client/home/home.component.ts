@@ -92,16 +92,13 @@ export class HomeComponent implements OnInit, OnDestroy {
       .subscribe(selectedMusic => {
         this.selectedMusic = selectedMusic;
         if (this.selectedMusic) {
-          that.musicPlayer = <HTMLAudioElement>document.getElementById('music-musicPlayer');
+          that.musicPlayer = <HTMLAudioElement>document.getElementById('music-player');
           if (that.musicPlayer) {
             that.musicPlayer.onended = function () {
               that.goToNextMusic();
             };
-            if (localStorage.getItem(Config.currentSongPosition)) {
-              that.musicPlayer.currentTime = Number(localStorage.getItem(Config.currentSongPosition));
-            } else {
-              that.musicPlayer.currentTime = 0;
-            }
+            that.musicPlayer.currentTime = localStorage.getItem(Config.currentSongPosition) ?
+              localStorage.getItem(Config.currentSongPosition) : 0;
           }
         }
       });

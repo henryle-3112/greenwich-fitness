@@ -3,7 +3,7 @@ import {ShareSingleExerciseService} from '@gw-services/core/shared/single-exerci
 import {Router} from '@angular/router';
 import {Music, NewFeed, ResponseMessage, SingleExercise, Training, UserAchievement, UserProfile} from '@gw-models/core';
 import {Config} from '@gw-config/core';
-import {NzModalService, NzNotificationService, UploadFile} from 'ng-zorro-antd';
+import {NzModalService, NzNotificationService} from 'ng-zorro-antd';
 import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
 import {UserAchievementService} from '@gw-services/core/api/user/user-achievement.service';
 import {ShareMusicService} from '@gw-services/core/shared/music/share-music.service';
@@ -46,7 +46,6 @@ export class SingleExerciseTrainingComponent implements OnInit, OnDestroy {
   userStatus: string;
   saveStatusImageUrl: string;
   statusImageUrl: string;
-  isImageUploaded: boolean;
   isUploadImageLoading: boolean;
   coffetiAnimationInterval: any;
   nRepsUserDid: number;
@@ -361,8 +360,7 @@ ${Config.statusParameter}=${musicStatus}`;
     userAchievement.nreps = this.nRepsUserDid;
     const addUserAchievementUrl = `${Config.apiBaseUrl}/${Config.apiUserManagementPrefix}/${Config.apiUserAchievements}`;
     this.userAchievementService.addUserAchievement(addUserAchievementUrl, userAchievement)
-      .subscribe(insertUserAchievement => {
-        console.log(insertUserAchievement);
+      .subscribe(() => {
         // check user start exercise from coach schedule or not
         // if yes, update training status before show status modal
         if (this.selectedTraining) {
@@ -384,9 +382,8 @@ ${Config.statusParameter}=${musicStatus}`;
     this.selectedTraining.log = this.trainingLog;
     this.isLoadingSpinnerShown = true;
     const updateTrainingUrl = `${Config.apiBaseUrl}/${Config.apiTrainingManagementPrefix}/${Config.apiTrainings}`;
-    this.trainingService.updateTrainingStatus(updateTrainingUrl, this.selectedTraining)
-      .subscribe((updatedTraining: Training) => {
-        console.log(updatedTraining);
+    this.trainingService.updateTraining(updateTrainingUrl, this.selectedTraining)
+      .subscribe(() => {
         this.isLoadingSpinnerShown = false;
         this.isStatusModalShown = true;
       });
@@ -562,42 +559,35 @@ ${Config.statusParameter}=${musicStatus}`;
         observer.complete();
         return;
       }
-      observer.next(isJPG && isLt2M);
+      if (isJPG && isLt2M) {
+        this.uploadStatusImage(file);
+      }
     });
   }
 
   /**
    *
-   * @param info - file info
+   * @param file - status's image that will be uploaded
    */
-  handleChange(info: { file: UploadFile }): void {
-    switch (info.file.status) {
-      case 'uploading':
-        this.isUploadImageLoading = true;
-        const formData = new FormData();
-        formData.append('file', info.file.originFileObj);
-        // if image was not uploaded
-        if (!this.isImageUploaded) {
-          const uploadRootLocation = 'status';
-          const uploadFileUrl = `${Config.apiBaseUrl}/${Config.apiUploadManagementPrefix}/${Config.apiUploads}/${uploadRootLocation}`;
-          this.uploadImageService.uploadFile(uploadFileUrl, formData).subscribe(
-            (responseMessage: ResponseMessage) => {
-              if (responseMessage.message.localeCompare('failure') !== 0) {
-                this.saveStatusImageUrl = responseMessage.message;
-                this.createNotification('success', 'Success', 'Your status image was uploaded successfully');
-              } else if (responseMessage.message.localeCompare('failure') === 0) {
-                this.createNotification('error', 'Error', 'Cannot upload your status image! Please try again!');
-              }
-              ImageValidator.getBase64(info.file.originFileObj, (img: string) => {
-                this.isUploadImageLoading = false;
-                this.statusImageUrl = img;
-              });
-            }
-          );
-          this.isImageUploaded = true;
+  private uploadStatusImage(file: File): void {
+    const formData = new FormData();
+    formData.append('file', file);
+    const uploadRootLocation = 'status';
+    const uploadFileUrl = `${Config.apiBaseUrl}/${Config.apiUploadManagementPrefix}/${Config.apiUploads}/${uploadRootLocation}`;
+    this.uploadImageService.uploadFile(uploadFileUrl, formData).subscribe(
+      (responseMessage: ResponseMessage) => {
+        if (responseMessage.message.localeCompare('failure') !== 0) {
+          this.saveStatusImageUrl = responseMessage.message;
+          this.createNotification('success', 'Success', 'Your status image was uploaded successfully');
+        } else if (responseMessage.message.localeCompare('failure') === 0) {
+          this.createNotification('error', 'Error', 'Cannot upload your status image! Please try again!');
         }
-        break;
-    }
+        ImageValidator.getBase64(file, (img: string) => {
+          this.isUploadImageLoading = false;
+          this.statusImageUrl = img;
+        });
+      }
+    );
   }
 
   /**

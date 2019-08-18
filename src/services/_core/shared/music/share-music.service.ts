@@ -6,10 +6,8 @@ import {Music} from '@gw-models/core';
   providedIn: 'root'
 })
 export class ShareMusicService {
-  // share single music
   private currentMusicSubject: BehaviorSubject<Music>;
   public currentMusic: Observable<Music>;
-  // share music list
   private currentMusicListSubject: BehaviorSubject<Music[]>;
   public currentMusicList: Observable<Music[]>;
 

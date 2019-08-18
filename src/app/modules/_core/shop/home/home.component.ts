@@ -143,6 +143,8 @@ ${Config.statusParameter}=${productCategoryStatus}`;
       this.router.navigate(['/shop/contact']);
     } else if (selectedProductCategory.productCategoryName.localeCompare('Home') === 0) {
       this.router.navigate([`/shop/home`]);
+    } else if (selectedProductCategory.productCategoryName.localeCompare('Feed') === 0) {
+      this.router.navigate(['/client/feed']);
     } else {
       this.shareProductCategoryService.changeProductCategory(selectedProductCategory);
       this.router.navigate([`/shop/category/${selectedProductCategory.productCategoryMetaTitle}`]);

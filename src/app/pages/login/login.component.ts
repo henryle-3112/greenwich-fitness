@@ -176,14 +176,12 @@ export class LoginComponent implements OnInit {
    * login by facebook
    */
   public loginByFacebook(): void {
-    this.isLoadingSpinnerShown = true;
     const that = this;
     FB.login((response) => {
       if (response.authResponse) {
+        that.isLoadingSpinnerShown = true;
         const selectedUserId = response.authResponse.userID;
         that.getFacebookUserInformation(selectedUserId);
-      } else {
-        this.createNotification('error', 'Error', 'Cannot login! Please try again!');
       }
     });
   }
@@ -202,18 +200,24 @@ export class LoginComponent implements OnInit {
         if (response && !response.error) {
           /* handle the result */
           const fullName = response.name;
-          const userProfile = new UserProfile();
-          userProfile.acceptTermsOfService = 1;
-          userProfile.status = 1;
-          userProfile.fullName = fullName;
-          userProfile.avatar = avatarUrl;
-          const facebookAccount = new FacebookAccount();
-          facebookAccount.facebookId = userId;
-          facebookAccount.userProfile = userProfile;
+          const userProfile = that.createUserProfileFromSocialAccount(fullName, avatarUrl);
+          const facebookAccount = that.createFacebookAccount(userId, userProfile);
           that.authenticateFacebookAccount(facebookAccount);
         }
       }
     );
+  }
+
+  /**
+   *
+   * @param userId - user's id that will be set to facebook's account
+   * @param userProfile - user's profile that will be set to facebook's account
+   */
+  private createFacebookAccount(userId: string, userProfile: UserProfile): FacebookAccount {
+    const facebookAccount = new FacebookAccount();
+    facebookAccount.facebookId = userId;
+    facebookAccount.userProfile = userProfile;
+    return facebookAccount;
   }
 
   /**
@@ -232,7 +236,6 @@ export class LoginComponent implements OnInit {
           that.zone.run(() => {
             localStorage.setItem(Config.loginType, 'facebook');
             localStorage.setItem(Config.facebookId, facebookAccount.facebookId);
-            that.isLoadingSpinnerShown = false;
             that.router.navigate([that.returnUrl]);
           });
         }
@@ -268,14 +271,8 @@ export class LoginComponent implements OnInit {
       auth2.attachClickHandler(customButtonGoogleSignIn, {},
         function (googleUser) {
           const googleUserProfile = googleUser.getBasicProfile();
-          const userProfile = new UserProfile();
-          userProfile.acceptTermsOfService = 1;
-          userProfile.status = 1;
-          userProfile.fullName = googleUserProfile.getName();
-          userProfile.avatar = googleUserProfile.getImageUrl();
-          const googleAccount = new GoogleAccount();
-          googleAccount.googleId = googleUserProfile.getId();
-          googleAccount.userProfile = userProfile;
+          const userProfile = that.createUserProfileFromSocialAccount(googleUserProfile.getName(), googleUserProfile.getImageUrl());
+          const googleAccount = that.createGoogleAccount(googleUserProfile.getId(), userProfile);
           that.authenticateGoogleAccount(googleAccount);
         }, function (error) {
           console.log(error);
@@ -285,9 +282,21 @@ export class LoginComponent implements OnInit {
   }
 
   /**
+   *
+   * @param googleId - google's id that will be set to google's account
+   * @param userProfile - user's profile that will be set to google's account
+   */
+  private createGoogleAccount(googleId: string, userProfile: UserProfile): GoogleAccount {
+    const googleAccount = new GoogleAccount();
+    googleAccount.googleId = googleId;
+    googleAccount.userProfile = userProfile;
+    return googleAccount;
+  }
+
+  /**
    * show isLoadingSpinnerShown component
    */
-  private showLoading(): void {
+  private loginByGoogle(): void {
     this.isLoadingSpinnerShown = true;
   }
 
@@ -307,10 +316,23 @@ export class LoginComponent implements OnInit {
           that.zone.run(() => {
             localStorage.setItem(Config.loginType, 'google');
             localStorage.setItem(Config.googleId, googleAccount.googleId);
-            that.isLoadingSpinnerShown = false;
             that.router.navigate([that.returnUrl]);
           });
         }
       });
+  }
+
+  /**
+   *
+   * @param fullName - fullname that will be set to user's profile
+   * @param avatarUrl - avatar's url that will be set to avatar's url
+   */
+  private createUserProfileFromSocialAccount(fullName: string, avatarUrl: string): UserProfile {
+    const userProfile = new UserProfile();
+    userProfile.acceptTermsOfService = 1;
+    userProfile.status = 1;
+    userProfile.fullName = fullName;
+    userProfile.avatar = avatarUrl;
+    return userProfile;
   }
 }

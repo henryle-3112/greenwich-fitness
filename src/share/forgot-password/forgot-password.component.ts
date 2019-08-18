@@ -34,11 +34,9 @@ export class ForgotPasswordComponent implements OnInit {
    * init data
    */
   ngOnInit() {
-    // set up validators for login form
     this.forgotPasswordForm = this.fb.group({
       email: [null, [Validators.required, CustomValidator.emailValidator]]
     });
-    // set current value to input fields when the form was loaded the first time to avoid null exception
     this.f.email.setValue('');
   }
 
@@ -60,7 +58,7 @@ export class ForgotPasswordComponent implements OnInit {
     const sendEmailResetPasswordUrl = `${Config.apiBaseUrl}/${Config.apiUserManagementPrefix}/${Config.apiSendEmailResetPassword}`;
     this.resetPasswordService.sendEmailToResetPassword(sendEmailResetPasswordUrl, this.f.email.value.toString())
       .subscribe((responseMessage: ResponseMessage) => {
-        if (responseMessage.message.localeCompare('successfully') === 0) {
+        if (responseMessage.message.localeCompare('success') === 0) {
           this.createNotification('success', 'Successfully', 'Email was sent successfully, if you do not see the email, please try again!');
           this.router.navigate(['/login']);
         } else {

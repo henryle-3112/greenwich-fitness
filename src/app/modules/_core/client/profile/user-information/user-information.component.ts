@@ -1,9 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {NzNotificationService, UploadFile} from 'ng-zorro-antd';
+import {NzNotificationService} from 'ng-zorro-antd';
 import {UploadImageService} from '@gw-services/core/api/upload-image/upload-image.service';
 import {Router} from '@angular/router';
-import {CustomValidator} from '@gw-services/core/validate/custom-validator';
 import {ResponseMessage, UserAccount, UserProfile} from '@gw-models/core';
 import {ImageValidator} from '@gw-services/core/validate/image-validator';
 import {Observable, Observer} from 'rxjs';
@@ -24,7 +23,6 @@ export class UserInformationComponent implements OnInit {
   userInformationForm: FormGroup;
   isLoadingSpinnerShown = false;
   avatarUrl: string;
-  isImageUploaded = false;
   savedAvatarUrl: string;
   selectedUserProfile: UserProfile;
   selectedUserAccount: UserAccount;
@@ -60,10 +58,8 @@ export class UserInformationComponent implements OnInit {
   ngOnInit() {
     this.loginType = localStorage.getItem(Config.loginType);
     this.userInformationForm = this.fb.group({
-      fullName: [null, [Validators.required]],
-      userName: [null, [Validators.required, CustomValidator.emailValidator]],
+      fullName: [null, [Validators.required]]
     });
-    this.f.userName.setValue('');
     this.f.fullName.setValue('');
     this.getCurrentUserInformation();
 
@@ -94,16 +90,6 @@ export class UserInformationComponent implements OnInit {
     this.isLoadingSpinnerShown = true;
     if (this.loginType.localeCompare('normal') === 0) {
       this.changeNormalAccountInformation();
-    }
-  }
-
-  /**
-   * validate email
-   */
-  validateEmail(): void {
-    if (this.f.userName.value.toString().localeCompare('') === 0) {
-      this.f.userName.markAsTouched();
-      this.f.userName.setErrors({'required': true});
     }
   }
 
@@ -149,45 +135,39 @@ export class UserInformationComponent implements OnInit {
           observer.complete();
           return;
         }
-
-        observer.next(isJPG && isLt2M && dimensionRes);
-        observer.complete();
+        if (isJPG && isLt2M && dimensionRes) {
+          this.updateUserAvatarToServer(file);
+        }
       });
     });
   }
 
   /**
    *
-   * @param info - uploaded file info
+   *
+   * @param file - user's avatar that user want to update
    */
-  handleChange(info: { file: UploadFile }): void {
-    switch (info.file.status) {
-      case 'uploading':
-        this.isLoadingSpinnerShown = true;
-        const formData = new FormData();
-        formData.append('file', info.file.originFileObj);
-        // if image was not uploaded
-        if (!this.isImageUploaded) {
-          const uploadRootLocation = 'user';
-          const uploadFileUrl = `${Config.apiBaseUrl}/${Config.apiUploadManagementPrefix}/${Config.apiUploads}/${uploadRootLocation}`;
-          this.uploadImageService.uploadFile(uploadFileUrl, formData).subscribe(
-            (responseMessage: ResponseMessage) => {
-              if (responseMessage.message.localeCompare('failure') !== 0) {
-                this.savedAvatarUrl = responseMessage.message;
-                this.createNotification('success', 'Success', 'Your avatar was uploaded successfully');
-              } else if (responseMessage.message.localeCompare('failure') === 0) {
-                this.createNotification('error', 'Error', 'Cannot upload your avatar! Please try again!');
-              }
-              ImageValidator.getBase64(info.file.originFileObj, (img: string) => {
-                this.isLoadingSpinnerShown = false;
-                this.avatarUrl = img;
-              });
-            }
-          );
-          this.isImageUploaded = true;
+  private updateUserAvatarToServer(file: File) {
+    this.isLoadingSpinnerShown = true;
+    const formData = new FormData();
+    formData.append('file', file);
+    const uploadRootLocation = 'user';
+    const uploadFileUrl = `${Config.apiBaseUrl}/${Config.apiUploadManagementPrefix}/${Config.apiUploads}/${uploadRootLocation}`;
+    this.uploadImageService.uploadFile(uploadFileUrl, formData).subscribe(
+      (responseMessage: ResponseMessage) => {
+        if (responseMessage.message.localeCompare('failure') !== 0) {
+          this.savedAvatarUrl = responseMessage.message;
+          this.selectedUserProfile.avatar = this.savedAvatarUrl;
+          this.createNotification('success', 'Success', 'Your avatar was uploaded successfully');
+        } else if (responseMessage.message.localeCompare('failure') === 0) {
+          this.createNotification('error', 'Error', 'Cannot upload your avatar! Please try again!');
         }
-        break;
-    }
+        ImageValidator.getBase64(file, (img: string) => {
+          this.isLoadingSpinnerShown = false;
+          this.avatarUrl = img;
+        });
+      }
+    );
   }
 
   /**
@@ -195,10 +175,7 @@ export class UserInformationComponent implements OnInit {
    */
   private changeNormalAccountInformation() {
     this.isLoadingSpinnerShown = true;
-    const updatedUserName = this.f.userName.value;
-    const updatedFullName = this.f.fullName.value;
-    this.selectedUserAccount.userName = updatedUserName;
-    this.selectedUserProfile.fullName = updatedFullName;
+    this.selectedUserProfile.fullName = this.f.fullName.value;
     const updateUserAccountUrl = `${Config.apiBaseUrl}/${Config.apiUserManagementPrefix}/${Config.apiUserAccounts}`;
     this.userAccountService.updateUserAccount(updateUserAccountUrl, this.selectedUserAccount)
       .subscribe((userAccount: UserAccount) => {
@@ -220,8 +197,9 @@ export class UserInformationComponent implements OnInit {
           this.selectedUserProfile = userProfile;
           this.isLoadingSpinnerShown = false;
           this.createNotification('success', 'Success', 'Your profile was updated successfully');
+        } else {
+          this.createNotification('error', 'Error', 'Failure to update your profile');
         }
-        this.createNotification('error', 'Error', 'Failure to update your profile');
       });
   }
 
@@ -241,7 +219,6 @@ export class UserInformationComponent implements OnInit {
       .subscribe(selectedUserAccount => {
         if (selectedUserAccount) {
           this.selectedUserAccount = selectedUserAccount;
-          this.f.userName.setValue(this.selectedUserAccount.userName);
         } else {
           this.router.navigate((['/client']));
         }

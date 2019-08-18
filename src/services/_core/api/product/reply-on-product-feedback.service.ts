@@ -21,9 +21,7 @@ export class ReplyOnProductFeedbackService {
    * @param url - url that will be used to get replies on product's feedback
    */
   public getRepliesOnProductFeedback(url: string): Observable<ReplyOnProductFeedback[]> {
-    return this.http.get<ReplyOnProductFeedback[]>(url, httpOptions).pipe(
-      tap((repliesOnProductFeedback: ReplyOnProductFeedback[]) => console.log(JSON.stringify(repliesOnProductFeedback)))
-    );
+    return this.http.get<ReplyOnProductFeedback[]>(url, httpOptions);
   }
 
   /**
@@ -32,9 +30,7 @@ export class ReplyOnProductFeedbackService {
    * @param replyOnProductFeedback - reply on product's feedback that will be added
    */
   public addReplyOnProductFeedback(url: string, replyOnProductFeedback: ReplyOnProductFeedback): Observable<ReplyOnProductFeedback> {
-    return this.http.post<ReplyOnProductFeedback>(url, replyOnProductFeedback, httpOptions).pipe(
-      tap((insertedReplyOnProductFeedback: ReplyOnProductFeedback) => console.log(JSON.stringify(insertedReplyOnProductFeedback)))
-    );
+    return this.http.post<ReplyOnProductFeedback>(url, replyOnProductFeedback, httpOptions);
   }
 
   /**
@@ -43,8 +39,6 @@ export class ReplyOnProductFeedbackService {
    * @param replyOnProductFeedback - reply on product's feedback that will be updated
    */
   public updateReplyOnProductFeedback(url: string, replyOnProductFeedback: ReplyOnProductFeedback): Observable<ReplyOnProductFeedback> {
-    return this.http.put<ReplyOnProductFeedback>(url, replyOnProductFeedback, httpOptions).pipe(
-      tap((updatedReplyOnProductFeedback: ReplyOnProductFeedback) => console.log(JSON.stringify(updatedReplyOnProductFeedback)))
-    );
+    return this.http.put<ReplyOnProductFeedback>(url, replyOnProductFeedback, httpOptions);
   }
 }

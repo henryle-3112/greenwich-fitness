@@ -41,7 +41,7 @@ export class CoachInformationComponent implements OnInit {
   selectedUserProfile: UserProfile;
   isHireCoachRequestSent: boolean;
   selectedMembership: Membership;
-  isRelationshipBetweenUserAndCoachExixted: boolean;
+  isRelationshipBetweenUserAndCoachExisted: boolean;
 
   /**
    *
@@ -142,10 +142,10 @@ ${Config.apiMemberships}`;
       .subscribe((selectedMembership: Membership) => {
         if (selectedMembership) {
           this.selectedMembership = selectedMembership;
-          this.isRelationshipBetweenUserAndCoachExixted = this.selectedMembership.status === 1;
+          this.isRelationshipBetweenUserAndCoachExisted = this.selectedMembership.status === 1;
           this.checkUserSentRequestToCoach();
         } else {
-          this.isRelationshipBetweenUserAndCoachExixted = false;
+          this.isRelationshipBetweenUserAndCoachExisted = false;
           this.checkUserSentRequestToCoach();
         }
       });
@@ -407,10 +407,10 @@ ${Config.apiCoachFeedbackReactions}`;
       selectedCoachFeedback.numberOfDislikes -= 1;
     }
     selectedCoachFeedback.numberOfLikes += 1;
-    selectedCoachFeedback.isLikeClicked = true;
-    selectedCoachFeedback.isReacted = true;
     // update number of likes of selected coach's feedback
     this.updateCoachFeedback(selectedCoachFeedback);
+    selectedCoachFeedback.isLikeClicked = true;
+    selectedCoachFeedback.isReacted = true;
     this.submitNewCoachFeedbackReaction(selectedCoachFeedback, 1);
   }
 
@@ -426,10 +426,10 @@ ${Config.apiCoachFeedbackReactions}`;
       selectedCoachFeedback.numberOfLikes -= 1;
     }
     selectedCoachFeedback.numberOfDislikes += 1;
-    selectedCoachFeedback.isLikeClicked = false;
-    selectedCoachFeedback.isReacted = true;
     // update number of dislikes of selected coach's feedback
     this.updateCoachFeedback(selectedCoachFeedback);
+    selectedCoachFeedback.isLikeClicked = false;
+    selectedCoachFeedback.isReacted = true;
     this.submitNewCoachFeedbackReaction(selectedCoachFeedback, 0);
   }
 
@@ -440,9 +440,7 @@ ${Config.apiCoachFeedbackReactions}`;
   private updateCoachFeedback(selectedCoachFeedback: CoachFeedback) {
     const updateCoachFeedbackUrl = `${Config.apiBaseUrl}/${Config.apiCoachManagementPrefix}/${Config.apiCoachFeedbacks}`;
     this.coachFeedbackService.updateCoachFeedback(updateCoachFeedbackUrl, selectedCoachFeedback)
-      .subscribe((updatedCoachFeedback: CoachFeedback) => {
-        console.log(updatedCoachFeedback);
-      });
+      .subscribe();
   }
 
   /**
@@ -457,11 +455,7 @@ ${Config.apiCoachFeedbackReactions}`;
     newCoachFeedbackReaction.reaction = reactionValue;
     const addCoachFeedbackReactionUrl = `${Config.apiBaseUrl}/${Config.apiCoachManagementPrefix}/${Config.apiCoachFeedbackReactions}`;
     this.coachFeedbackReactionService.addCoachFeedbackReaction(addCoachFeedbackReactionUrl, newCoachFeedbackReaction)
-      .subscribe((insertedCoachFeedbackReaction: CoachFeedbackReaction) => {
-        if (insertedCoachFeedbackReaction) {
-          console.log(insertedCoachFeedbackReaction);
-        }
-      });
+      .subscribe();
   }
 
   /**
@@ -549,10 +543,10 @@ ${Config.apiReplyOnCoachFeedbackReactions}`;
       selectedReplyOnCoachFeedback.numberOfDislikes -= 1;
     }
     selectedReplyOnCoachFeedback.numberOfLikes += 1;
-    selectedReplyOnCoachFeedback.isLikeClicked = true;
-    selectedReplyOnCoachFeedback.isReacted = true;
     // update number of likes of reply on coach's feedback
     this.updateReplyOnCoachFeedback(selectedReplyOnCoachFeedback);
+    selectedReplyOnCoachFeedback.isLikeClicked = true;
+    selectedReplyOnCoachFeedback.isReacted = true;
     this.submitNewReplyCoachFeedbackReaction(selectedReplyOnCoachFeedback, 1);
   }
 
@@ -568,10 +562,10 @@ ${Config.apiReplyOnCoachFeedbackReactions}`;
       selectedReplyOnCoachFeedback.numberOfLikes -= 1;
     }
     selectedReplyOnCoachFeedback.numberOfDislikes += 1;
-    selectedReplyOnCoachFeedback.isLikeClicked = false;
-    selectedReplyOnCoachFeedback.isReacted = true;
     // update number of dislikes of reply on coach's feedback
     this.updateReplyOnCoachFeedback(selectedReplyOnCoachFeedback);
+    selectedReplyOnCoachFeedback.isLikeClicked = false;
+    selectedReplyOnCoachFeedback.isReacted = true;
     this.submitNewReplyCoachFeedbackReaction(selectedReplyOnCoachFeedback, 0);
   }
 
@@ -582,9 +576,7 @@ ${Config.apiReplyOnCoachFeedbackReactions}`;
   private updateReplyOnCoachFeedback(selectedReplyOnCoachFeedback: ReplyOnCoachFeedback) {
     const updateReplyOnCoachFeedbackUrl = `${Config.apiBaseUrl}/${Config.apiCoachManagementPrefix}/${Config.apiRepliesOnCoachFeedback}`;
     this.replyOnCoachFeedbackService.updateReplyOnCoachFeedback(updateReplyOnCoachFeedbackUrl, selectedReplyOnCoachFeedback)
-      .subscribe((updatedReplyOnCoachFeedback: ReplyOnCoachFeedback) => {
-        console.log(updatedReplyOnCoachFeedback);
-      });
+      .subscribe();
   }
 
   /**
@@ -602,11 +594,7 @@ ${Config.apiCoachManagementPrefix}/
 ${Config.apiReplyOnCoachFeedbackReactions}`;
     this.replyOnCoachFeedbackReactionService
       .addNewReplyOnCoachFeedbackReaction(addReplyOnCoachFeedbackReactionUrl, newReplyOnCoachFeedbackReaction)
-      .subscribe((insertedReplyOnCoachFeedbackReaction: ReplyOnCoachFeedbackReaction) => {
-        if (insertedReplyOnCoachFeedbackReaction) {
-          console.log(insertedReplyOnCoachFeedbackReaction);
-        }
-      });
+      .subscribe();
   }
 
   /**
@@ -644,17 +632,15 @@ ${Config.apiReplyOnCoachFeedbackReactions}`;
     newReplyOnCoachFeedback.userProfile = this.selectedUserProfile;
     newReplyOnCoachFeedback.numberOfLikes = 0;
     newReplyOnCoachFeedback.numberOfDislikes = 0;
+    selectedCoachFeedback.numberOfReplies += 1;
+    // update number of replies of selected coach's feedback
+    this.updateCoachFeedback(selectedCoachFeedback);
     const addReplyOnCoachFeedbackUrl = `${Config.apiBaseUrl}/${Config.apiCoachManagementPrefix}/${Config.apiRepliesOnCoachFeedback}`;
     this.replyOnCoachFeedbackService.addReplyOnCoachFeedback(addReplyOnCoachFeedbackUrl, newReplyOnCoachFeedback)
-      .subscribe((insertedReplyOnCoachFeedback: ReplyOnCoachFeedback) => {
-        if (insertedReplyOnCoachFeedback) {
-          console.log(insertedReplyOnCoachFeedback);
-        }
-      });
+      .subscribe();
     if (selectedCoachFeedback.replies && selectedCoachFeedback.replies.length) {
       selectedCoachFeedback.replies.push(newReplyOnCoachFeedback);
     }
-    selectedCoachFeedback.numberOfReplies += 1;
   }
 
   /**

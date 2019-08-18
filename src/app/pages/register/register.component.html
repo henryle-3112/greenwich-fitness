@@ -18,7 +18,6 @@
           nzListType="picture-card"
           [nzShowUploadList]="false"
           [nzBeforeUpload]="beforeUpload"
-          (nzChange)="handleChange($event)"
         >
           <ng-container *ngIf="!avatarUrl">
             <i class="upload-icon" nz-icon [nzType]="isLoadingSpinnerShown ? 'loading' : 'plus'"></i>

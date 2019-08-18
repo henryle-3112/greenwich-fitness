@@ -23,11 +23,7 @@ export class ReplyOnCoachFeedbackReactionService {
    * @param url - url that will be used to get reactions of replies on coach's feedback
    */
   public getReplyOnCoachFeedbackReactions(url: string): Observable<ReplyOnCoachFeedbackReaction[]> {
-    return this.http.get<ReplyOnCoachFeedbackReaction[]>(url, httpOptions).pipe(
-      tap((replyOnCoachFeedbackReactions: ReplyOnCoachFeedbackReaction[]) => {
-        console.log(JSON.stringify(replyOnCoachFeedbackReactions));
-      })
-    );
+    return this.http.get<ReplyOnCoachFeedbackReaction[]>(url, httpOptions);
   }
 
   /**
@@ -37,10 +33,6 @@ export class ReplyOnCoachFeedbackReactionService {
    */
   public addNewReplyOnCoachFeedbackReaction(url: string, replyOnCoachFeedbackReaction: ReplyOnCoachFeedbackReaction)
     : Observable<ReplyOnCoachFeedbackReaction> {
-    return this.http.post<ReplyOnCoachFeedbackReaction>(url, replyOnCoachFeedbackReaction, httpOptions).pipe(
-      tap(
-        (insertedReplyOnCoachFeedbackReaction: ReplyOnCoachFeedbackReaction) =>
-          console.log(JSON.stringify(insertedReplyOnCoachFeedbackReaction)))
-    );
+    return this.http.post<ReplyOnCoachFeedbackReaction>(url, replyOnCoachFeedbackReaction, httpOptions);
   }
 }

@@ -65,8 +65,6 @@ export class ProductDetailComponent implements OnInit {
   ngOnInit(): void {
     this.initData();
     this.getSelectedProduct();
-    this.getSelectedUserProfile();
-    this.getSelectedProductRate();
   }
 
   /**
@@ -74,8 +72,8 @@ export class ProductDetailComponent implements OnInit {
    */
   private initData(): void {
     this.selectedProductQuantity = 1;
-    this.currentProductFeedbacksPage = 1;
-    this.nProductFeedbacksPerPage = 8;
+    this.currentProductFeedbacksPage = Config.currentPage;
+    this.nProductFeedbacksPerPage = Config.numberItemsPerPage;
   }
 
   /**
@@ -87,6 +85,7 @@ export class ProductDetailComponent implements OnInit {
       .subscribe(selectedProduct => {
         if (selectedProduct) {
           this.selectedProduct = selectedProduct;
+          this.getSelectedUserProfile();
           this.getProductFeedbacksByProduct();
         } else {
           this.router.navigate(['/shop/home']);
@@ -104,6 +103,7 @@ export class ProductDetailComponent implements OnInit {
       .subscribe(selectedUserProfile => {
         if (selectedUserProfile) {
           this.selectedUserProfile = selectedUserProfile;
+          this.getSelectedProductRate();
         } else {
           this.router.navigate(['/shop/home']);
         }
@@ -351,10 +351,10 @@ ${Config.apiProductFeedbackReactions}`;
       selectedProductFeedback.numberOfDislikes -= 1;
     }
     selectedProductFeedback.numberOfLikes += 1;
-    selectedProductFeedback.isLikeClicked = true;
-    selectedProductFeedback.isReacted = true;
     // update number of likes of selected product's feedback
     this.updateProductFeedback(selectedProductFeedback);
+    selectedProductFeedback.isLikeClicked = true;
+    selectedProductFeedback.isReacted = true;
     this.submitNewProductFeedbackReaction(selectedProductFeedback, 1);
   }
 
@@ -370,10 +370,10 @@ ${Config.apiProductFeedbackReactions}`;
       selectedProductFeedback.numberOfLikes -= 1;
     }
     selectedProductFeedback.numberOfDislikes += 1;
-    selectedProductFeedback.isLikeClicked = false;
-    selectedProductFeedback.isReacted = true;
     // update number of dislikes of selected product's feedback
     this.updateProductFeedback(selectedProductFeedback);
+    selectedProductFeedback.isLikeClicked = false;
+    selectedProductFeedback.isReacted = true;
     this.submitNewProductFeedbackReaction(selectedProductFeedback, 0);
   }
 
@@ -383,10 +383,7 @@ ${Config.apiProductFeedbackReactions}`;
    */
   private updateProductFeedback(selectedProductFeedback: ProductFeedback): void {
     const updateProductFeedbackUrl = `${Config.apiBaseUrl}/${Config.apiProductManagementPrefix}/${Config.apiProductFeedbacks}`;
-    this.productFeedbackService.updateProductFeedback(updateProductFeedbackUrl, selectedProductFeedback)
-      .subscribe((updatedProductFeedback: ProductFeedback) => {
-        console.log(updatedProductFeedback);
-      });
+    this.productFeedbackService.updateProductFeedback(updateProductFeedbackUrl, selectedProductFeedback).subscribe();
   }
 
   /**
@@ -401,11 +398,7 @@ ${Config.apiProductFeedbackReactions}`;
     newProductFeedbackReaction.reaction = reactionValue;
     const addProductFeedbackReactionUrl = `${Config.apiBaseUrl}/${Config.apiProductManagementPrefix}/${Config.apiProductFeedbackReactions}`;
     this.productFeedbackReactionService.addNewProductFeedbackReaction(addProductFeedbackReactionUrl, newProductFeedbackReaction)
-      .subscribe((insertedProductFeedbackReaction: ProductFeedbackReaction) => {
-        if (insertedProductFeedbackReaction) {
-          console.log(insertedProductFeedbackReaction);
-        }
-      });
+      .subscribe();
   }
 
   /**
@@ -493,10 +486,10 @@ ${Config.apiReplyOnProductFeedbackReaction}`;
       selectedReplyOnProductFeedback.numberOfDislikes -= 1;
     }
     selectedReplyOnProductFeedback.numberOfLikes += 1;
-    selectedReplyOnProductFeedback.isLikeClicked = true;
-    selectedReplyOnProductFeedback.isReacted = true;
     // update number of likes of reply on product's feedback
     this.updateReplyOnProductFeedback(selectedReplyOnProductFeedback);
+    selectedReplyOnProductFeedback.isLikeClicked = true;
+    selectedReplyOnProductFeedback.isReacted = true;
     this.submitNewReplyProductFeedbackReaction(selectedReplyOnProductFeedback, 1);
   }
 
@@ -512,10 +505,10 @@ ${Config.apiReplyOnProductFeedbackReaction}`;
       selectedReplyOnProductFeedback.numberOfLikes -= 1;
     }
     selectedReplyOnProductFeedback.numberOfDislikes += 1;
-    selectedReplyOnProductFeedback.isLikeClicked = false;
-    selectedReplyOnProductFeedback.isReacted = true;
     // update number of dislikes of reply on product's feedback
     this.updateReplyOnProductFeedback(selectedReplyOnProductFeedback);
+    selectedReplyOnProductFeedback.isLikeClicked = false;
+    selectedReplyOnProductFeedback.isReacted = true;
     this.submitNewReplyProductFeedbackReaction(selectedReplyOnProductFeedback, 0);
   }
 
@@ -524,9 +517,7 @@ ${Config.apiReplyOnProductFeedbackReaction}`;
 ${Config.apiProductManagementPrefix}/
 ${Config.apiRepliesOnProductFeedback}`;
     this.replyOnProductFeedbackService.updateReplyOnProductFeedback(updateReplyOnProductFeedbackUrl, selectedReplyOnProductFeedback)
-      .subscribe((updatedReplyOnProductFeedback: ReplyOnProductFeedback) => {
-        console.log(updatedReplyOnProductFeedback);
-      });
+      .subscribe();
   }
 
   /**
@@ -545,11 +536,7 @@ ${Config.apiProductManagementPrefix}/
 ${Config.apiReplyOnProductFeedbackReaction}`;
     this.replyOnProductFeedbackReactionService
       .addReplyOnProductFeedbackReaction(addReplyProductFeedbackReactionUrl, newReplyOnProductFeedbackReaction)
-      .subscribe((insertedReplyOnProductFeedbackReaction: ReplyOnProductFeedbackReaction) => {
-        if (insertedReplyOnProductFeedbackReaction) {
-          console.log(insertedReplyOnProductFeedbackReaction);
-        }
-      });
+      .subscribe();
   }
 
   /**
@@ -586,15 +573,12 @@ ${Config.apiReplyOnProductFeedbackReaction}`;
     newReplyOnProductFeedback.numberOfDislikes = 0;
     const addReplyOnProductFeedbackUrl = `${Config.apiBaseUrl}/${Config.apiProductManagementPrefix}/${Config.apiRepliesOnProductFeedback}`;
     this.replyOnProductFeedbackService.addReplyOnProductFeedback(addReplyOnProductFeedbackUrl, newReplyOnProductFeedback)
-      .subscribe((insertedReplyOnProductFeedback: ReplyOnProductFeedback) => {
-        if (insertedReplyOnProductFeedback) {
-          console.log(insertedReplyOnProductFeedback);
-        }
-      });
+      .subscribe();
+    selectedProductFeedback.numberOfReplies += 1;
+    this.updateProductFeedback(selectedProductFeedback);
     if (selectedProductFeedback.replies && selectedProductFeedback.replies.length) {
       selectedProductFeedback.replies.push(newReplyOnProductFeedback);
     }
-    selectedProductFeedback.numberOfReplies += 1;
   }
 
   /**
@@ -642,7 +626,7 @@ ${Config.apiReplyOnProductFeedbackReaction}`;
   private initShoppingCart(): void {
     const currentShoppingCart = [];
     const newProductShoppingCart = new ShoppingCart();
-    newProductShoppingCart.quantity = 1;
+    newProductShoppingCart.quantity = this.selectedProductQuantity;
     newProductShoppingCart.product = this.selectedProduct;
     currentShoppingCart.push(newProductShoppingCart);
     localStorage.setItem(Config.shoppingCart, JSON.stringify(currentShoppingCart));

@@ -76,10 +76,11 @@ export class ChangePasswordComponent implements OnInit {
    * @param updatedUserAccount - updated user-account's account to change password
    */
   resetUserPassword(updatedUserAccount: UserAccount): void {
+    this.isLoadingSpinnerShown = true;
     const changePasswordUrl = `${Config.apiBaseUrl}/${Config.apiUserManagementPrefix}/${Config.apiChangeUserPassword}`;
     this.resetPasswordService.changePassword(changePasswordUrl, updatedUserAccount)
       .subscribe((responseMessage: ResponseMessage) => {
-        if (responseMessage.message.localeCompare('successfully') === 0) {
+        if (responseMessage.message.localeCompare('success') === 0) {
           this.createNotification('success', 'Success', 'Your password was changed successfully');
         } else {
           this.createNotification('error', 'Error', 'Your password cannot be changed');

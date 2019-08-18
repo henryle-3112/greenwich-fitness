@@ -122,10 +122,9 @@ ${selectedCoachId}?
 ${Config.trainingDateParameter}=${trainingDate}`;
     this.trainingService.getTrainings(getTrainingsUrl)
       .subscribe(response => {
-        console.log(response);
         if (response) {
-          // this.showStatusButtonForEachTraining();
-          // this.trainings = trainings;
+          this.showStatusButtonForEachTraining(response.body);
+          this.trainings = response.body;
         } else {
           this.router.navigate(['/client']);
         }
@@ -138,27 +137,24 @@ ${Config.trainingDateParameter}=${trainingDate}`;
    * @param trainings - trainings that will be set status button (1 is start, -1 is not done)
    */
   private showStatusButtonForEachTraining(trainings: Training[]): void {
-    // check start button start should be activated or not
-    // assume all exercises are not done
-    let isAllNotDone = true, isAllDone = true;
+    let isAllTrainingNotDone = true;
     let i = 0;
     while (i < trainings.length) {
-      if (i !== trainings.length - 1 && trainings[i].status === 1 && trainings[i + 1].status === -1) {
-        isAllNotDone = false;
+      if (trainings[i].status === 1) {
+        isAllTrainingNotDone = false;
         trainings[i].statusButton = 1;
-        trainings[i + 1].statusButton = 0;
-        i = i + 2;
-      } else if (trainings[i].status === -1) {
+      } else if (trainings[i].status === 2) {
+        isAllTrainingNotDone = false;
+        trainings[i].statusButton = 0;
+      } else if (trainings[i].status === -1 && i !== 0 && trainings[i - 1].status === 1) {
+        trainings[i].statusButton = 0;
+      } else {
         trainings[i].statusButton = -1;
-        isAllDone = false;
-        i = i + 1;
-      } else if (trainings[i].status === 1) {
-        isAllNotDone = false;
-        trainings[i].statusButton = 1;
-        i = i + 1;
       }
+      i++;
     }
-    if (isAllNotDone || !isAllDone) {
+    // if all trainings are not done, the first training will be activated
+    if (isAllTrainingNotDone) {
       trainings[0].statusButton = 0;
     }
   }

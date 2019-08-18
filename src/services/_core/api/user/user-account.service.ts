@@ -29,6 +29,6 @@ export class UserAccountService {
    * @param userAccount - user's account that will be updated
    */
   public updateUserAccount(url: string, userAccount: UserAccount): Observable<UserAccount> {
-    return this.http.post<UserAccount>(url, userAccount, httpOptions);
+    return this.http.put<UserAccount>(url, userAccount, httpOptions);
   }
 }

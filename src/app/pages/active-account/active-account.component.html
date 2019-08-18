@@ -7,8 +7,8 @@
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
   <!-- message -->
-  <h1 *ngIf="!isActivated && !isLoadingSpinnerShown" class="message">Your account is activating</h1>
-  <h1 *ngIf="isActivated && !isLoadingSpinnerShown" class="message">Your account is activated</h1>
+  <h1 *ngIf="!isActivated && !isLoadingSpinnerShown" class="message">Failure to active your account! Please try again!</h1>
+  <h1 *ngIf="isActivated && !isLoadingSpinnerShown" class="message">Your account is activated!</h1>
   <div align="center" *ngIf="!isLoadingSpinnerShown">
     <button nz-button [nzType]="'primary'" (click)="goToLogin();">Go to Log In</button>
   </div>

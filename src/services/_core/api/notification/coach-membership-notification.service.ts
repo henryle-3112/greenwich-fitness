@@ -2,11 +2,14 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {CoachMembershipNotification} from '@gw-models/core';
-import {tap} from 'rxjs/operators';
 
-const httpOptions = {
+const httpFullOptions = {
   headers: new HttpHeaders({'Content-Type': 'application/json'}),
   observe: 'response' as 'body'
+};
+
+const httpOptions = {
+  headers: new HttpHeaders({'Content-Type': 'application/json'})
 };
 
 @Injectable({
@@ -22,9 +25,7 @@ export class CoachMembershipNotificationService {
    * @param url - url that will be get coach membership notifications
    */
   public getCoachMembershipNotifications(url: string): Observable<HttpResponse<CoachMembershipNotification[]>> {
-    return this.http.get<HttpResponse<CoachMembershipNotification[]>>(url, httpOptions).pipe(
-      tap(response => console.log(response))
-    );
+    return this.http.get<HttpResponse<CoachMembershipNotification[]>>(url, httpFullOptions);
   }
 
   /**
@@ -34,11 +35,7 @@ export class CoachMembershipNotificationService {
    */
   public addCoachMembershipNotification(url: string, coachMembershipNotification: CoachMembershipNotification):
     Observable<CoachMembershipNotification> {
-    return this.http.post<CoachMembershipNotification>(url, coachMembershipNotification, httpOptions).pipe(
-      tap((insertedCoachMembershipNotification: CoachMembershipNotification) => {
-        console.log(JSON.stringify(insertedCoachMembershipNotification));
-      })
-    );
+    return this.http.post<CoachMembershipNotification>(url, coachMembershipNotification, httpOptions);
   }
 
   /**
@@ -48,11 +45,7 @@ export class CoachMembershipNotificationService {
    */
   public updateCoachMembershipNotification(url: string, coachMembershipNotification: CoachMembershipNotification):
     Observable<CoachMembershipNotification> {
-    return this.http.put<CoachMembershipNotification>(url, coachMembershipNotification, httpOptions).pipe(
-      tap((updatedCoachMembershipNotification: CoachMembershipNotification) => {
-        console.log(JSON.stringify(updatedCoachMembershipNotification));
-      })
-    );
+    return this.http.put<CoachMembershipNotification>(url, coachMembershipNotification, httpOptions);
   }
 
   /**
@@ -60,8 +53,6 @@ export class CoachMembershipNotificationService {
    * @param url - url that will be used to get coach membership notification
    */
   public getCoachMembershipNotification(url: string): Observable<CoachMembershipNotification> {
-    return this.http.get<CoachMembershipNotification>(url, httpOptions).pipe(
-      tap((coachMembershipNotification: CoachMembershipNotification) => console.log(JSON.stringify(coachMembershipNotification)))
-    );
+    return this.http.get<CoachMembershipNotification>(url, httpOptions);
   }
 }

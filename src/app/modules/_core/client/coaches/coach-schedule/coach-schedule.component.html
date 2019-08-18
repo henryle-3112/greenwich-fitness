@@ -30,7 +30,7 @@
     (nzPageIndexChange)="trainingsPageChange($event)"></nz-pagination>
   <!-- end pagination -->
 
-  <div id="expired-message" *ngIf="isRelationshipBetweenUserAndCoachExpired || selectedMembership.status == 0">
+  <div id="expired-message" *ngIf="isRelationshipBetweenUserAndCoachExpired || (selectedMembership && selectedMembership.status == 0)">
     *(30 days is over, You need to pay for {{ selectedMembership.coach.userProfile.fullName }}.
     Therefore, you cannot receive training schedule right now)
   </div>

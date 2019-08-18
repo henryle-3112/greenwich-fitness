@@ -6,8 +6,7 @@
   <!-- end loading component -->
 
   <!-- login form -->
-  <form nz-form [formGroup]="loginForm" [ngClass]="{'login-form': true, 'opacity-loading': isLoadingSpinnerShown}"
-        (ngSubmit)="submitForm()">
+  <form nz-form [formGroup]="loginForm" [ngClass]="{'login-form': true, 'opacity-loading': isLoadingSpinnerShown}">
     <h1 align="center">Login</h1>
     <nz-form-item>
       <nz-form-control>
@@ -37,15 +36,15 @@
     <nz-form-item>
       <nz-form-control>
         <a class="login-form-forgot float-left" routerLink="/forgot-password">Forgot password</a>
-        <button nz-button class="login-form-button" [nzType]="'primary'">Log in</button>
+        <button nz-button class="login-form-button" [nzType]="'primary'" (click)="submitForm()">Log in</button>
         <div class="clear-both"></div>
         Or
         <a href="">login with...</a>
-        <button nz-button class="login-form-button" [nzType]="'primary'" ngClass="facebook-background"
+        <button nz-button [nzType]="'primary'" ngClass="facebook-background"
                 (click)="loginByFacebook()">Facebook
         </button>
-        <button nz-button class="login-form-button" [nzType]="'primary'" ngClass="google-background"
-                id="google-sign-in-button" (click)="showLoading();">Google
+        <button nz-button [nzType]="'primary'" ngClass="google-background"
+                id="google-sign-in-button" (click)="loginByGoogle();">Google
         </button>
         Or
         <a routerLink="/register">register now!</a>

@@ -47,7 +47,7 @@ ${Config.apiMusics}?
 ${Config.statusParameter}=${musicStatus}&
 ${Config.pageParameter}=${this.currentMusicsPage}`;
     if (this.musicTitleKeywords.localeCompare('') !== 0) {
-      getMusicsUrl += `?${Config.searchParameter}=${this.musicTitleKeywords.toLowerCase()}`;
+      getMusicsUrl += `&${Config.searchParameter}=${this.musicTitleKeywords.toLowerCase()}`;
     }
     this.isLoadingSpinnerShown = true;
     this.musicService.getMusics(getMusicsUrl)

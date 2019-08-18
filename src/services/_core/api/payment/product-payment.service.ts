@@ -1,7 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {ProductPayment} from '@gw-models/core';
-import {tap} from 'rxjs/operators';
 
 const httpOptions = {
   headers: new HttpHeaders({'Content-Type': 'application/json'})
@@ -21,8 +20,6 @@ export class ProductPaymentService {
    * @param productPayment - product payment that will be added
    */
   public addProductPayment(url: string, productPayment: ProductPayment) {
-    return this.http.post<ProductPayment>(url, productPayment, httpOptions).pipe(
-      tap((insertedProductPayment: ProductPayment) => console.log(insertedProductPayment))
-    );
+    return this.http.post<ProductPayment>(url, productPayment, httpOptions);
   }
 }

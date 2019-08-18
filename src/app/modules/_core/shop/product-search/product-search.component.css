@@ -20,6 +20,33 @@
 /* responsive css */
 
 
+
+@keyframes TranslateYOut{
+  0%{
+    transform: rotate(0deg) translateY(0%);
+  }
+  100%{
+    transform: rotate(0deg) translateY(-3%);
+  }
+}
+
+@keyframes TranslateYIn{
+  0%{
+    transform: rotate(0deg) translateY(-3%);
+  }
+  100%{
+    transform: rotate(0deg) translateY(0%);
+  }
+}
+
+.product-item{
+  animation: TranslateYIn 1s forwards 0s ease;
+}
+
+.product-item:hover {
+  animation: TranslateYOut 1s forwards 0s ease;
+}
+
 @media (min-width:320px)  {
   /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
 

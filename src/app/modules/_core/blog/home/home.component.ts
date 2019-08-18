@@ -143,6 +143,8 @@ ${Config.statusParameter}=${postCategoryStatus}`;
       this.router.navigate(['/blog/contact']);
     } else if (selectedPostCategory.postCategoryName.localeCompare('Home') === 0) {
       this.router.navigate([`/blog/home`]);
+    } else if (selectedPostCategory.postCategoryName.localeCompare('Feed') === 0) {
+      this.router.navigate(['/client/feed']);
     } else {
       this.sharePostCategoryService.changePostCategory(selectedPostCategory);
       this.router.navigate([`/blog/category/${selectedPostCategory.postCategoryMetaTitle}`]);

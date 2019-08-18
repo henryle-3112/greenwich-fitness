@@ -1,6 +1,5 @@
 import {Gallery} from '@gw-models/core';
 import {Observable} from 'rxjs';
-import {tap} from 'rxjs/operators';
 import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -24,8 +23,6 @@ export class GalleryService {
    * @param url - url that will be used to get galleries
    */
   public getGalleries(url): Observable<HttpResponse<Gallery[]>> {
-    return this.http.get<HttpResponse<Gallery[]>>(url, httpOptions).pipe(
-      tap(response => console.log(response))
-    );
+    return this.http.get<HttpResponse<Gallery[]>>(url, httpOptions);
   }
 }
