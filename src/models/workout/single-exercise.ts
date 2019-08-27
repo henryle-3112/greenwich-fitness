@@ -1,4 +1,4 @@
-import {Workout} from '@gw-models/core';
+import { Workout } from '@gw-models/core';
 
 export class SingleExercise {
   slug?: string;

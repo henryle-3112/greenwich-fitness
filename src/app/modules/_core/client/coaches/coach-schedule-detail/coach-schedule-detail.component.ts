@@ -1,16 +1,16 @@
-import {Component, OnInit} from '@angular/core';
-import {Coach, DetailedRounds, SingleExercise, Training, UserProfile, Workout, WorkoutExercise} from '@gw-models/core';
-import {ShareMembershipScheduleService} from '@gw-services/core/shared/membership-schedule/share-membership-schedule.service';
-import {Router} from '@angular/router';
-import {TrainingService} from '@gw-services/core/api/training/training.service';
-import {ShareCoachService} from '@gw-services/core/shared/coach/share-coach.service';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
-import {ReadLocalJsonService} from '@gw-services/core/api/read-local-json/read-local-json.service';
-import {Config} from '@gw-config/core';
-import {ShareSingleExerciseService} from '@gw-services/core/shared/single-exercise/share-single-exercise.service';
-import {NzNotificationService} from 'ng-zorro-antd';
-import {ShareWorkoutService} from '@gw-services/core/shared/workout/share-workout.service';
-import {ShareTrainingService} from '@gw-services/core/shared/training/share-training.service';
+import { Component, OnInit } from '@angular/core';
+import { Coach, DetailedRounds, SingleExercise, Training, UserProfile, Workout, WorkoutExercise } from '@gw-models/core';
+import { ShareMembershipScheduleService } from '@gw-services/core/shared/membership-schedule/share-membership-schedule.service';
+import { Router } from '@angular/router';
+import { TrainingService } from '@gw-services/core/api/training/training.service';
+import { ShareCoachService } from '@gw-services/core/shared/coach/share-coach.service';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { ReadLocalJsonService } from '@gw-services/core/api/read-local-json/read-local-json.service';
+import { Config } from '@gw-config/core';
+import { ShareSingleExerciseService } from '@gw-services/core/shared/single-exercise/share-single-exercise.service';
+import { NzNotificationService } from 'ng-zorro-antd';
+import { ShareWorkoutService } from '@gw-services/core/shared/workout/share-workout.service';
+import { ShareTrainingService } from '@gw-services/core/shared/training/share-training.service';
 
 @Component({
   selector: 'app-coach-schedule-detail',
@@ -39,15 +39,15 @@ export class CoachScheduleDetailComponent implements OnInit {
    * @param router - inject router
    */
   constructor(private shareMembershipScheduleService: ShareMembershipScheduleService,
-              private shareSingleExerciseService: ShareSingleExerciseService,
-              private shareWorkoutService: ShareWorkoutService,
-              private readLocalJson: ReadLocalJsonService,
-              private shareCoachService: ShareCoachService,
-              private shareUserProfileService: ShareUserProfileService,
-              private trainingService: TrainingService,
-              private notification: NzNotificationService,
-              private shareTrainingService: ShareTrainingService,
-              private router: Router) {
+    private shareSingleExerciseService: ShareSingleExerciseService,
+    private shareWorkoutService: ShareWorkoutService,
+    private readLocalJson: ReadLocalJsonService,
+    private shareCoachService: ShareCoachService,
+    private shareUserProfileService: ShareUserProfileService,
+    private trainingService: TrainingService,
+    private notification: NzNotificationService,
+    private shareTrainingService: ShareTrainingService,
+    private router: Router) {
   }
 
   ngOnInit(): void {

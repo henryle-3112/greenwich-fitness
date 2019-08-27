@@ -1,11 +1,11 @@
-import {NgModule} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {LoadingComponent} from './loading/loading.component';
-import {ForgotPasswordComponent} from './forgot-password/forgot-password.component';
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { LoadingComponent } from './loading/loading.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 
-import {NgZorroAntdModule} from 'ng-zorro-antd';
+import { NgZorroAntdModule } from 'ng-zorro-antd';
 
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FacebookLikeComponent } from './facebook-like/facebook-like.component';
 import { TwitterShareComponent } from './twitter-share/twitter-share.component';
 import { PinterestShareComponent } from './pinterest-share/pinterest-share.component';

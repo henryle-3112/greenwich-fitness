@@ -1,12 +1,23 @@
 <!--suppress ALL -->
-<div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;">
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
   <!-- loading component -->
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- search box-->
-  <nz-input-group [nzSuffix]="suffixIconSearch" [ngClass]="{'mg-bottom-24': true, 'width-50': true}">
-    <input type="text" nz-input placeholder="Name..." #searchBox  (keyup.enter)="searchExercise(searchBox.value)"/>
+  <nz-input-group
+    [nzSuffix]="suffixIconSearch"
+    [ngClass]="{ 'mg-bottom-24': true, 'width-50': true }"
+  >
+    <input
+      type="text"
+      nz-input
+      placeholder="Name..."
+      #searchBox
+      (keyup.enter)="searchExercise(searchBox.value)"
+    />
   </nz-input-group>
   <ng-template #suffixIconSearch>
     <i nz-icon type="search"></i>
@@ -14,16 +25,26 @@
   <!-- end search box -->
 
   <!-- custom list -->
-  <nz-list [nzDataSource]="singleExercisesPerPage" [nzRenderItem]="item" [nzItemLayout]="'horizontal'"
-           [ngClass]="{'opacity-loading': isLoadingSpinnerShown, 'mg-bottom-24': true}">
+  <nz-list
+    [nzDataSource]="singleExercisesPerPage"
+    [nzRenderItem]="item"
+    [nzItemLayout]="'horizontal'"
+    [ngClass]="{
+      'opacity-loading': isLoadingSpinnerShown,
+      'mg-bottom-24': true
+    }"
+  >
     <ng-template #item let-item>
-      <nz-list-item>
+      <nz-list-item
+        (click)="goToExerciseDetail(item)"
+        class="single-exercise-item"
+      >
         <nz-list-item-meta
           [nzTitle]="nzTitle"
           nzAvatar="{{ item.smallMobileRetinaPictureUrl }}"
         >
           <ng-template #nzTitle>
-            <span (click)="goToExerciseDetail(item)">{{ item.title }}</span>
+            <span>{{ item.title }}</span>
           </ng-template>
         </nz-list-item-meta>
       </nz-list-item>
@@ -37,6 +58,7 @@
     [nzPageSize]="nSingleExercisesPerPage"
     [nzTotal]="totalSingleExercises"
     [nzSize]="'small'"
-    (nzPageIndexChange)="exercisePageChange($event)"></nz-pagination>
+    (nzPageIndexChange)="exercisePageChange($event)"
+  ></nz-pagination>
   <!-- end pagination -->
 </div>

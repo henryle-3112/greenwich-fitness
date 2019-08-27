@@ -1,13 +1,25 @@
 <!--suppress ALL -->
-<div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
-     [ngClass]="{'opacity-loading': isLoadingSpinnerShown}">
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+  [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+>
   <!-- loading component -->
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- search box-->
-  <nz-input-group *ngIf="coachMembershipNotifications && coachMembershipNotifications.length" [nzSuffix]="suffixIconSearch" [ngClass]="{'mg-bottom-24': true, 'width-50': true}">
-    <input type="text" nz-input placeholder="Name..." #searchBox (keyup.enter)="searchNotifications(searchBox.value)"/>
+  <nz-input-group
+    *ngIf="coachMembershipNotifications && coachMembershipNotifications.length"
+    [nzSuffix]="suffixIconSearch"
+    [ngClass]="{ 'mg-bottom-24': true, 'width-50': true }"
+  >
+    <input
+      type="text"
+      nz-input
+      placeholder="Name..."
+      #searchBox
+      (keyup.enter)="searchNotifications(searchBox.value)"
+    />
   </nz-input-group>
   <ng-template #suffixIconSearch>
     <i nz-icon type="search"></i>
@@ -15,8 +27,16 @@
   <!-- end search box -->
 
   <!-- custom list -->
-  <nz-list [nzDataSource]="coachMembershipNotifications" [nzRenderItem]="item" [nzItemLayout]="'horizontal'"
-           *ngIf="coachMembershipNotifications && coachMembershipNotifications.length && !isLoadingSpinnerShown">
+  <nz-list
+    [nzDataSource]="coachMembershipNotifications"
+    [nzRenderItem]="item"
+    [nzItemLayout]="'horizontal'"
+    *ngIf="
+      coachMembershipNotifications &&
+      coachMembershipNotifications.length &&
+      !isLoadingSpinnerShown
+    "
+  >
     <ng-template #item let-item>
       <nz-list-item>
         <nz-list-item-meta
@@ -26,20 +46,37 @@
         >
           <ng-template #nzTitle>
             <span>{{ item.content }}</span>
-            <div class="notification-created-date">{{ item.createdDate | date: 'MM/dd/yyyy' }}</div>
+            <div class="notification-created-date">
+              {{ item.createdDate | date: "MM/dd/yyyy" }}
+            </div>
           </ng-template>
           <ng-template #nzDescription>
             <!-- if user is a coach -->
             <div *ngIf="selectedCoach" class="notification-description">
               <div class="notification-actions" *ngIf="item.status == 0">
-                <button nz-button nzType="primary" (click)="acceptMembershipRequest(item);">Accept</button>
-                <button nz-button nzType="primary" class="decline-button" (click)="declinedMembershipRequest(item);">
+                <button
+                  nz-button
+                  nzType="primary"
+                  (click)="acceptMembershipRequest(item)"
+                >
+                  Accept
+                </button>
+                <button
+                  nz-button
+                  nzType="primary"
+                  class="decline-button"
+                  (click)="declinedMembershipRequest(item)"
+                >
                   Decline
                 </button>
               </div>
               <div class="status" *ngIf="item.status != 0">
-                <span *ngIf="item.status == 1 || item.status == 2">Status: <span class="status-accepted">Accepted</span></span>
-                <span *ngIf="item.status == -1">Status: <span class="status-declined">Declined</span></span>
+                <span *ngIf="item.status == 1 || item.status == 2"
+                  >Status: <span class="status-accepted">Accepted</span></span
+                >
+                <span *ngIf="item.status == -1"
+                  >Status: <span class="status-declined">Declined</span></span
+                >
               </div>
               <div class="notify-message">
                 (*If you accepted or declined, you cannot change your decision)
@@ -48,11 +85,23 @@
             <!-- if user is a normal user -->
             <div *ngIf="!selectedCoach">
               <div class="status">
-                <span *ngIf="item.status == 2">Status: <span class="status-accepted">Pay</span></span>
-                <span *ngIf="item.status == 0">Status: <span class="status-pending">Pending</span></span>
-                <button nz-button nzType="primary" *ngIf="item.status == 1" (click)="paymentForCoach(item);">Payment
+                <span *ngIf="item.status == 2"
+                  >Status: <span class="status-accepted">Pay</span></span
+                >
+                <span *ngIf="item.status == 0"
+                  >Status: <span class="status-pending">Pending</span></span
+                >
+                <button
+                  nz-button
+                  nzType="primary"
+                  *ngIf="item.status == 1"
+                  (click)="showVoucherModal(item)"
+                >
+                  Payment
                 </button>
-                <span *ngIf="item.status == -1">Status: <span class="status-declined">Declined</span></span>
+                <span *ngIf="item.status == -1"
+                  >Status: <span class="status-declined">Declined</span></span
+                >
               </div>
             </div>
           </ng-template>
@@ -69,6 +118,83 @@
     [nzPageSize]="nNotificationsPerPage"
     [nzTotal]="totalTrainingNotifications"
     [nzSize]="'small'"
-    (nzPageIndexChange)="notificationsPageChange($event)"></nz-pagination>
+    (nzPageIndexChange)="notificationsPageChange($event)"
+  ></nz-pagination>
   <!-- end pagination -->
+
+  <!-- voucher modal -->
+  <nz-modal
+    [(nzVisible)]="isVoucherModalShown"
+    nzTitle="Volume"
+    (nzOnCancel)="handleCancelVoucherModal()"
+    (nzOnOk)="handleConfirmVoucherModal()"
+  >
+    <!-- loading component -->
+    <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+    <!-- end loading component -->
+
+    <!-- search box-->
+    <nz-input-group
+      *ngIf="userGifts && userGifts.length"
+      [nzSuffix]="suffixIconSearch"
+      [ngClass]="{ 'mg-bottom-24': true, 'width-50': true }"
+    >
+      <input
+        type="text"
+        nz-input
+        placeholder="Name..."
+        #searchBox
+        (keyup.enter)="searchUserGift(searchBox.value)"
+      />
+    </nz-input-group>
+    <ng-template #suffixIconSearch>
+      <i nz-icon type="search"></i>
+    </ng-template>
+    <!-- end search box -->
+
+    <!-- custom list -->
+    <nz-list
+      [nzDataSource]="userGifts"
+      [nzRenderItem]="item"
+      [nzItemLayout]="'horizontal'"
+    >
+      <ng-template #item let-item>
+        <nz-list-item>
+          <nz-list-item-meta
+            [nzTitle]="nzTitle"
+            nzAvatar="{{ item.image }}"
+            [nzDescription]="nzDescription"
+          >
+            <ng-template #nzTitle>
+              <span>{{ item.name }}</span>
+            </ng-template>
+            <ng-template #nzDescription>
+              <span>{{ item.point }} points</span> <br />
+              <button
+                nz-button
+                [nzType]="'primary'"
+                class="mg-top-12"
+                (click)="useGift(item)"
+              >
+                Use
+              </button>
+            </ng-template>
+          </nz-list-item-meta>
+        </nz-list-item>
+      </ng-template>
+    </nz-list>
+    <!-- end custom list-->
+
+    <!-- pagination -->
+    <nz-pagination
+      *ngIf="userGifts && userGifts.length"
+      [nzPageIndex]="currentUserGiftsPage"
+      [nzPageSize]="nUserGiftsPerPage"
+      [nzTotal]="totalUserGifts"
+      [nzSize]="'small'"
+      (nzPageIndexChange)="userGiftsPageChange($event)"
+    ></nz-pagination>
+    <!-- end pagination -->
+  </nz-modal>
+  <!-- end voucher modal-->
 </div>

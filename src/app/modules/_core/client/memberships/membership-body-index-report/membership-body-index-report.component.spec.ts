@@ -8,9 +8,9 @@ describe('MembershipBodyIndexReportComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ MembershipBodyIndexReportComponent ]
+      declarations: [MembershipBodyIndexReportComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

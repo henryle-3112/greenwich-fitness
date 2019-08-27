@@ -19,7 +19,6 @@
 
 /* responsive css */
 
-
 @media (min-width: 320px) {
   /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
   .post-item {
@@ -32,7 +31,6 @@
   .post-item {
     margin-bottom: 24px;
   }
-
 }
 
 /*@media screen and (min-width: 600px) , screen and (max-width: 800px) {*/
@@ -44,7 +42,6 @@
   .post-item {
     margin-bottom: 24px;
   }
-
 }
 
 @media (min-width: 801px) {
@@ -52,7 +49,6 @@
   .post-item {
     margin-bottom: 24px;
   }
-
 }
 
 @media (min-width: 1025px) {
@@ -60,7 +56,6 @@
   .post-item {
     margin-bottom: 0;
   }
-
 }
 
 @media (min-width: 1281px) {

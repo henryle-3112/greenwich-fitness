@@ -1,11 +1,11 @@
-import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {CustomValidator} from '@gw-services/core/validate/custom-validator';
-import {ResetPasswordService} from '@gw-services/core/api/user/reset-password.service';
-import {ResponseMessage} from '@gw-models/core';
-import {NzNotificationService} from 'ng-zorro-antd';
-import {Router} from '@angular/router';
-import {Config} from '@gw-config/core';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CustomValidator } from '@gw-services/core/validate/custom-validator';
+import { ResetPasswordService } from '@gw-services/core/api/user/reset-password.service';
+import { ResponseMessage } from '@gw-models/core';
+import { NzNotificationService } from 'ng-zorro-antd';
+import { Router } from '@angular/router';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-forgot-password',
@@ -88,7 +88,7 @@ export class ForgotPasswordComponent implements OnInit {
   validateEmail(): void {
     if (this.f.email.value.toString().localeCompare('') === 0) {
       this.f.email.markAsTouched();
-      this.f.email.setErrors({'required': true});
+      this.f.email.setErrors({ 'required': true });
     }
   }
 

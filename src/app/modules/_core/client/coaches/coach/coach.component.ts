@@ -1,9 +1,9 @@
-import {Component, OnInit} from '@angular/core';
-import {Coach} from '@gw-models/core';
-import {CoachService} from '@gw-services/core/api/coach/coach.service';
-import {ShareCoachService} from '@gw-services/core/shared/coach/share-coach.service';
-import {Config} from '@gw-config/core';
-import {Router} from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Coach } from '@gw-models/core';
+import { CoachService } from '@gw-services/core/api/coach/coach.service';
+import { ShareCoachService } from '@gw-services/core/shared/coach/share-coach.service';
+import { Config } from '@gw-config/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-coach',
@@ -25,8 +25,8 @@ export class CoachComponent implements OnInit {
    * @param router - inject router
    */
   constructor(private coachService: CoachService,
-              private shareCoachService: ShareCoachService,
-              private router: Router) {
+    private shareCoachService: ShareCoachService,
+    private router: Router) {
   }
 
   /**

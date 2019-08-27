@@ -1,11 +1,11 @@
-import {AfterViewInit, Component, Input, OnInit} from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-twitter-share',
   templateUrl: './twitter-share.component.html',
   styleUrls: ['./twitter-share.component.css']
 })
-export class TwitterShareComponent implements OnInit, AfterViewInit  {
+export class TwitterShareComponent implements OnInit, AfterViewInit {
 
   @Input() url = location.href;
   @Input() text = '';
@@ -22,7 +22,7 @@ export class TwitterShareComponent implements OnInit, AfterViewInit  {
 
   ngAfterViewInit(): void {
     // render tweet button
-    window['twttr'] && window['twttr'].widgets.load();
+    // window['twttr'] && window['twttr'].widgets.load();
   }
 
   ngOnInit(): void {

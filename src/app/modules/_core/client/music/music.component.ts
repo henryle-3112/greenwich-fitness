@@ -1,8 +1,8 @@
-import {Component, OnInit} from '@angular/core';
-import {Music} from '@gw-models/core';
-import {Config} from '@gw-config/core';
-import {MusicService} from '@gw-services/core/api/music/music.service';
-import {ShareMusicService} from '@gw-services/core/shared/music/share-music.service';
+import { Component, OnInit } from '@angular/core';
+import { Music } from '@gw-models/core';
+import { Config } from '@gw-config/core';
+import { MusicService } from '@gw-services/core/api/music/music.service';
+import { ShareMusicService } from '@gw-services/core/shared/music/share-music.service';
 
 @Component({
   selector: 'app-music',
@@ -19,11 +19,11 @@ export class MusicComponent implements OnInit {
 
   /**
    *
-   * @param musicService - inject music service to interact with music's data
-   * @param shareMusicService - inject share music service to share seledted music to other component
+   * @param musicService - inject musicService
+   * @param shareMusicService - inject shareMusicService
    */
   constructor(private musicService: MusicService,
-              private shareMusicService: ShareMusicService) {
+    private shareMusicService: ShareMusicService) {
   }
 
   /**

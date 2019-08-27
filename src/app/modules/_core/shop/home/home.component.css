@@ -101,7 +101,6 @@ nz-footer {
 
 /* end service footer css */
 
-
 @media (min-width: 320px) {
   /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
   /* header css */
@@ -169,7 +168,6 @@ nz-footer {
   .footer-content {
     padding-left: 0;
   }
-
 }
 
 /*@media screen and (min-width: 600px) , screen and (max-width: 800px) {*/
@@ -211,7 +209,6 @@ nz-footer {
   .footer-content {
     padding-left: 0;
   }
-
 }
 
 @media (min-width: 801px) {
@@ -249,7 +246,6 @@ nz-footer {
   .footer-content {
     padding-left: 0;
   }
-
 }
 
 @media (min-width: 1025px) {
@@ -292,7 +288,6 @@ nz-footer {
   .footer-content {
     padding-left: 24px;
   }
-
 }
 
 @media (min-width: 1281px) {
@@ -347,6 +342,3 @@ nz-footer {
   margin-top: 24px;
 }
 /* end footer css */
-
-
-

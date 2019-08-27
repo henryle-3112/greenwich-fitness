@@ -1,12 +1,12 @@
-import {Component, OnInit} from '@angular/core';
-import {Config} from '@gw-config/core';
-import {ProductOrder, ProductOrderDetail, ShoppingCart, UserProfile} from '@gw-models/core';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
-import {ProductOrderService} from '@gw-services/core/api/product/product-order.service';
-import {ProductOrderDetailService} from '@gw-services/core/api/product/product-order-detail.service';
-import {NzNotificationService} from 'ng-zorro-antd';
-import {PaymentService} from '@gw-services/core/api/payment/payment.service';
-import {Router} from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { Config } from '@gw-config/core';
+import { ProductOrder, ProductOrderDetail, ShoppingCart, UserProfile } from '@gw-models/core';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { ProductOrderService } from '@gw-services/core/api/product/product-order.service';
+import { ProductOrderDetailService } from '@gw-services/core/api/product/product-order-detail.service';
+import { NzNotificationService } from 'ng-zorro-antd';
+import { PaymentService } from '@gw-services/core/api/payment/payment.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-shopping-cart',
@@ -30,11 +30,11 @@ export class ShoppingCartComponent implements OnInit {
    * @param notification - inject notification
    */
   constructor(private shareUserProfileService: ShareUserProfileService,
-              private router: Router,
-              private paymentService: PaymentService,
-              private productOrderService: ProductOrderService,
-              private productOrderDetailService: ProductOrderDetailService,
-              private notification: NzNotificationService) {
+    private router: Router,
+    private paymentService: PaymentService,
+    private productOrderService: ProductOrderService,
+    private productOrderDetailService: ProductOrderDetailService,
+    private notification: NzNotificationService) {
   }
 
   ngOnInit(): void {

@@ -1,7 +1,7 @@
-import {Component, OnInit} from '@angular/core';
-import {AboutService} from '@gw-services/core/api/about/about.service';
-import {About} from '@gw-models/core';
-import {Config} from '@gw-config/core';
+import { Component, OnInit } from '@angular/core';
+import { AboutService } from '@gw-services/core/api/about/about.service';
+import { About } from '@gw-models/core';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-about',

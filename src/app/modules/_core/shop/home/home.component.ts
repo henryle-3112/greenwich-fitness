@@ -1,30 +1,30 @@
-import {Component, HostListener, OnInit} from '@angular/core';
-import {ProductSlideService} from '@gw-services/core/api/product/product-slide.service';
-import {FacebookAccount, GoogleAccount, ProductCategory, ProductSlide, UserAccount} from '@gw-models/core';
-import {ProductCategoryService} from '@gw-services/core/api/product/product-category.service';
-import {ShareProductCategoryService} from '@gw-services/core/shared/product-category/share-product-category.service';
-import {Router} from '@angular/router';
-import {animate, style, transition, trigger} from '@angular/animations';
-import {Config} from '@gw-config/core';
-import {ShareMessageService} from '@gw-services/core/shared/message/share-message.service';
-import {AuthenticationService} from '@gw-services/core/authentication/authentication.service';
-import {UserAccountService} from '@gw-services/core/api/user/user-account.service';
-import {FacebookAccountService} from '@gw-services/core/api/user/facebook-account.service';
-import {GoogleAccountService} from '@gw-services/core/api/user/google-account.service';
-import {ShareUserAccountService} from '@gw-services/core/shared/user-account/share-user-account.service';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { ProductSlideService } from '@gw-services/core/api/product/product-slide.service';
+import { FacebookAccount, GoogleAccount, ProductCategory, ProductSlide, UserAccount } from '@gw-models/core';
+import { ProductCategoryService } from '@gw-services/core/api/product/product-category.service';
+import { ShareProductCategoryService } from '@gw-services/core/shared/product-category/share-product-category.service';
+import { Router } from '@angular/router';
+import { animate, style, transition, trigger } from '@angular/animations';
+import { Config } from '@gw-config/core';
+import { ShareMessageService } from '@gw-services/core/shared/message/share-message.service';
+import { AuthenticationService } from '@gw-services/core/authentication/authentication.service';
+import { UserAccountService } from '@gw-services/core/api/user/user-account.service';
+import { FacebookAccountService } from '@gw-services/core/api/user/facebook-account.service';
+import { GoogleAccountService } from '@gw-services/core/api/user/google-account.service';
+import { ShareUserAccountService } from '@gw-services/core/shared/user-account/share-user-account.service';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
 
 @Component({
   selector: 'app-home',
   animations: [
     trigger('fadeInAnimation', [
       transition(':enter', [
-        style({opacity: 0}),
-        animate(200, style({opacity: 1}))
+        style({ opacity: 0 }),
+        animate(200, style({ opacity: 1 }))
       ]),
       transition(':leave', [
-        style({opacity: 1}),
-        animate(200, style({opacity: 0}))
+        style({ opacity: 1 }),
+        animate(200, style({ opacity: 0 }))
       ])
 
     ])
@@ -62,16 +62,16 @@ export class HomeComponent implements OnInit {
    * @param shareUserProfileService - inject shareUserProfileService
    */
   constructor(private productSlideService: ProductSlideService,
-              private productCategoryService: ProductCategoryService,
-              private shareProductCategoryService: ShareProductCategoryService,
-              private router: Router,
-              private shareMessageService: ShareMessageService,
-              private authentication: AuthenticationService,
-              private userAccountService: UserAccountService,
-              private facebookAccountService: FacebookAccountService,
-              private googleAccountService: GoogleAccountService,
-              private shareUserAccountService: ShareUserAccountService,
-              private shareUserProfileService: ShareUserProfileService) {
+    private productCategoryService: ProductCategoryService,
+    private shareProductCategoryService: ShareProductCategoryService,
+    private router: Router,
+    private shareMessageService: ShareMessageService,
+    private authentication: AuthenticationService,
+    private userAccountService: UserAccountService,
+    private facebookAccountService: FacebookAccountService,
+    private googleAccountService: GoogleAccountService,
+    private shareUserAccountService: ShareUserAccountService,
+    private shareUserProfileService: ShareUserProfileService) {
   }
 
   ngOnInit(): void {

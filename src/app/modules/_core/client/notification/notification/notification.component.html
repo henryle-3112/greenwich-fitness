@@ -1,14 +1,25 @@
 <!--suppress ALL -->
-<div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
-     [ngClass]="{'opacity-loading': isLoadingSpinnerShown}">
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+  [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+>
   <!-- loading component -->
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- search box-->
-  <nz-input-group *ngIf="notifications && notifications.length" [nzSuffix]="suffixIconSearch"
-                  [ngClass]="{'mg-bottom-24': true, 'width-50': true}">
-    <input type="text" nz-input placeholder="Name..." #searchBox (keyup.enter)="searchNotifications(searchBox.value)"/>
+  <nz-input-group
+    *ngIf="notifications && notifications.length"
+    [nzSuffix]="suffixIconSearch"
+    [ngClass]="{ 'mg-bottom-24': true, 'width-50': true }"
+  >
+    <input
+      type="text"
+      nz-input
+      placeholder="Name..."
+      #searchBox
+      (keyup.enter)="searchNotifications(searchBox.value)"
+    />
   </nz-input-group>
   <ng-template #suffixIconSearch>
     <i nz-icon type="search"></i>
@@ -16,12 +27,14 @@
   <!-- end search box -->
 
   <!-- custom list -->
-  <nz-list [nzDataSource]="notifications" [nzRenderItem]="item" [nzItemLayout]="'horizontal'">
+  <nz-list
+    [nzDataSource]="notifications"
+    [nzRenderItem]="item"
+    [nzItemLayout]="'horizontal'"
+  >
     <ng-template #item let-item>
       <nz-list-item>
-        <nz-list-item-meta
-          [nzTitle]="nzTitle"
-        >
+        <nz-list-item-meta [nzTitle]="nzTitle">
           <ng-template #nzTitle>
             <span>{{ item.content }}</span>
           </ng-template>
@@ -38,6 +51,7 @@
     [nzPageSize]="nNotificationsPerPage"
     [nzTotal]="totalNotification"
     [nzSize]="'small'"
-    (nzPageIndexChange)="notificationsPageChange($event)"></nz-pagination>
+    (nzPageIndexChange)="notificationsPageChange($event)"
+  ></nz-pagination>
   <!-- end pagination -->
 </div>

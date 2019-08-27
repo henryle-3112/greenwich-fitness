@@ -1,6 +1,8 @@
 <!--suppress ALL -->
-<nz-layout class="height-auto" [ngClass]="{'opacity-loading': isLoadingSpinnerShown}">
-
+<nz-layout
+  class="height-auto"
+  [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+>
   <!-- loading component -->
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
@@ -13,8 +15,13 @@
       </p>
     </div>
     <ul nz-menu nzTheme="dark" nzMode="horizontal" class="horizontal-menu">
-      <li (click)="goToCategory(eachPostCategory)" nz-menu-item
-          *ngFor="let eachPostCategory of postCategories">{{ eachPostCategory.postCategoryName }}</li>
+      <li
+        (click)="goToCategory(eachPostCategory)"
+        nz-menu-item
+        *ngFor="let eachPostCategory of postCategories"
+      >
+        {{ eachPostCategory.postCategoryName }}
+      </li>
     </ul>
     <!-- icon to open dropdown menu -->
     <div class="menu-icon" (click)="openDropDownMenu($event)">
@@ -36,18 +43,37 @@
 
   <!-- main content -->
   <nz-content>
-
     <!-- col menu -->
-    <div nz-col class="gutter-row drop-down-menu" nzXs="24" nzSm="24" nzMd="24" nzLg="24" nzXl="24" [@fadeInAnimation]
-         *ngIf="isDropDownMenuOpened">
-      <div class="gutter-box" style="background-color: #fff; min-height: 280px; padding: 24px;">
+    <div
+      nz-col
+      class="gutter-row drop-down-menu"
+      nzXs="24"
+      nzSm="24"
+      nzMd="24"
+      nzLg="24"
+      nzXl="24"
+      [@fadeInAnimation]
+      *ngIf="isDropDownMenuOpened"
+    >
+      <div
+        class="gutter-box"
+        style="background-color: #fff; min-height: 280px; padding: 24px;"
+      >
         <h3>Menu</h3>
         <nz-divider></nz-divider>
         <ul nz-menu ngClass="none-border">
-          <a (click)="goToCategory(eachPostCategory)" class="link-color"
-             *ngFor="let eachPostCategory of postCategories">
-            <li style="z-index: 2; padding-left: 0;" nz-menu-item><span><span
-              class="nav-text">{{ eachPostCategory.postCategoryName }}</span></span></li>
+          <a
+            (click)="goToCategory(eachPostCategory)"
+            class="link-color"
+            *ngFor="let eachPostCategory of postCategories"
+          >
+            <li style="z-index: 2; padding-left: 0;" nz-menu-item>
+              <span
+                ><span class="nav-text">{{
+                  eachPostCategory.postCategoryName
+                }}</span></span
+              >
+            </li>
           </a>
         </ul>
       </div>
@@ -56,12 +82,28 @@
 
     <!-- carousel -->
     <div nz-row nzGutter="0">
-      <div nz-col class="gutter-row" nzXs="24" nzSm="24" nzMd="24" nzLg="24" nzXl="24">
+      <div
+        nz-col
+        class="gutter-row"
+        nzXs="24"
+        nzSm="24"
+        nzMd="24"
+        nzLg="24"
+        nzXl="24"
+      >
         <div class="gutter-box">
           <nz-carousel nzAutoPlay [nzEffect]="'fade'" [nzAutoPlaySpeed]="1000">
-            <div class="collection" nz-carousel-content *ngFor="let eachPostSlide of postSlides"
-                 [ngStyle]="{ 'background-image': 'url(' + eachPostSlide.postSlideImage + ')'}">
-              <h1 class="post-slide-title">{{ eachPostSlide.postSlideTitle | uppercase }}</h1>
+            <div
+              class="collection"
+              nz-carousel-content
+              *ngFor="let eachPostSlide of postSlides"
+              [ngStyle]="{
+                'background-image': 'url(' + eachPostSlide.postSlideImage + ')'
+              }"
+            >
+              <h1 class="post-slide-title">
+                {{ eachPostSlide.postSlideTitle | uppercase }}
+              </h1>
             </div>
           </nz-carousel>
         </div>
@@ -80,38 +122,84 @@
   <nz-footer class="footer">
     <div nz-row nzGutter="0">
       <!-- post categories footer -->
-      <div nz-col class="gutter-row" nzXs="24" nzSm="24" nzMd="8" nzLg="8" nzXl="8">
+      <div
+        nz-col
+        class="gutter-row"
+        nzXs="24"
+        nzSm="24"
+        nzMd="8"
+        nzLg="8"
+        nzXl="8"
+      >
         <h3 style="color: white; text-align: left;">Post Categories</h3>
         <ul style="list-style-type: none; padding-left: 0;">
-          <a (click)="goToCategory(eachPostCategory)"
-             *ngFor="let eachPostCategory of postCategoriesSelection">
+          <a
+            (click)="goToCategory(eachPostCategory)"
+            *ngFor="let eachPostCategory of postCategoriesSelection"
+          >
             <li
-              style="z-index: 2; padding-left: 0; text-align: left; color: white; height: 40px; line-height: 40px;"><span><span
-              class="nav-text">{{ eachPostCategory.postCategoryName }}</span></span></li>
+              style="z-index: 2; padding-left: 0; text-align: left; color: white; height: 40px; line-height: 40px;"
+            >
+              <span
+                ><span class="nav-text">{{
+                  eachPostCategory.postCategoryName
+                }}</span></span
+              >
+            </li>
           </a>
         </ul>
       </div>
       <!-- post categories footer-->
       <!-- post service footer -->
-      <div nz-col class="gutter-row service" nzXs="24" nzSm="24" nzMd="8" nzLg="8" nzXl="8">
+      <div
+        nz-col
+        class="gutter-row service"
+        nzXs="24"
+        nzSm="24"
+        nzMd="8"
+        nzLg="8"
+        nzXl="8"
+      >
         <h3 class="footer-title">Services</h3>
         <ul class="footer-content">
-          <a (click)="goToCategory(eachPostCategory)"
-             *ngFor="let eachPostCategory of notPostCategoriesSelection">
+          <a
+            (click)="goToCategory(eachPostCategory)"
+            *ngFor="let eachPostCategory of notPostCategoriesSelection"
+          >
             <li
-              style="z-index: 2; padding-left: 0; text-align: left; color: white; height: 40px; line-height: 40px;"><span><span
-              class="nav-text">{{ eachPostCategory.postCategoryName }}</span></span></li>
+              style="z-index: 2; padding-left: 0; text-align: left; color: white; height: 40px; line-height: 40px;"
+            >
+              <span
+                ><span class="nav-text">{{
+                  eachPostCategory.postCategoryName
+                }}</span></span
+              >
+            </li>
           </a>
         </ul>
       </div>
       <!-- end post service footer-->
       <!-- developer -->
-      <div nz-col class="gutter-row" nzXs="24" nzSm="24" nzMd="8" nzLg="8" nzXl="8">
+      <div
+        nz-col
+        class="gutter-row"
+        nzXs="24"
+        nzSm="24"
+        nzMd="8"
+        nzLg="8"
+        nzXl="8"
+      >
         <h3 class="footer-title">Copyright</h3>
         <ul class="footer-content">
           <li
-            style="z-index: 2; padding-left: 0; text-align: left; color: white; height: 40px; line-height: 40px;"><span><span
-            class="nav-text">Greenwich Fitness ©2019 Implement By Henry Le</span></span></li>
+            style="z-index: 2; padding-left: 0; text-align: left; color: white; height: 40px; line-height: 40px;"
+          >
+            <span
+              ><span class="nav-text"
+                >Greenwich Fitness ©2019 Implement By Henry Le</span
+              ></span
+            >
+          </li>
         </ul>
       </div>
       <!-- end developer-->
@@ -120,29 +208,46 @@
   <!-- end footer -->
 
   <!-- modal search -->
-  <nz-modal [(nzVisible)]="isSearchPostModalShown"
-            nzTitle="Search"
-            (nzOnCancel)="handleCancelSearchPostModal()"
-            (nzOnOk)="handleConfirmSearchPostModal()">
+  <nz-modal
+    [(nzVisible)]="isSearchPostModalShown"
+    nzTitle="Search"
+    (nzOnCancel)="handleCancelSearchPostModal()"
+    (nzOnOk)="handleConfirmSearchPostModal()"
+  >
     <!-- post's category selection -->
-    <h3 class="mg-bottom-24">Post Category: </h3>
-    <nz-select style="width: 200px;" class="mg-bottom-24" [(ngModel)]="selectedPostCategoryForSearching"
-               nzPlaceHolder="Choose Post Category">
-      <nz-option *ngFor="let eachPostCategory of postCategoriesSelection" nzValue="{{ eachPostCategory.id }}"
-                 nzLabel="{{ eachPostCategory.postCategoryName}}"></nz-option>
+    <h3 class="mg-bottom-24">Post Category:</h3>
+    <nz-select
+      style="width: 200px;"
+      class="mg-bottom-24"
+      [(ngModel)]="selectedPostCategoryForSearching"
+      nzPlaceHolder="Choose Post Category"
+    >
+      <nz-option
+        *ngFor="let eachPostCategory of postCategoriesSelection"
+        nzValue="{{ eachPostCategory.id }}"
+        nzLabel="{{ eachPostCategory.postCategoryName }}"
+      ></nz-option>
     </nz-select>
     <!-- end post's category selection -->
 
     <!-- post's name input -->
-    <h3 class="mg-bottom-24">Post Name: </h3>
-    <nz-input-group [nzSuffix]="suffixIconSearch" [ngClass]="{'mg-bottom-24': true}" style="width: 200px;">
-      <input [(ngModel)]="selectedPostNameForSearching" type="text" nz-input placeholder="Post Name..."/>
+    <h3 class="mg-bottom-24">Post Name:</h3>
+    <nz-input-group
+      [nzSuffix]="suffixIconSearch"
+      [ngClass]="{ 'mg-bottom-24': true }"
+      style="width: 200px;"
+    >
+      <input
+        [(ngModel)]="selectedPostNameForSearching"
+        type="text"
+        nz-input
+        placeholder="Post Name..."
+      />
     </nz-input-group>
     <ng-template #suffixIconSearch>
       <i nz-icon type="search"></i>
     </ng-template>
     <!-- end post's name input -->
-
   </nz-modal>
   <!-- end modal change repetitions -->
 </nz-layout>

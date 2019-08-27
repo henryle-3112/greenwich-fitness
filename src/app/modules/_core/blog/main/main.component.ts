@@ -1,10 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
-import {Post, PostCategory} from '@gw-models/core';
-import {SharePostCategoryService} from '@gw-services/core/shared/post-category/share-post-category.service';
-import {PostService} from '@gw-services/core/api/post/post.service';
-import {SharePostService} from '@gw-services/core/shared/post/share-post.service';
-import {Config} from '@gw-config/core';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { Post, PostCategory } from '@gw-models/core';
+import { SharePostCategoryService } from '@gw-services/core/shared/post-category/share-post-category.service';
+import { PostService } from '@gw-services/core/api/post/post.service';
+import { SharePostService } from '@gw-services/core/shared/post/share-post.service';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-main',
@@ -27,9 +27,9 @@ export class MainComponent implements OnInit {
    * @param sharePostCategoryService - inject sharePostCategoryService
    */
   constructor(private postService: PostService,
-              private router: Router,
-              private sharePostService: SharePostService,
-              private sharePostCategoryService: SharePostCategoryService) {
+    private router: Router,
+    private sharePostService: SharePostService,
+    private sharePostCategoryService: SharePostCategoryService) {
   }
 
   ngOnInit(): void {

@@ -1,14 +1,25 @@
 <!--suppress ALL -->
-<div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
-     [ngClass]="{'opacity-loading': isLoadingSpinnerShown}">
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+  [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+>
   <!-- loading component -->
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- search box-->
-  <nz-input-group [nzSuffix]="suffixIconSearch" [ngClass]="{'mg-bottom-24': true, 'width-50': true}"
-                  *ngIf="memberships && memberships.length">
-    <input type="text" nz-input placeholder="Name..." #searchBox (keyup.enter)="searchMembership(searchBox.value)"/>
+  <nz-input-group
+    [nzSuffix]="suffixIconSearch"
+    [ngClass]="{ 'mg-bottom-24': true, 'width-50': true }"
+    *ngIf="memberships && memberships.length"
+  >
+    <input
+      type="text"
+      nz-input
+      placeholder="Name..."
+      #searchBox
+      (keyup.enter)="searchMembership(searchBox.value)"
+    />
   </nz-input-group>
   <ng-template #suffixIconSearch>
     <i nz-icon type="search"></i>
@@ -16,9 +27,14 @@
   <!-- end search box -->
 
   <!-- custom list -->
-  <nz-list [nzDataSource]="memberships" [nzRenderItem]="item" [nzItemLayout]="'horizontal'" class="mg-bottom-24">
+  <nz-list
+    [nzDataSource]="memberships"
+    [nzRenderItem]="item"
+    [nzItemLayout]="'horizontal'"
+    class="mg-bottom-24"
+  >
     <ng-template #item let-item>
-      <nz-list-item (click)="goToMembershipDetail(item);">
+      <nz-list-item (click)="goToMembershipDetail(item)">
         <nz-list-item-meta
           [nzTitle]="nzTitle"
           nzAvatar="{{ item.userProfile.avatar }}"
@@ -39,6 +55,7 @@
     [nzPageSize]="nMembershipsPerPage"
     [nzTotal]="totalMemberships"
     [nzSize]="'small'"
-    (nzPageIndexChange)="membershipsPageChange($event)"></nz-pagination>
+    (nzPageIndexChange)="membershipsPageChange($event)"
+  ></nz-pagination>
   <!-- end pagination -->
 </div>

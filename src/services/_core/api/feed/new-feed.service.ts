@@ -1,11 +1,15 @@
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {NewFeed} from '@gw-models/core';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { NewFeed } from '@gw-models/core';
+
+const httpFullOptions = {
+  headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+  observe: 'response' as 'body'
+};
 
 const httpOptions = {
-  headers: new HttpHeaders({'Content-Type': 'application/json'}),
-  observe: 'response' as 'body'
+  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
 };
 
 @Injectable({
@@ -28,7 +32,7 @@ export class NewFeedService {
 
   /** GET: get new feeds by status and by page */
   public getNewFeeds(url): Observable<HttpResponse<NewFeed[]>> {
-    return this.http.get<HttpResponse<NewFeed[]>>(url, httpOptions);
+    return this.http.get<HttpResponse<NewFeed[]>>(url, httpFullOptions);
   }
 
   /**

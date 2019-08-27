@@ -8,9 +8,9 @@ describe('CoachAchievementComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CoachAchievementComponent ]
+      declarations: [CoachAchievementComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

@@ -1,30 +1,30 @@
-import {Component, HostListener, OnInit} from '@angular/core';
-import {animate, style, transition, trigger} from '@angular/animations';
-import {Config} from '@gw-config/core';
-import {FacebookAccount, GoogleAccount, PostCategory, PostSlide, UserAccount} from '@gw-models/core';
-import {Router} from '@angular/router';
-import {ShareMessageService} from '@gw-services/core/shared/message/share-message.service';
-import {UserAccountService} from '@gw-services/core/api/user/user-account.service';
-import {FacebookAccountService} from '@gw-services/core/api/user/facebook-account.service';
-import {AuthenticationService} from '@gw-services/core/authentication/authentication.service';
-import {GoogleAccountService} from '@gw-services/core/api/user/google-account.service';
-import {ShareUserAccountService} from '@gw-services/core/shared/user-account/share-user-account.service';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
-import {PostSlideService} from '@gw-services/core/api/post/post-slide.service';
-import {PostCategoryService} from '@gw-services/core/api/post/post-category.service';
-import {SharePostCategoryService} from '@gw-services/core/shared/post-category/share-post-category.service';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { animate, style, transition, trigger } from '@angular/animations';
+import { Config } from '@gw-config/core';
+import { FacebookAccount, GoogleAccount, PostCategory, PostSlide, UserAccount } from '@gw-models/core';
+import { Router } from '@angular/router';
+import { ShareMessageService } from '@gw-services/core/shared/message/share-message.service';
+import { UserAccountService } from '@gw-services/core/api/user/user-account.service';
+import { FacebookAccountService } from '@gw-services/core/api/user/facebook-account.service';
+import { AuthenticationService } from '@gw-services/core/authentication/authentication.service';
+import { GoogleAccountService } from '@gw-services/core/api/user/google-account.service';
+import { ShareUserAccountService } from '@gw-services/core/shared/user-account/share-user-account.service';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { PostSlideService } from '@gw-services/core/api/post/post-slide.service';
+import { PostCategoryService } from '@gw-services/core/api/post/post-category.service';
+import { SharePostCategoryService } from '@gw-services/core/shared/post-category/share-post-category.service';
 
 @Component({
   selector: 'app-home',
   animations: [
     trigger('fadeInAnimation', [
       transition(':enter', [
-        style({opacity: 0}),
-        animate(200, style({opacity: 1}))
+        style({ opacity: 0 }),
+        animate(200, style({ opacity: 1 }))
       ]),
       transition(':leave', [
-        style({opacity: 1}),
-        animate(200, style({opacity: 0}))
+        style({ opacity: 1 }),
+        animate(200, style({ opacity: 0 }))
       ])
 
     ])
@@ -61,16 +61,16 @@ export class HomeComponent implements OnInit {
    * @param shareUserProfileService - inject shareUserProfileService
    */
   constructor(private postSlideService: PostSlideService,
-              private postCategoryService: PostCategoryService,
-              private sharePostCategoryService: SharePostCategoryService,
-              private router: Router,
-              private shareMessageService: ShareMessageService,
-              private authentication: AuthenticationService,
-              private userAccountService: UserAccountService,
-              private facebookAccountService: FacebookAccountService,
-              private googleAccountService: GoogleAccountService,
-              private shareUserAccountService: ShareUserAccountService,
-              private shareUserProfileService: ShareUserProfileService) {
+    private postCategoryService: PostCategoryService,
+    private sharePostCategoryService: SharePostCategoryService,
+    private router: Router,
+    private shareMessageService: ShareMessageService,
+    private authentication: AuthenticationService,
+    private userAccountService: UserAccountService,
+    private facebookAccountService: FacebookAccountService,
+    private googleAccountService: GoogleAccountService,
+    private shareUserAccountService: ShareUserAccountService,
+    private shareUserProfileService: ShareUserProfileService) {
   }
 
   ngOnInit(): void {

@@ -1,12 +1,16 @@
-<div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;">
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
   <!-- loading component -->
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- select product order status -->
-  <nz-select style="width: 120px;"
-             [(ngModel)]="selectedProductOrderStatus"
-             (ngModelChange)="onProductOrderStatusChanged($event)">
+  <nz-select
+    style="width: 120px;"
+    [(ngModel)]="selectedProductOrderStatus"
+    (ngModelChange)="onProductOrderStatusChanged($event)"
+  >
     <nz-option nzValue="0" nzLabel="Not Done"></nz-option>
     <nz-option nzValue="1" nzLabel="Done"></nz-option>
     <nz-option nzValue="2" nzLabel="Processing"></nz-option>
@@ -16,15 +20,21 @@
   <!-- end select product order status-->
 
   <!-- custom list -->
-  <nz-list [nzDataSource]="productOrders" [nzRenderItem]="item" [nzItemLayout]="'horizontal'"
-           [ngClass]="{'opacity-loading': isLoadingSpinnerShown, 'mg-bottom-24': true, 'mg-top-24': true}">
+  <nz-list
+    [nzDataSource]="productOrders"
+    [nzRenderItem]="item"
+    [nzItemLayout]="'horizontal'"
+    [ngClass]="{
+      'opacity-loading': isLoadingSpinnerShown,
+      'mg-bottom-24': true,
+      'mg-top-24': true
+    }"
+  >
     <ng-template #item let-item>
       <nz-list-item (click)="goToBuyingHistoryDetail(item)">
-        <nz-list-item-meta
-          [nzTitle]="nzTitle"
-        >
+        <nz-list-item-meta [nzTitle]="nzTitle">
           <ng-template #nzTitle>
-            <span>{{ item.productOrderDate | date: 'MM/dd/yyyy'}}</span>
+            <span>{{ item.productOrderDate | date: "MM/dd/yyyy" }}</span>
           </ng-template>
         </nz-list-item-meta>
       </nz-list-item>
@@ -39,6 +49,7 @@
     [nzPageSize]="nProductOrdersPerPage"
     [nzTotal]="totalProductOrders"
     [nzSize]="'small'"
-    (nzPageIndexChange)="productOrdersPageChange($event)"></nz-pagination>
+    (nzPageIndexChange)="productOrdersPageChange($event)"
+  ></nz-pagination>
   <!-- end pagination -->
 </div>

@@ -1,10 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {ProductOrder, UserProfile} from '@gw-models/core';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
-import {Router} from '@angular/router';
-import {ProductOrderService} from '@gw-services/core/api/product/product-order.service';
-import {ShareProductOrderService} from '@gw-services/core/shared/order/share-product-order.service';
-import {Config} from '@gw-config/core';
+import { Component, OnInit } from '@angular/core';
+import { ProductOrder, UserProfile } from '@gw-models/core';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { Router } from '@angular/router';
+import { ProductOrderService } from '@gw-services/core/api/product/product-order.service';
+import { ShareProductOrderService } from '@gw-services/core/shared/order/share-product-order.service';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-buying-history',
@@ -28,9 +28,9 @@ export class BuyingHistoryComponent implements OnInit {
    * @param router - inject router
    */
   constructor(private shareUserProfileService: ShareUserProfileService,
-              private productOrderService: ProductOrderService,
-              private shareProductOrderService: ShareProductOrderService,
-              private router: Router) {
+    private productOrderService: ProductOrderService,
+    private shareProductOrderService: ShareProductOrderService,
+    private router: Router) {
   }
 
   ngOnInit(): void {

@@ -1,10 +1,10 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Post} from '@gw-models/core';
-import {Router} from '@angular/router';
-import {ShareMessageService} from '@gw-services/core/shared/message/share-message.service';
-import {Config} from '@gw-config/core';
-import {PostService} from '@gw-services/core/api/post/post.service';
-import {SharePostService} from '@gw-services/core/shared/post/share-post.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Post } from '@gw-models/core';
+import { Router } from '@angular/router';
+import { ShareMessageService } from '@gw-services/core/shared/message/share-message.service';
+import { Config } from '@gw-config/core';
+import { PostService } from '@gw-services/core/api/post/post.service';
+import { SharePostService } from '@gw-services/core/shared/post/share-post.service';
 
 @Component({
   selector: 'app-blog-search',
@@ -27,9 +27,9 @@ export class BlogSearchComponent implements OnInit, OnDestroy {
    * @param sharePostService - inject sharePostService
    */
   constructor(private postService: PostService,
-              private router: Router,
-              private shareMessageService: ShareMessageService,
-              private sharePostService: SharePostService) {
+    private router: Router,
+    private shareMessageService: ShareMessageService,
+    private sharePostService: SharePostService) {
   }
 
   ngOnInit(): void {

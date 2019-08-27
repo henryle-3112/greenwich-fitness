@@ -8,9 +8,9 @@ describe('CoachPaymentHistoryComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CoachPaymentHistoryComponent ]
+      declarations: [CoachPaymentHistoryComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

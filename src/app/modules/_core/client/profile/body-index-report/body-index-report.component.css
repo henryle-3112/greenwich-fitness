@@ -4,7 +4,6 @@
   margin-top: 24px;
 }
 
-
 /* end current weight css */
 
 /* line css */
@@ -23,3 +22,6 @@
 }
 /* end body index css*/
 
+.ic-edit-body-index:hover {
+  cursor: pointer;
+}

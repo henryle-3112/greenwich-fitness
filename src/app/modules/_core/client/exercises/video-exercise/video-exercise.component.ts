@@ -1,7 +1,7 @@
-import {Component, OnInit} from '@angular/core';
-import {ShareSingleExerciseService} from '@gw-services/core/shared/single-exercise/share-single-exercise.service';
-import {SingleExercise} from '@gw-models/core';
-import {Router} from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ShareSingleExerciseService } from '@gw-services/core/shared/single-exercise/share-single-exercise.service';
+import { SingleExercise } from '@gw-models/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-video-exercise',
@@ -18,7 +18,7 @@ export class VideoExerciseComponent implements OnInit {
    * @param router - inject router for routing
    */
   constructor(private shareSingleExercise: ShareSingleExerciseService,
-              private router: Router) {
+    private router: Router) {
   }
 
   /**

@@ -1,10 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {UserAchievement} from '@gw-models/core';
-import {UserAchievementService} from '@gw-services/core/api/user/user-achievement.service';
-import {UserAccountService} from '@gw-services/core/api/user/user-account.service';
-import {ShareCoachService} from '@gw-services/core/shared/coach/share-coach.service';
-import {Config} from '@gw-config/core';
-import {Router} from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { UserAchievement } from '@gw-models/core';
+import { UserAchievementService } from '@gw-services/core/api/user/user-achievement.service';
+import { UserAccountService } from '@gw-services/core/api/user/user-account.service';
+import { ShareCoachService } from '@gw-services/core/shared/coach/share-coach.service';
+import { Config } from '@gw-config/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-coach-achievement',
@@ -27,9 +27,9 @@ export class CoachAchievementComponent implements OnInit {
    * @param router - inject router
    */
   constructor(private userAchievementService: UserAchievementService,
-              private userAccountService: UserAccountService,
-              private shareCoachService: ShareCoachService,
-              private router: Router) {
+    private userAccountService: UserAccountService,
+    private shareCoachService: ShareCoachService,
+    private router: Router) {
   }
 
   /**

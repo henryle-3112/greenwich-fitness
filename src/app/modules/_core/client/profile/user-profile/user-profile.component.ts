@@ -1,10 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {Coach, UserProfile} from '@gw-models/core';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
-import {Router} from '@angular/router';
-import {CoachService} from '@gw-services/core/api/coach/coach.service';
-import {ShareCoachService} from '@gw-services/core/shared/coach/share-coach.service';
-import {Config} from '@gw-config/core';
+import { Component, OnInit } from '@angular/core';
+import { Coach, UserProfile } from '@gw-models/core';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { Router } from '@angular/router';
+import { CoachService } from '@gw-services/core/api/coach/coach.service';
+import { ShareCoachService } from '@gw-services/core/shared/coach/share-coach.service';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-user-profile',
@@ -23,9 +23,9 @@ export class UserProfileComponent implements OnInit {
    * @param router - inject router
    */
   constructor(private shareUserProfileService: ShareUserProfileService,
-              private shareCoachService: ShareCoachService,
-              private coachService: CoachService,
-              private router: Router) {
+    private shareCoachService: ShareCoachService,
+    private coachService: CoachService,
+    private router: Router) {
   }
 
   ngOnInit(): void {

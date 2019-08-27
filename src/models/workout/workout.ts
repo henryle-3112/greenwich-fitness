@@ -1,4 +1,4 @@
-import {DetailedRounds} from './detailed-rounds';
+import { DetailedRounds } from './detailed-rounds';
 
 export class Workout {
   slug?: string;

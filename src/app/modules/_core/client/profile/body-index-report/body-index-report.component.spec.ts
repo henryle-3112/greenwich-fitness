@@ -8,9 +8,9 @@ describe('BodyIndexReportComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ BodyIndexReportComponent ]
+      declarations: [BodyIndexReportComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

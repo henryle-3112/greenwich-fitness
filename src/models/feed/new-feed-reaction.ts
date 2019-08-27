@@ -1,4 +1,4 @@
-import {NewFeed, UserProfile} from '@gw-models/core';
+import { NewFeed, UserProfile } from '@gw-models/core';
 
 export class NewFeedReaction {
   id?: number;

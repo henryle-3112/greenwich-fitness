@@ -1,15 +1,15 @@
-import {Router} from '@angular/router';
-import {SignupService} from '@gw-services/core/api/user/signup.service';
-import {ResponseMessage, UserAccount, UserProfile} from '@gw-models/core';
-import {UploadImageService} from '@gw-services/core/api/upload-image/upload-image.service';
-import {ImageValidator} from '@gw-services/core/validate/image-validator';
-import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {CustomValidator} from '@gw-services/core/validate/custom-validator';
-import {NzNotificationService} from 'ng-zorro-antd';
-import {Observable, Observer} from 'rxjs';
-import {UserAccountStatus} from 'src/models/user/user-account-status';
-import {Config} from '@gw-config/core';
+import { Router } from '@angular/router';
+import { SignupService } from '@gw-services/core/api/user/signup.service';
+import { ResponseMessage, UserAccount, UserProfile } from '@gw-models/core';
+import { UploadImageService } from '@gw-services/core/api/upload-image/upload-image.service';
+import { ImageValidator } from '@gw-services/core/validate/image-validator';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CustomValidator } from '@gw-services/core/validate/custom-validator';
+import { NzNotificationService } from 'ng-zorro-antd';
+import { Observable, Observer } from 'rxjs';
+import { UserAccountStatus } from 'src/models/user/user-account-status';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-register',
@@ -31,10 +31,10 @@ export class RegisterComponent implements OnInit {
    * @param router - inject router
    */
   constructor(private fb: FormBuilder,
-              private notification: NzNotificationService,
-              private uploadImageService: UploadImageService,
-              private signUpService: SignupService,
-              private router: Router) {
+    private notification: NzNotificationService,
+    private uploadImageService: UploadImageService,
+    private signUpService: SignupService,
+    private router: Router) {
   }
 
   /**
@@ -142,7 +142,7 @@ export class RegisterComponent implements OnInit {
   validatePassword(): void {
     if (this.f.password.value.toString().localeCompare('') === 0) {
       this.f.password.markAsTouched();
-      this.f.password.setErrors({'required': true});
+      this.f.password.setErrors({ 'required': true });
     }
   }
 
@@ -152,7 +152,7 @@ export class RegisterComponent implements OnInit {
   validateEmail(): void {
     if (this.f.userName.value.toString().localeCompare('') === 0) {
       this.f.userName.markAsTouched();
-      this.f.userName.setErrors({'required': true});
+      this.f.userName.setErrors({ 'required': true });
     }
   }
 
@@ -162,7 +162,7 @@ export class RegisterComponent implements OnInit {
   validateName(): void {
     if (this.f.fullName.value.toString().localeCompare('') === 0) {
       this.f.fullName.markAsTouched();
-      this.f.fullName.setErrors({'required': true});
+      this.f.fullName.setErrors({ 'required': true });
     }
   }
 
@@ -172,7 +172,7 @@ export class RegisterComponent implements OnInit {
   validateConfirmPassword(): void {
     if (this.f.confirmPassword.value.toString().localeCompare('') === 0) {
       this.f.confirmPassword.markAsTouched();
-      this.f.confirmPassword.setErrors({'required': true});
+      this.f.confirmPassword.setErrors({ 'required': true });
     }
   }
 
@@ -182,7 +182,7 @@ export class RegisterComponent implements OnInit {
   checkKeyUpValidateConfirmPassword(): void {
     if (this.f.confirmPassword.value.toString().localeCompare(this.f.password.value.toString()) !== 0) {
       this.f.confirmPassword.markAsTouched();
-      this.f.confirmPassword.setErrors({'required': true});
+      this.f.confirmPassword.setErrors({ 'required': true });
     } else {
       this.f.confirmPassword.setErrors(null);
     }

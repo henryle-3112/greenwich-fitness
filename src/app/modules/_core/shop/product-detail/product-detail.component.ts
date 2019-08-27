@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   Product,
   ProductFeedback,
@@ -8,16 +8,16 @@ import {
   ShoppingCart,
   UserProfile
 } from '@gw-models/core';
-import {ShareProductService} from '@gw-services/core/shared/product/share-product.service';
-import {Router} from '@angular/router';
-import {ProductFeedbackService} from '@gw-services/core/api/product/product-feedback.service';
-import {NzNotificationService} from 'ng-zorro-antd';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
-import {ProductRateService} from '@gw-services/core/api/product/product-rate.service';
-import {ReplyOnProductFeedbackService} from '@gw-services/core/api/product/reply-on-product-feedback.service';
-import {ProductFeedbackReactionService} from '@gw-services/core/api/product/product-feedback-reaction.service';
-import {ReplyOnProductFeedbackReactionService} from '@gw-services/core/api/product/reply-on-product-feedback-reaction.service';
-import {Config} from '@gw-config/core';
+import { ShareProductService } from '@gw-services/core/shared/product/share-product.service';
+import { Router } from '@angular/router';
+import { ProductFeedbackService } from '@gw-services/core/api/product/product-feedback.service';
+import { NzNotificationService } from 'ng-zorro-antd';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { ProductRateService } from '@gw-services/core/api/product/product-rate.service';
+import { ReplyOnProductFeedbackService } from '@gw-services/core/api/product/reply-on-product-feedback.service';
+import { ProductFeedbackReactionService } from '@gw-services/core/api/product/product-feedback-reaction.service';
+import { ReplyOnProductFeedbackReactionService } from '@gw-services/core/api/product/reply-on-product-feedback-reaction.service';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-product-detail',
@@ -52,14 +52,14 @@ export class ProductDetailComponent implements OnInit {
    * @param replyOnProductFeedbackReactionService - inject replyOnProductFeedbackReactionService
    */
   constructor(private shareProductService: ShareProductService,
-              private router: Router,
-              private productFeedbackService: ProductFeedbackService,
-              private notification: NzNotificationService,
-              private shareUserProfileService: ShareUserProfileService,
-              private productRateService: ProductRateService,
-              private replyOnProductFeedbackService: ReplyOnProductFeedbackService,
-              private productFeedbackReactionService: ProductFeedbackReactionService,
-              private replyOnProductFeedbackReactionService: ReplyOnProductFeedbackReactionService) {
+    private router: Router,
+    private productFeedbackService: ProductFeedbackService,
+    private notification: NzNotificationService,
+    private shareUserProfileService: ShareUserProfileService,
+    private productRateService: ProductRateService,
+    private replyOnProductFeedbackService: ReplyOnProductFeedbackService,
+    private productFeedbackReactionService: ProductFeedbackReactionService,
+    private replyOnProductFeedbackReactionService: ReplyOnProductFeedbackReactionService) {
   }
 
   ngOnInit(): void {
@@ -230,7 +230,7 @@ ${Config.apiProductFeedbackReactions}`;
    * @param selectedProductFeedbackReaction - reaction's value that user has reacted to selected products' feedback
    */
   private changeProductFeedbackReactionStatus(selectedProductFeedback: ProductFeedback,
-                                              selectedProductFeedbackReaction: ProductFeedbackReaction): void {
+    selectedProductFeedbackReaction: ProductFeedbackReaction): void {
     selectedProductFeedback.isReacted = true;
     if (selectedProductFeedbackReaction.reaction === 1) {
       selectedProductFeedback.isLikeClicked = true;
@@ -448,7 +448,7 @@ ${Config.apiReplyOnProductFeedbackReaction}`;
    * @param replyOnProductFeedbackReactions - replies on product's feedback that user liked and disliked
    */
   private showReplyOnProductFeedbacksUserLikedDisliked(repliesOnProductFeedback: ReplyOnProductFeedback[],
-                                                       replyOnProductFeedbackReactions: ReplyOnProductFeedbackReaction[]): void {
+    replyOnProductFeedbackReactions: ReplyOnProductFeedbackReaction[]): void {
     for (const eachReplyOnProductFeedbackReaction of replyOnProductFeedbackReactions) {
       for (const eachReplyOnProductFeedback of repliesOnProductFeedback) {
         if (eachReplyOnProductFeedbackReaction.replyOnProductFeedback.id === eachReplyOnProductFeedback.id) {
@@ -465,7 +465,7 @@ ${Config.apiReplyOnProductFeedbackReaction}`;
    * @param selectedReplyOnProductFeedbackReacton - reaction's value that will be set to selected reply on product's feedback
    */
   private changeReplyOnProductFeedbackReactionStatus(selectedReplyOnProductFeedback: ReplyOnProductFeedback,
-                                                     selectedReplyOnProductFeedbackReacton: ReplyOnProductFeedbackReaction): void {
+    selectedReplyOnProductFeedbackReacton: ReplyOnProductFeedbackReaction): void {
     selectedReplyOnProductFeedback.isReacted = true;
     if (selectedReplyOnProductFeedbackReacton.reaction === 1) {
       selectedReplyOnProductFeedback.isLikeClicked = true;

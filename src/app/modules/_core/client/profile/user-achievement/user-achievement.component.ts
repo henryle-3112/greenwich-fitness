@@ -1,10 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {UserAchievement} from '@gw-models/core';
-import {UserAchievementService} from '@gw-services/core/api/user/user-achievement.service';
-import {Config} from '@gw-config/core';
-import {UserAccountService} from '@gw-services/core/api/user/user-account.service';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
-import {Router} from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { UserAchievement } from '@gw-models/core';
+import { UserAchievementService } from '@gw-services/core/api/user/user-achievement.service';
+import { Config } from '@gw-config/core';
+import { UserAccountService } from '@gw-services/core/api/user/user-account.service';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-user-achievement',
@@ -27,9 +27,9 @@ export class UserAchievementComponent implements OnInit {
    * @param shareUserProfileService - inject shareUserProfileService
    */
   constructor(private userAchievementService: UserAchievementService,
-              private userAccountService: UserAccountService,
-              private router: Router,
-              private shareUserProfileService: ShareUserProfileService) {
+    private userAccountService: UserAccountService,
+    private router: Router,
+    private shareUserProfileService: ShareUserProfileService) {
   }
 
   /**

@@ -1,8 +1,8 @@
-import {Coffeti, ResponseMessage, UserAccount} from '@gw-models/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {ActiveAccountService} from '@gw-services/core/api/user/active-account.service';
-import {Component, OnInit} from '@angular/core';
-import {Config} from '@gw-config/core';
+import { Coffeti, ResponseMessage, UserAccount } from '@gw-models/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ActiveAccountService } from '@gw-services/core/api/user/active-account.service';
+import { Component, OnInit } from '@angular/core';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-active-account',
@@ -23,8 +23,8 @@ export class ActiveAccountComponent implements OnInit {
    * @param router - inject router
    */
   constructor(private activeAccountService: ActiveAccountService,
-              private route: ActivatedRoute,
-              private router: Router) {
+    private route: ActivatedRoute,
+    private router: Router) {
   }
 
   /**

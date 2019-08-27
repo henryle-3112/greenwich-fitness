@@ -1,15 +1,15 @@
-import {Component, OnInit} from '@angular/core';
-import {Coach, Membership, Training} from '@gw-models/core';
-import {ShareMembershipScheduleService} from '@gw-services/core/shared/membership-schedule/share-membership-schedule.service';
-import {Router} from '@angular/router';
-import {ReadLocalJsonService} from '@gw-services/core/api/read-local-json/read-local-json.service';
-import {Utils} from '@gw-helpers/core';
-import {TrainingService} from '@gw-services/core/api/training/training.service';
-import {ShareMembershipService} from '@gw-services/core/shared/membership/share-membership.service';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
-import {CoachService} from '@gw-services/core/api/coach/coach.service';
-import {NzNotificationService} from 'ng-zorro-antd';
-import {Config} from '@gw-config/core';
+import { Component, OnInit } from '@angular/core';
+import { Coach, Membership, Training } from '@gw-models/core';
+import { ShareMembershipScheduleService } from '@gw-services/core/shared/membership-schedule/share-membership-schedule.service';
+import { Router } from '@angular/router';
+import { ReadLocalJsonService } from '@gw-services/core/api/read-local-json/read-local-json.service';
+import { Utils } from '@gw-helpers/core';
+import { TrainingService } from '@gw-services/core/api/training/training.service';
+import { ShareMembershipService } from '@gw-services/core/shared/membership/share-membership.service';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { CoachService } from '@gw-services/core/api/coach/coach.service';
+import { NzNotificationService } from 'ng-zorro-antd';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-schedule-detail',
@@ -41,13 +41,13 @@ export class MembershipScheduleDetailComponent implements OnInit {
    * @param router - inject router
    */
   constructor(private shareMembershipScheduleService: ShareMembershipScheduleService,
-              private shareMembershipService: ShareMembershipService,
-              private shareUserProfileService: ShareUserProfileService,
-              private coachService: CoachService,
-              private readLocalJson: ReadLocalJsonService,
-              private trainingService: TrainingService,
-              private notification: NzNotificationService,
-              private router: Router) {
+    private shareMembershipService: ShareMembershipService,
+    private shareUserProfileService: ShareUserProfileService,
+    private coachService: CoachService,
+    private readLocalJson: ReadLocalJsonService,
+    private trainingService: TrainingService,
+    private notification: NzNotificationService,
+    private router: Router) {
   }
 
   ngOnInit(): void {

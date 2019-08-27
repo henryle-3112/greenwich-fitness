@@ -1,18 +1,27 @@
 <!--suppress ALL -->
-<div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;">
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
   <!-- loading component -->
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- What to knnow -->
   <h3>What to know</h3>
   <div id="what-to-know" (click)="goToExerciseVideo()">
-    <img id="image-what-to-know" src="{{ selectedSingleExercise?.largeMobileRetinaPictureUrl }}"
-         alt="{{ selectedSingleExercise?.title}}">
+    <img
+      id="image-what-to-know"
+      src="{{ selectedSingleExercise?.largeMobileRetinaPictureUrl }}"
+      alt="{{ selectedSingleExercise?.title }}"
+    />
     <!-- play video -->
     <div id="play-video">
-      <img id="image-play-video" src="./assets/images/ic_play.png" alt="Play Video">
+      <img
+        id="image-play-video"
+        src="./assets/images/ic_play.png"
+        alt="Play Video"
+      />
     </div>
     <!-- title exercise -->
-    <h4 id="exercise-title">{{ selectedSingleExercise?.title}} </h4>
+    <h4 id="exercise-title">{{ selectedSingleExercise?.title }}</h4>
   </div>
   <!-- end what to know-->
 
@@ -28,21 +37,37 @@
   <!-- summary  -->
   <h3 id="summary-title">Summary</h3>
   <div id="summary">
-    <img id="img-summary" src="{{ selectedSingleExercise?.smallMobileRetinaPictureUrl }}" alt="">
-    <h4 id="exercise-repetition-title">{{ currentRepetitions }} x {{ selectedSingleExercise?.title}}</h4>
+    <img
+      id="img-summary"
+      src="{{ selectedSingleExercise?.smallMobileRetinaPictureUrl }}"
+      alt=""
+    />
+    <h4 id="exercise-repetition-title">
+      {{ currentRepetitions }} x {{ selectedSingleExercise?.title }}
+    </h4>
   </div>
   <div class="clear-both"></div>
   <!-- end summary -->
 
   <!-- button start -->
-  <button nz-button nzType="primary" nzBlock id="btn-start" (click)="startTraining();">Start</button>
+  <button
+    nz-button
+    nzType="primary"
+    nzBlock
+    id="btn-start"
+    (click)="startTraining()"
+  >
+    Start
+  </button>
   <!-- end button start -->
 
   <!-- modal change repetitions -->
-  <nz-modal [(nzVisible)]="isChangeRepetitionsModalShown"
-            nzTitle="Repetitions"
-            (nzOnCancel)="handleCancelChangeRepetitionsModal()"
-            (nzOnOk)="handleConfirmChangeRepetitionsModal()">
+  <nz-modal
+    [(nzVisible)]="isChangeRepetitionsModalShown"
+    nzTitle="Repetitions"
+    (nzOnCancel)="handleCancelChangeRepetitionsModal()"
+    (nzOnOk)="handleConfirmChangeRepetitionsModal()"
+  >
     <nz-radio-group [(ngModel)]="radioRepetitionValue">
       <label nz-radio class="radio-repetition" nzValue="10">10</label>
       <label nz-radio class="radio-repetition" nzValue="25">25</label>

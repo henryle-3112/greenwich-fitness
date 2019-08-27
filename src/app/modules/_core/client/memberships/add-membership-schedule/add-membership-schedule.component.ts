@@ -1,14 +1,14 @@
-import {Component, OnInit} from '@angular/core';
-import {ReadLocalJsonService} from '@gw-services/core/api/read-local-json/read-local-json.service';
-import {Utils} from '@gw-helpers/core';
-import {Coach, Membership, Training} from '@gw-models/core';
-import {TrainingService} from '@gw-services/core/api/training/training.service';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
-import {Router} from '@angular/router';
-import {ShareMembershipService} from '@gw-services/core/shared/membership/share-membership.service';
-import {CoachService} from '@gw-services/core/api/coach/coach.service';
-import {NzNotificationService} from 'ng-zorro-antd';
-import {Config} from '@gw-config/core';
+import { Component, OnInit } from '@angular/core';
+import { ReadLocalJsonService } from '@gw-services/core/api/read-local-json/read-local-json.service';
+import { Utils } from '@gw-helpers/core';
+import { Coach, Membership, Training } from '@gw-models/core';
+import { TrainingService } from '@gw-services/core/api/training/training.service';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { Router } from '@angular/router';
+import { ShareMembershipService } from '@gw-services/core/shared/membership/share-membership.service';
+import { CoachService } from '@gw-services/core/api/coach/coach.service';
+import { NzNotificationService } from 'ng-zorro-antd';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-add-membership-schedule',
@@ -36,12 +36,12 @@ export class AddMembershipScheduleComponent implements OnInit {
    * @param trainingService - inject trainingService
    */
   constructor(private readLocalJson: ReadLocalJsonService,
-              private shareUserProfileService: ShareUserProfileService,
-              private shareMembershipService: ShareMembershipService,
-              private coachService: CoachService,
-              private notification: NzNotificationService,
-              private router: Router,
-              private trainingService: TrainingService
+    private shareUserProfileService: ShareUserProfileService,
+    private shareMembershipService: ShareMembershipService,
+    private coachService: CoachService,
+    private notification: NzNotificationService,
+    private router: Router,
+    private trainingService: TrainingService
   ) {
   }
 
@@ -260,7 +260,7 @@ ${Config.trainingDateParameter}=${this.currentDate}`;
   /**
    * save membership schedule
    */
-  private saveMembershipSchedule(): void {
+  public saveMembershipSchedule(): void {
     const listOfTrainings = [];
     for (const eachTrainingTitle of this.selectedTrainings) {
       const training = new Training();

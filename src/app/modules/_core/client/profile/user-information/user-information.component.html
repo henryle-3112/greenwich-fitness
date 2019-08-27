@@ -1,14 +1,24 @@
 <!--suppress ALL -->
 <!-- layout -->
-<div nz-row nzType="flex"
-     [ngClass]="{'height-100': true, 'position-relative': true}">
+<div
+  nz-row
+  nzType="flex"
+  [ngClass]="{ 'height-100': true, 'position-relative': true }"
+>
   <!-- loading component -->
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- user-account' information's form -->
-  <form nz-form [formGroup]="userInformationForm"
-        [ngClass]="{'user-information-form': true, 'opacity-loading': isLoadingSpinnerShown}" (ngSubmit)="submitForm()">
+  <form
+    nz-form
+    [formGroup]="userInformationForm"
+    [ngClass]="{
+      'user-information-form': true,
+      'opacity-loading': isLoadingSpinnerShown
+    }"
+    (ngSubmit)="submitForm()"
+  >
     <nz-form-item>
       <nz-form-control>
         <nz-upload
@@ -20,10 +30,14 @@
           [nzBeforeUpload]="beforeUpload"
         >
           <ng-container *ngIf="!avatarUrl">
-            <i class="upload-icon" nz-icon [nzType]="isLoadingSpinnerShown ? 'loading' : 'plus'"></i>
+            <i
+              class="upload-icon"
+              nz-icon
+              [nzType]="isLoadingSpinnerShown ? 'loading' : 'plus'"
+            ></i>
             <div class="ant-upload-text">Upload</div>
           </ng-container>
-          <img *ngIf="avatarUrl" [src]="avatarUrl" class="avatar"/>
+          <img *ngIf="avatarUrl" [src]="avatarUrl" class="avatar" />
         </nz-upload>
         <span>
           (Click here to upload your avatar!)
@@ -33,18 +47,32 @@
     <nz-form-item>
       <nz-form-control>
         <nz-input-group [nzPrefix]="prefixUser">
-          <input type="text" nz-input formControlName="fullName" placeholder="Name" (blur)="validateName()"/>
+          <input
+            type="text"
+            nz-input
+            formControlName="fullName"
+            placeholder="Name"
+            (blur)="validateName()"
+          />
         </nz-input-group>
         <nz-form-explain
-          *ngIf="userInformationForm.get('fullName').touched && userInformationForm.get('fullName').hasError('required')"
-        >Please input your full name!
-        </nz-form-explain
-        >
+          *ngIf="
+            userInformationForm.get('fullName').touched &&
+            userInformationForm.get('fullName').hasError('required')
+          "
+          >Please input your full name!
+        </nz-form-explain>
       </nz-form-control>
     </nz-form-item>
     <nz-form-item>
       <nz-form-control>
-        <button nz-button class="user-information-form-button" [nzType]="'primary'">Change Information</button>
+        <button
+          nz-button
+          class="user-information-form-button"
+          [nzType]="'primary'"
+        >
+          Change Information
+        </button>
       </nz-form-control>
     </nz-form-item>
   </form>
@@ -52,8 +80,10 @@
 
   <!-- change password menu -->
   <div class="line" *ngIf="loginType == 'normal'"></div>
-  <div id="change-password" *ngIf="loginType == 'normal'"><i nz-icon nzType="lock" nzTheme="outline"></i><a
-    routerLink="/client/change-password">Change Password</a></div>
+  <div id="change-password" *ngIf="loginType == 'normal'">
+    <i nz-icon nzType="lock" nzTheme="outline"></i
+    ><a routerLink="/client/change-password">Change Password</a>
+  </div>
   <div class="line" *ngIf="loginType == 'normal'"></div>
   <ng-template #prefixUser><i nz-icon type="user"></i></ng-template>
   <!-- end change password menu -->

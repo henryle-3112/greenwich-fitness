@@ -1,5 +1,5 @@
-import {Component, OnInit} from '@angular/core';
-import {ShareCoachService} from '@gw-services/core/shared/coach/share-coach.service';
+import { Component, OnInit } from '@angular/core';
+import { ShareCoachService } from '@gw-services/core/shared/coach/share-coach.service';
 import {
   Coach,
   CoachFeedback,
@@ -9,17 +9,17 @@ import {
   ReplyOnCoachFeedbackReaction,
   UserProfile
 } from '@gw-models/core';
-import {MembershipService} from '@gw-services/core/api/coach/membership.service';
-import {Router} from '@angular/router';
-import {CoachRateService} from '@gw-services/core/api/coach/coach-rate.service';
-import {CoachFeedbackService} from '@gw-services/core/api/coach/coach-feedback.service';
-import {NzNotificationService} from 'ng-zorro-antd';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
-import {ReplyOnCoachFeedbackService} from '@gw-services/core/api/coach/reply-on-coach-feedback.service';
-import {CoachFeedbackReactionService} from '@gw-services/core/api/coach/coach-feedback-reaction.service';
-import {ReplyOnCoachFeedbackReactionService} from '@gw-services/core/api/coach/reply-on-coach-feedback-reaction.service';
-import {CoachMembershipNotificationService} from '@gw-services/core/api/notification/coach-membership-notification.service';
-import {Config} from '@gw-config/core';
+import { MembershipService } from '@gw-services/core/api/coach/membership.service';
+import { Router } from '@angular/router';
+import { CoachRateService } from '@gw-services/core/api/coach/coach-rate.service';
+import { CoachFeedbackService } from '@gw-services/core/api/coach/coach-feedback.service';
+import { NzNotificationService } from 'ng-zorro-antd';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { ReplyOnCoachFeedbackService } from '@gw-services/core/api/coach/reply-on-coach-feedback.service';
+import { CoachFeedbackReactionService } from '@gw-services/core/api/coach/coach-feedback-reaction.service';
+import { ReplyOnCoachFeedbackReactionService } from '@gw-services/core/api/coach/reply-on-coach-feedback-reaction.service';
+import { CoachMembershipNotificationService } from '@gw-services/core/api/notification/coach-membership-notification.service';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-coach-information',
@@ -58,16 +58,16 @@ export class CoachInformationComponent implements OnInit {
    * @param notification - inject notification
    */
   constructor(private shareCoachService: ShareCoachService,
-              private membershipService: MembershipService,
-              private coachRateService: CoachRateService,
-              private coachFeedbackService: CoachFeedbackService,
-              private replyOnCoachFeedbackService: ReplyOnCoachFeedbackService,
-              private coachFeedbackReactionService: CoachFeedbackReactionService,
-              private replyOnCoachFeedbackReactionService: ReplyOnCoachFeedbackReactionService,
-              private shareUserProfileService: ShareUserProfileService,
-              private router: Router,
-              private coachMembershipNotificationService: CoachMembershipNotificationService,
-              private notification: NzNotificationService) {
+    private membershipService: MembershipService,
+    private coachRateService: CoachRateService,
+    private coachFeedbackService: CoachFeedbackService,
+    private replyOnCoachFeedbackService: ReplyOnCoachFeedbackService,
+    private coachFeedbackReactionService: CoachFeedbackReactionService,
+    private replyOnCoachFeedbackReactionService: ReplyOnCoachFeedbackReactionService,
+    private shareUserProfileService: ShareUserProfileService,
+    private router: Router,
+    private coachMembershipNotificationService: CoachMembershipNotificationService,
+    private notification: NzNotificationService) {
   }
 
   ngOnInit() {
@@ -505,7 +505,7 @@ ${Config.apiReplyOnCoachFeedbackReactions}`;
    * @param replyOnCoachFeedbackReactions - replies on coach's feedback that user liked and disliked
    */
   private showRepliesOnCoachFeedbackUserLikedDisliked(repliesOnCoachFeedback: ReplyOnCoachFeedback[],
-                                                      replyOnCoachFeedbackReactions: ReplyOnCoachFeedbackReaction[]) {
+    replyOnCoachFeedbackReactions: ReplyOnCoachFeedbackReaction[]) {
     for (const eachReplyOnCoachFeedbackReaction of replyOnCoachFeedbackReactions) {
       for (const eachReplyOnCoachFeedback of repliesOnCoachFeedback) {
         if (eachReplyOnCoachFeedbackReaction.replyOnCoachFeedback.id === eachReplyOnCoachFeedback.id) {
@@ -522,7 +522,7 @@ ${Config.apiReplyOnCoachFeedbackReactions}`;
    * @param selectedReplyOnCoachFeedbackReaction - reaction's value that will be set to reply on coach's feedback
    */
   private changeReplyOnCoachFeedbackReactionStatus(selectedReplyOnCoachFeedback: ReplyOnCoachFeedback,
-                                                   selectedReplyOnCoachFeedbackReaction: ReplyOnCoachFeedbackReaction) {
+    selectedReplyOnCoachFeedbackReaction: ReplyOnCoachFeedbackReaction) {
     selectedReplyOnCoachFeedback.isReacted = true;
     if (selectedReplyOnCoachFeedbackReaction.reaction === 1) {
       selectedReplyOnCoachFeedback.isLikeClicked = true;

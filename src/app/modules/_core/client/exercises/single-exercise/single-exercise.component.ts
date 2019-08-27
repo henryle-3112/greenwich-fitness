@@ -1,9 +1,9 @@
-import {Component, OnInit} from '@angular/core';
-import {ReadLocalJsonService} from '@gw-services/core/api/read-local-json/read-local-json.service';
-import {SingleExercise} from '@gw-models/core';
-import {Router} from '@angular/router';
-import {ShareSingleExerciseService} from '@gw-services/core/shared/single-exercise/share-single-exercise.service';
-import {Config} from '@gw-config/core';
+import { Component, OnInit } from '@angular/core';
+import { ReadLocalJsonService } from '@gw-services/core/api/read-local-json/read-local-json.service';
+import { SingleExercise } from '@gw-models/core';
+import { Router } from '@angular/router';
+import { ShareSingleExerciseService } from '@gw-services/core/shared/single-exercise/share-single-exercise.service';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-single-exercise',
@@ -27,8 +27,8 @@ export class SingleExerciseComponent implements OnInit {
    * @param router - inject Router for routing
    */
   constructor(private readLocalJson: ReadLocalJsonService,
-              private shareSingleExercise: ShareSingleExerciseService,
-              private router: Router) {
+    private shareSingleExercise: ShareSingleExerciseService,
+    private router: Router) {
   }
 
   /**

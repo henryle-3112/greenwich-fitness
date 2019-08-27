@@ -12,3 +12,7 @@
   background-color: #1890ff;
   color: white;
 }
+
+.workout-item:hover {
+  cursor: pointer;
+}

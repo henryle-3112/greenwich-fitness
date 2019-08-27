@@ -1,12 +1,12 @@
-import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {ActivatedRoute, Router} from '@angular/router';
-import {CustomValidator} from '@gw-services/core/validate/custom-validator';
-import {ResetPasswordService} from '@gw-services/core/api/user/reset-password.service';
-import {ResponseMessage, UserAccount} from '@gw-models/core';
-import {NzNotificationService} from 'ng-zorro-antd';
-import {AuthenticationService} from '@gw-services/core/authentication/authentication.service';
-import {Config} from '@gw-config/core';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { CustomValidator } from '@gw-services/core/validate/custom-validator';
+import { ResetPasswordService } from '@gw-services/core/api/user/reset-password.service';
+import { ResponseMessage, UserAccount } from '@gw-models/core';
+import { NzNotificationService } from 'ng-zorro-antd';
+import { AuthenticationService } from '@gw-services/core/authentication/authentication.service';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-change-password',
@@ -28,11 +28,11 @@ export class ChangePasswordComponent implements OnInit {
    * @param notification - inject notification
    */
   constructor(private fb: FormBuilder,
-              private authenticationService: AuthenticationService,
-              private route: ActivatedRoute,
-              private router: Router,
-              private resetPasswordService: ResetPasswordService,
-              private notification: NzNotificationService) {
+    private authenticationService: AuthenticationService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private resetPasswordService: ResetPasswordService,
+    private notification: NzNotificationService) {
   }
 
   /**
@@ -111,7 +111,7 @@ export class ChangePasswordComponent implements OnInit {
   validatePassword(): void {
     if (this.f.password.value.toString().localeCompare('') === 0) {
       this.f.password.markAsTouched();
-      this.f.password.setErrors({'required': true});
+      this.f.password.setErrors({ 'required': true });
     }
   }
 
@@ -121,7 +121,7 @@ export class ChangePasswordComponent implements OnInit {
   validateConfirmPassword(): void {
     if (this.f.confirmPassword.value.toString().localeCompare(this.f.password.value) !== 0) {
       this.f.confirmPassword.markAsTouched();
-      this.f.confirmPassword.setErrors({'required': true});
+      this.f.confirmPassword.setErrors({ 'required': true });
     } else {
       this.f.confirmPassword.setErrors(null);
     }

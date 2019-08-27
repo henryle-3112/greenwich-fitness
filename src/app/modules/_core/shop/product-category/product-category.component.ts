@@ -1,10 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {Product, ProductCategory} from '@gw-models/core';
-import {ProductService} from '@gw-services/core/api/product/product.service';
-import {ShareProductCategoryService} from '@gw-services/core/shared/product-category/share-product-category.service';
-import {ActivatedRoute, Router} from '@angular/router';
-import {ShareProductService} from '@gw-services/core/shared/product/share-product.service';
-import {Config} from '@gw-config/core';
+import { Component, OnInit } from '@angular/core';
+import { Product, ProductCategory } from '@gw-models/core';
+import { ProductService } from '@gw-services/core/api/product/product.service';
+import { ShareProductCategoryService } from '@gw-services/core/shared/product-category/share-product-category.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ShareProductService } from '@gw-services/core/shared/product/share-product.service';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-product-category',
@@ -28,10 +28,10 @@ export class ProductCategoryComponent implements OnInit {
    * @param shareProductService - inject shareProductService
    */
   constructor(private productService: ProductService,
-              private shareProductCategoryService: ShareProductCategoryService,
-              private router: Router,
-              private route: ActivatedRoute,
-              private shareProductService: ShareProductService) {
+    private shareProductCategoryService: ShareProductCategoryService,
+    private router: Router,
+    private route: ActivatedRoute,
+    private shareProductService: ShareProductService) {
   }
 
   ngOnInit(): void {

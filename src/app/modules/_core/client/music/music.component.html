@@ -1,13 +1,25 @@
 <!--suppress ALL -->
-<div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
-     [ngClass]="{'opacity-loading': isLoadingSpinnerShown}">
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+  [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+>
   <!-- loading component -->
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- search box-->
-  <nz-input-group *ngIf="musics && musics.length" [nzSuffix]="suffixIconSearch" [ngClass]="{'mg-bottom-24': true, 'width-50': true}">
-    <input type="text" nz-input placeholder="Name..." #searchBox (keyup.enter)="searchMusic(searchBox.value)"/>
+  <nz-input-group
+    *ngIf="musics && musics.length"
+    [nzSuffix]="suffixIconSearch"
+    [ngClass]="{ 'mg-bottom-24': true, 'width-50': true }"
+  >
+    <input
+      type="text"
+      nz-input
+      placeholder="Name..."
+      #searchBox
+      (keyup.enter)="searchMusic(searchBox.value)"
+    />
   </nz-input-group>
   <ng-template #suffixIconSearch>
     <i nz-icon type="search"></i>
@@ -15,16 +27,20 @@
   <!-- end search box -->
 
   <!-- custom list -->
-  <nz-list [nzDataSource]="musics" [nzRenderItem]="item" [nzItemLayout]="'horizontal'">
+  <nz-list
+    [nzDataSource]="musics"
+    [nzRenderItem]="item"
+    [nzItemLayout]="'horizontal'"
+  >
     <ng-template #item let-item>
-      <nz-list-item>
+      <nz-list-item (click)="changeSong(item)" class="music-item">
         <nz-list-item-meta
           [nzTitle]="nzTitle"
           nzAvatar="{{ item.musicImage }}"
           nzDescription="{{ item.musicAuthor }}"
         >
           <ng-template #nzTitle>
-            <span (click)="changeSong(item)">{{ item.musicName }}</span>
+            <span>{{ item.musicName }}</span>
           </ng-template>
         </nz-list-item-meta>
       </nz-list-item>
@@ -39,6 +55,7 @@
     [nzPageSize]="nMusicPerPage"
     [nzTotal]="totalMusic"
     [nzSize]="'small'"
-    (nzPageIndexChange)="musicPageChange($event)"></nz-pagination>
+    (nzPageIndexChange)="musicPageChange($event)"
+  ></nz-pagination>
   <!-- end pagination -->
 </div>

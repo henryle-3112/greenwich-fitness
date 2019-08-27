@@ -1,20 +1,20 @@
-import {Component, ElementRef, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import {
   Post, PostComment, PostCommentReaction, PostRate, PostTag, ReplyOnPostComment, ReplyOnPostCommentReaction, Tag,
   UserProfile
 } from '@gw-models/core';
-import {Router} from '@angular/router';
-import {NzNotificationService} from 'ng-zorro-antd';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
-import {SharePostService} from '@gw-services/core/shared/post/share-post.service';
-import {PostCommentService} from '@gw-services/core/api/post/post-comment.service';
-import {PostRateService} from '@gw-services/core/api/post/post-rate.service';
-import {ReplyOnPostCommentService} from '@gw-services/core/api/post/reply-on-post-comment.service';
-import {PostCommentReactionService} from '@gw-services/core/api/post/post-comment-reaction.service';
-import {ReplyOnPostCommentReactionService} from '@gw-services/core/api/post/reply-on-post-comment-reaction.service';
-import {PostTagService} from '@gw-services/core/api/post/post-tag.service';
-import {ShareTagService} from '@gw-services/core/shared/tag/share-tag.service';
-import {Config} from '@gw-config/core';
+import { Router } from '@angular/router';
+import { NzNotificationService } from 'ng-zorro-antd';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { SharePostService } from '@gw-services/core/shared/post/share-post.service';
+import { PostCommentService } from '@gw-services/core/api/post/post-comment.service';
+import { PostRateService } from '@gw-services/core/api/post/post-rate.service';
+import { ReplyOnPostCommentService } from '@gw-services/core/api/post/reply-on-post-comment.service';
+import { PostCommentReactionService } from '@gw-services/core/api/post/post-comment-reaction.service';
+import { ReplyOnPostCommentReactionService } from '@gw-services/core/api/post/reply-on-post-comment-reaction.service';
+import { PostTagService } from '@gw-services/core/api/post/post-tag.service';
+import { ShareTagService } from '@gw-services/core/shared/tag/share-tag.service';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-blog-detail',
@@ -53,16 +53,16 @@ export class BlogDetailComponent implements OnInit {
    * @param shareTagService - inject shareTagService
    */
   constructor(private sharePostService: SharePostService,
-              private router: Router,
-              private postCommentService: PostCommentService,
-              private notification: NzNotificationService,
-              private shareUserProfileService: ShareUserProfileService,
-              private postRateService: PostRateService,
-              private replyOnPostCommentService: ReplyOnPostCommentService,
-              private postCommentReactionService: PostCommentReactionService,
-              private replyOnPostCommentReactionService: ReplyOnPostCommentReactionService,
-              private postTagService: PostTagService,
-              private shareTagService: ShareTagService) {
+    private router: Router,
+    private postCommentService: PostCommentService,
+    private notification: NzNotificationService,
+    private shareUserProfileService: ShareUserProfileService,
+    private postRateService: PostRateService,
+    private replyOnPostCommentService: ReplyOnPostCommentService,
+    private postCommentReactionService: PostCommentReactionService,
+    private replyOnPostCommentReactionService: ReplyOnPostCommentReactionService,
+    private postTagService: PostTagService,
+    private shareTagService: ShareTagService) {
   }
 
   ngOnInit(): void {
@@ -475,7 +475,7 @@ ${Config.apiReplyOnPostCommentReactions}`;
    * @param replyOnPostCommentReactions - replies on post's comment that user liked and disliked
    */
   private showRepliesOnPostCommentUserLikedAndDisliked(repliesOnPostComment: ReplyOnPostComment[],
-                                                       replyOnPostCommentReactions: ReplyOnPostCommentReaction[]): void {
+    replyOnPostCommentReactions: ReplyOnPostCommentReaction[]): void {
     for (const eachReplyOnPostCommentReaction of replyOnPostCommentReactions) {
       for (const eachReplyOnPostComment of repliesOnPostComment) {
         if (eachReplyOnPostCommentReaction.replyOnPostComment.id === eachReplyOnPostComment.id) {
@@ -492,7 +492,7 @@ ${Config.apiReplyOnPostCommentReactions}`;
    * @param selectedReplyOnPostCommentReaction - reaction's value that will be set to selected reply on post's comment
    */
   private changeReplyOnPostCommentReactionStatus(selectedReplyOnPostComment: ReplyOnPostComment,
-                                                 selectedReplyOnPostCommentReaction: ReplyOnPostCommentReaction): void {
+    selectedReplyOnPostCommentReaction: ReplyOnPostCommentReaction): void {
     selectedReplyOnPostComment.isReacted = true;
     if (selectedReplyOnPostCommentReaction.reaction === 1) {
       selectedReplyOnPostComment.isLikeClicked = true;

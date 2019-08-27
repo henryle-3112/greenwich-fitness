@@ -1,7 +1,8 @@
 <!-- layout -->
-<div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;">
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
   <nz-tabset>
-
     <!-- tab user-account' profile -->
     <nz-tab nzTitle="Coach Profile" *ngIf="isCoachInformationShow">
       <app-coach-information></app-coach-information>
@@ -20,7 +21,11 @@
     </nz-tab>
     <!-- end coach schedule -->
 
-
+    <!-- chat tab -->
+    <nz-tab nzTitle="Chat" *ngIf="isRelationshipBetWeenUserAndCoachExisted">
+      <app-coach-chat></app-coach-chat>
+    </nz-tab>
+    <!-- end chat tab -->
   </nz-tabset>
 </div>
 <!-- end layout -->

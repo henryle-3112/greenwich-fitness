@@ -1,10 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {CoachPayment, UserProfile} from '@gw-models/core';
-import {CoachPaymentService} from '@gw-services/core/api/payment/coach-payment.service';
-import {CoachService} from '@gw-services/core/api/coach/coach.service';
-import {Router} from '@angular/router';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
-import {Config} from '@gw-config/core';
+import { Component, OnInit } from '@angular/core';
+import { CoachPayment, UserProfile } from '@gw-models/core';
+import { CoachPaymentService } from '@gw-services/core/api/payment/coach-payment.service';
+import { CoachService } from '@gw-services/core/api/coach/coach.service';
+import { Router } from '@angular/router';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-coach-payment-history',
@@ -31,9 +31,9 @@ export class CoachPaymentHistoryComponent implements OnInit {
    * @param shareUserProfileService - inject coachPaymentService
    */
   constructor(private coachPaymentService: CoachPaymentService,
-              private coachService: CoachService,
-              private router: Router,
-              private shareUserProfileService: ShareUserProfileService) {
+    private coachService: CoachService,
+    private router: Router,
+    private shareUserProfileService: ShareUserProfileService) {
   }
 
   ngOnInit(): void {
@@ -90,7 +90,7 @@ ${Config.pageParameter}=${this.currentCoachPaymentHistoriesPage}`;
    *
    * @param event - month that was selected by users to view their coach payment history
    */
-  private onMonthChanged(event): void {
+  public onMonthChanged(event): void {
     if (this.selectedDateToViewCoachPaymentHistories) {
       this.selectedMonthToViewCoachPaymentHistories = this.selectedDateToViewCoachPaymentHistories.getMonth() + 1;
       this.selectedYearToViewCoachPaymentHistories = this.selectedDateToViewCoachPaymentHistories.getFullYear();

@@ -1,7 +1,7 @@
-import {OnInit, Component} from '@angular/core';
-import {Gallery} from '@gw-models/core';
-import {GalleryService} from '@gw-services/core/api/gallery/gallery.service';
-import {Config} from '@gw-config/core';
+import { OnInit, Component } from '@angular/core';
+import { Gallery } from '@gw-models/core';
+import { GalleryService } from '@gw-services/core/api/gallery/gallery.service';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-gallery',

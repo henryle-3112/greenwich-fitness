@@ -1,7 +1,7 @@
-import {HttpClient} from '@angular/common/http';
-import {Observable} from 'rxjs';
-import {Injectable} from '@angular/core';
-import {ResponseMessage} from '@gw-models/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { ResponseMessage } from '@gw-models/core';
 
 @Injectable({
   providedIn: 'root'

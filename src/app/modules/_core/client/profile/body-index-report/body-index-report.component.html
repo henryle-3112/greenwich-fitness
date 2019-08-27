@@ -1,7 +1,13 @@
 <!-- layout -->
-<div nz-row nzType="flex"
-     [ngClass]="{'height-100': true, 'position-relative': true, 'opacity-loading': isLoadingSpinnerShown}">
-
+<div
+  nz-row
+  nzType="flex"
+  [ngClass]="{
+    'height-100': true,
+    'position-relative': true,
+    'opacity-loading': isLoadingSpinnerShown
+  }"
+>
   <!-- loading component -->
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
@@ -19,10 +25,10 @@
     <h4 id="current-weight-result" class="display-inline">Current:</h4>
     <h4 class="display-inline float-right">{{ currentUserWeight }} kg</h4>
     <div class="clear-both"></div>
-    <h4 id="heaviest-weight-result" class="display-inline">Heaviest: </h4>
+    <h4 id="heaviest-weight-result" class="display-inline">Heaviest:</h4>
     <h4 class="display-inline float-right">{{ heaviestUserWeight }} kg</h4>
     <div class="clear-both"></div>
-    <h4 id="lightest-weight-result" class="display-inline">Lightest: </h4>
+    <h4 id="lightest-weight-result" class="display-inline">Lightest:</h4>
     <h4 class="display-inline float-right">{{ lightestUserWeight }} kg</h4>
     <div class="clear-both"></div>
   </div>
@@ -36,57 +42,103 @@
   <!-- Current BMI and Change Weight, Height -->
   <div id="body-index">
     <h4 id="current-bmi-result" class="display-inline">BMI(kg/m2):</h4>
-    <i class="ic-edit-body-index float-right" nz-icon nzType="edit" nzTheme="outline"
-       (click)="showChangeBodyIndexModal()"></i>
-    <h4 class="display-inline float-right pd-right-6">{{ currentUserBMIResult }} </h4>
+    <i
+      class="ic-edit-body-index float-right"
+      nz-icon
+      nzType="edit"
+      nzTheme="outline"
+      (click)="showChangeBodyIndexModal()"
+    ></i>
+    <h4 class="display-inline float-right pd-right-6">
+      {{ currentUserBMIResult }}
+    </h4>
     <div class="clear-both"></div>
     <h4 id="current-weigh-value" class="display-inline">Weight(kg):</h4>
-    <i class="ic-edit-body-index float-right" nz-icon nzType="edit" nzTheme="outline"
-       (click)="showChangeBodyIndexModal()"></i>
-    <h4 class="display-inline float-right pd-right-6">{{ currentUserWeight }} </h4>
+    <i
+      class="ic-edit-body-index float-right"
+      nz-icon
+      nzType="edit"
+      nzTheme="outline"
+      (click)="showChangeBodyIndexModal()"
+    ></i>
+    <h4 class="display-inline float-right pd-right-6">
+      {{ currentUserWeight }}
+    </h4>
     <div class="clear-both"></div>
-    <h4 id="current-height" class="display-inline">Height(cm): </h4>
-    <i class="ic-edit-body-index float-right" nz-icon nzType="edit" nzTheme="outline"
-       (click)="showChangeBodyIndexModal()"></i>
-    <h4 class="display-inline float-right pd-right-6">{{ currentUserHeight }} </h4>
+    <h4 id="current-height" class="display-inline">Height(cm):</h4>
+    <i
+      class="ic-edit-body-index float-right"
+      nz-icon
+      nzType="edit"
+      nzTheme="outline"
+      (click)="showChangeBodyIndexModal()"
+    ></i>
+    <h4 class="display-inline float-right pd-right-6">
+      {{ currentUserHeight }}
+    </h4>
     <div class="clear-both"></div>
   </div>
   <!-- end current bmi and change weight and height -->
 
   <!-- modal change body index -->
-  <nz-modal [(nzVisible)]="isChangeBodyIndexModalShown"
-            nzTitle="Body Index"
-            (nzOnCancel)="handleCancelChangeBodyIndexModal()"
-            (nzOnOk)="handleConfirmChangeBodyIndexModal()">
-
+  <nz-modal
+    [(nzVisible)]="isChangeBodyIndexModalShown"
+    nzTitle="Body Index"
+    (nzOnCancel)="handleCancelChangeBodyIndexModal()"
+    (nzOnOk)="handleConfirmChangeBodyIndexModal()"
+  >
     <!-- form change body index-->
-    <form nz-form [formGroup]="bodyIndexForm"
-          [ngClass]="{'body-index-form': true, 'opacity-loading': isLoadingSpinnerShown}"
-          (ngSubmit)="submitForm()">
+    <form
+      nz-form
+      [formGroup]="bodyIndexForm"
+      [ngClass]="{
+        'body-index-form': true,
+        'opacity-loading': isLoadingSpinnerShown
+      }"
+      (ngSubmit)="submitForm()"
+    >
       <nz-form-item>
         <nz-form-control>
           <nz-input-group>
-            <input style="border-radius: 4px;" type="text" nz-input formControlName="weight" placeholder="Weight"
-                   (blur)="validateWeight()"/>
+            <input
+              style="border-radius: 4px;"
+              type="text"
+              nz-input
+              formControlName="weight"
+              placeholder="Weight"
+              (blur)="validateWeight()"
+            />
           </nz-input-group>
           <nz-form-explain
-            *ngIf="bodyIndexForm.get('weight').touched && bodyIndexForm.get('weight').hasError('required') || bodyIndexForm.get('weight').hasError('invalidNumber')"
-          >Please input your weight! Your weight must be a number
-          </nz-form-explain
-          >
+            *ngIf="
+              (bodyIndexForm.get('weight').touched &&
+                bodyIndexForm.get('weight').hasError('required')) ||
+              bodyIndexForm.get('weight').hasError('invalidNumber')
+            "
+            >Please input your weight! Your weight must be a number
+          </nz-form-explain>
         </nz-form-control>
       </nz-form-item>
       <nz-form-item>
         <nz-form-control>
           <nz-input-group>
-            <input style="border-radius: 4px;" type="text" nz-input formControlName="height" placeholder="Height"
-                   (blur)="validateHeight()"/>
+            <input
+              style="border-radius: 4px;"
+              type="text"
+              nz-input
+              formControlName="height"
+              placeholder="Height"
+              (blur)="validateHeight()"
+            />
           </nz-input-group>
           <nz-form-explain
-            *ngIf="bodyIndexForm.get('height').touched && (bodyIndexForm.get('height').hasError('required') || bodyIndexForm.get('height').hasError('invalidNumber'))"
-          >Please input your height! Your height must be a number!
-          </nz-form-explain
-          >
+            *ngIf="
+              bodyIndexForm.get('height').touched &&
+              (bodyIndexForm.get('height').hasError('required') ||
+                bodyIndexForm.get('height').hasError('invalidNumber'))
+            "
+            >Please input your height! Your height must be a number!
+          </nz-form-explain>
         </nz-form-control>
       </nz-form-item>
     </form>
@@ -95,6 +147,5 @@
     <!-- end form change body index -->
   </nz-modal>
   <!-- end modal chang body index -->
-
 </div>
 <!-- end layout -->

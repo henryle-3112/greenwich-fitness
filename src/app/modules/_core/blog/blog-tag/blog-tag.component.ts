@@ -1,10 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {Post, PostTag, Tag} from '@gw-models/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {SharePostService} from '@gw-services/core/shared/post/share-post.service';
-import {PostTagService} from '@gw-services/core/api/post/post-tag.service';
-import {ShareTagService} from '@gw-services/core/shared/tag/share-tag.service';
-import {Config} from '@gw-config/core';
+import { Component, OnInit } from '@angular/core';
+import { Post, PostTag, Tag } from '@gw-models/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { SharePostService } from '@gw-services/core/shared/post/share-post.service';
+import { PostTagService } from '@gw-services/core/api/post/post-tag.service';
+import { ShareTagService } from '@gw-services/core/shared/tag/share-tag.service';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-blog-tag',
@@ -28,10 +28,10 @@ export class BlogTagComponent implements OnInit {
    * @param sharePostService - inject sharePostService
    */
   constructor(private postTagService: PostTagService,
-              private shareTagService: ShareTagService,
-              private router: Router,
-              private route: ActivatedRoute,
-              private sharePostService: SharePostService) {
+    private shareTagService: ShareTagService,
+    private router: Router,
+    private route: ActivatedRoute,
+    private sharePostService: SharePostService) {
   }
 
   ngOnInit(): void {

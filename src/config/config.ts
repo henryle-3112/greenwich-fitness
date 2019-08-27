@@ -20,6 +20,7 @@ export enum Config {
   payerIdParameter = 'payerId',
   monthParameter = 'month',
   yearParameter = 'year',
+  giftTypeIdParameter = 'giftTypeId',
 
   // common value
   numberItemsPerPage = 8,
@@ -137,6 +138,11 @@ export enum Config {
   apiChangeUserPassword = 'change-password',
   apiUserAccounts = 'accounts',
   apiUserProfiles = 'profiles',
+
+  // api gift manaage prefix
+  apiGiftManagementPrefix = 'gift-management',
+  apiGifts = 'gifts',
+  apiUserGifts = 'user-gifts',
 
 
   // google credentials

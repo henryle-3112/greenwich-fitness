@@ -1,14 +1,14 @@
-import {Component, OnInit} from '@angular/core';
-import {TrainingService} from '@gw-services/core/api/training/training.service';
-import {Coach, Membership, Training, UserProfile} from '@gw-models/core';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
-import {ShareMembershipService} from '@gw-services/core/shared/membership/share-membership.service';
-import {Router} from '@angular/router';
-import {Config} from '@gw-config/core';
-import {CoachService} from '@gw-services/core/api/coach/coach.service';
-import {ShareMembershipScheduleService} from '@gw-services/core/shared/membership-schedule/share-membership-schedule.service';
-import {Utils} from '@gw-helpers/core';
-import {MembershipService} from '@gw-services/core/api/coach/membership.service';
+import { Component, OnInit } from '@angular/core';
+import { TrainingService } from '@gw-services/core/api/training/training.service';
+import { Coach, Membership, Training, UserProfile } from '@gw-models/core';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { ShareMembershipService } from '@gw-services/core/shared/membership/share-membership.service';
+import { Router } from '@angular/router';
+import { Config } from '@gw-config/core';
+import { CoachService } from '@gw-services/core/api/coach/coach.service';
+import { ShareMembershipScheduleService } from '@gw-services/core/shared/membership-schedule/share-membership-schedule.service';
+import { Utils } from '@gw-helpers/core';
+import { MembershipService } from '@gw-services/core/api/coach/membership.service';
 
 @Component({
   selector: 'app-membership-schedule',
@@ -36,12 +36,12 @@ export class MembershipScheduleComponent implements OnInit {
    * @param router - inject router
    */
   constructor(private trainingService: TrainingService,
-              private membershipService: MembershipService,
-              private coachService: CoachService,
-              private shareMembershipService: ShareMembershipService,
-              private shareUserProfileService: ShareUserProfileService,
-              private shareMembershipSchedule: ShareMembershipScheduleService,
-              private router: Router) {
+    private membershipService: MembershipService,
+    private coachService: CoachService,
+    private shareMembershipService: ShareMembershipService,
+    private shareUserProfileService: ShareUserProfileService,
+    private shareMembershipSchedule: ShareMembershipScheduleService,
+    private router: Router) {
   }
 
   /**

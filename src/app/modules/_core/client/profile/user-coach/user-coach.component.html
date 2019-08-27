@@ -1,14 +1,25 @@
 <!--suppress ALL -->
-<div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
-     [ngClass]="{'opacity-loading': isLoadingSpinnerShown}">
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+  [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+>
   <!-- loading component -->
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- search box-->
-  <nz-input-group *ngIf="coaches && coaches.length" [nzSuffix]="suffixIconSearch"
-                  [ngClass]="{'mg-bottom-24': true, 'width-50': true}">
-    <input type="text" nz-input placeholder="Name..." #searchBox (keyup.enter)="searchCoach(searchBox.value)"/>
+  <nz-input-group
+    *ngIf="coaches && coaches.length"
+    [nzSuffix]="suffixIconSearch"
+    [ngClass]="{ 'mg-bottom-24': true, 'width-50': true }"
+  >
+    <input
+      type="text"
+      nz-input
+      placeholder="Name..."
+      #searchBox
+      (keyup.enter)="searchCoach(searchBox.value)"
+    />
   </nz-input-group>
   <ng-template #suffixIconSearch>
     <i nz-icon type="search"></i>
@@ -16,9 +27,14 @@
   <!-- end search box -->
 
   <!-- custom list -->
-  <nz-list [nzDataSource]="coaches" [nzRenderItem]="item" [nzItemLayout]="'horizontal'" class="mg-bottom-24">
+  <nz-list
+    [nzDataSource]="coaches"
+    [nzRenderItem]="item"
+    [nzItemLayout]="'horizontal'"
+    class="mg-bottom-24"
+  >
     <ng-template #item let-item>
-      <nz-list-item (click)="goToCoachDetail(item);">
+      <nz-list-item (click)="goToCoachDetail(item)" class="coach-item">
         <nz-list-item-meta
           [nzTitle]="nzTitle"
           nzAvatar="{{ item.userProfile.avatar }}"
@@ -40,6 +56,7 @@
     [nzPageSize]="nCoachesPerPage"
     [nzTotal]="totalCoaches"
     [nzSize]="'small'"
-    (nzPageIndexChange)="coachesPageChange($event)"></nz-pagination>
+    (nzPageIndexChange)="coachesPageChange($event)"
+  ></nz-pagination>
   <!-- end pagination -->
 </div>

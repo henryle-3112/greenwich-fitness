@@ -1,12 +1,13 @@
-import {Component, OnInit} from '@angular/core';
-import {Coach, CoachMembershipNotification, UserProfile} from '@gw-models/core';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
-import {Router} from '@angular/router';
-import {CoachService} from '@gw-services/core/api/coach/coach.service';
-import {Config} from '@gw-config/core';
-import {CoachMembershipNotificationService} from '@gw-services/core/api/notification/coach-membership-notification.service';
-import {NzNotificationService} from 'ng-zorro-antd';
-import {PaymentService} from '@gw-services/core/api/payment/payment.service';
+import { Component, OnInit } from '@angular/core';
+import { Coach, CoachMembershipNotification, UserGift, UserProfile } from '@gw-models/core';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { Router } from '@angular/router';
+import { CoachService } from '@gw-services/core/api/coach/coach.service';
+import { Config } from '@gw-config/core';
+import { CoachMembershipNotificationService } from '@gw-services/core/api/notification/coach-membership-notification.service';
+import { NzNotificationService } from 'ng-zorro-antd';
+import { PaymentService } from '@gw-services/core/api/payment/payment.service';
+import { UserGiftService } from '@gw-services/core/api/gift/user-gift.service';
 
 @Component({
   selector: 'app-training-notification',
@@ -23,6 +24,14 @@ export class TrainingNotificationComponent implements OnInit {
   // check current user is coach or normal user. If user is a coach, then get coach's information
   selectedCoach: Coach;
   coachMembershipNotifications: CoachMembershipNotification[];
+  isVoucherModalShown: boolean;
+  userGifts: UserGift[];
+  currentUserGiftsPage: number;
+  nUserGiftsPerPage: number;
+  totalUserGifts: number;
+  userGiftTitleKeywords: string;
+  totalCoachPayment: number;
+  selectedCoachMembershipNotification: CoachMembershipNotification;
 
   /**
    *
@@ -32,16 +41,23 @@ export class TrainingNotificationComponent implements OnInit {
    * @param coachService - inject shareUserProfileService
    * @param notification - inject shareUserProfileService
    * @param router - inject shareUserProfileService
+   * @param userGiftService - inject userGiftService
    */
   constructor(private shareUserProfileService: ShareUserProfileService,
-              private paymentService: PaymentService,
-              private coachMembershipNotificationService: CoachMembershipNotificationService,
-              private coachService: CoachService,
-              private notification: NzNotificationService,
-              private router: Router) {
+    private paymentService: PaymentService,
+    private coachMembershipNotificationService: CoachMembershipNotificationService,
+    private coachService: CoachService,
+    private notification: NzNotificationService,
+    private router: Router,
+    private userGiftService: UserGiftService) {
   }
 
   ngOnInit(): void {
+    this.totalCoachPayment = 20;
+    this.currentUserGiftsPage = Config.currentPage;
+    this.nUserGiftsPerPage = Config.numberItemsPerPage;
+    this.userGiftTitleKeywords = '';
+    this.userGifts = [];
     this.coachMembershipNotifications = [];
     this.currentTrainingNotificationsPage = Config.currentPage;
     this.nNotificationsPerPage = Config.numberItemsPerPage;
@@ -225,16 +241,101 @@ ${Config.apiCoachMembershipNotifications}`;
   }
 
   /**
-   *
-   * @param selectedCoachMembershipNotification - training's notification that user want to make payment
+   * show vocher modal
    */
-  public paymentForCoach(selectedCoachMembershipNotification: CoachMembershipNotification): void {
+  public showVoucherModal(selectedCoachMembershipNotification: CoachMembershipNotification) {
+    this.isVoucherModalShown = true;
+    this.selectedCoachMembershipNotification = selectedCoachMembershipNotification;
+    this.getUserGifts();
+  }
+
+  /**
+   * user gift
+   */
+  public useGift(selectedUserGift: UserGift) {
+    switch (selectedUserGift.gift.point) {
+      case 200:
+        this.totalCoachPayment = (this.totalCoachPayment * 20) / 100;
+        break;
+      case 500:
+        this.totalCoachPayment = (this.totalCoachPayment * 50) / 100;
+        break;
+      case 700:
+        this.totalCoachPayment = (this.totalCoachPayment * 70) / 100;
+        break;
+    }
+    this.isVoucherModalShown = false;
+    this.paymentForCoach();
+  }
+
+  /**
+   * get user's gifts by current's page
+   */
+  private getUserGifts(): void {
+    const giftStatus = 0;
+    const giftTypeId = 1;
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    let getUserGiftsUrl = `${Config.apiBaseUrl}/
+${Config.apiGiftManagementPrefix}/
+${Config.apiUserGifts}?
+${Config.userProfileIdParameter}=${selectedUserProfileId}&
+${Config.statusParameter}=${giftStatus}&
+${Config.giftTypeIdParameter}=${giftTypeId}&
+${Config.pageParameter}=${this.currentUserGiftsPage}`;
+    if (this.userGiftTitleKeywords.localeCompare('') !== 0) {
+      getUserGiftsUrl += `&${Config.searchParameter}=${this.userGiftTitleKeywords.toLowerCase()}`;
+    }
     this.isLoadingSpinnerShown = true;
-    const totalPayment = 20;
+    this.userGiftService.getUserGifts(getUserGiftsUrl)
+      .subscribe(response => {
+        this.userGifts = response.body;
+        this.totalUserGifts = Number(response.headers.get(Config.headerXTotalCount));
+        this.isLoadingSpinnerShown = false;
+      });
+  }
+
+  /**
+   *
+   * @param event - selected page
+   */
+  public userGiftsPageChange(event): void {
+    this.currentUserGiftsPage = event;
+    this.getUserGifts();
+  }
+
+  /**
+   *
+   * @param keyword - keyword that user-account type on the search box
+   */
+  public searchUserGift(keyword): void {
+    this.userGiftTitleKeywords = keyword;
+    this.currentUserGiftsPage = 1;
+    this.getUserGifts();
+  }
+
+  /**
+   * handle cancel voucher modal
+   */
+  public handleCancelVoucherModal() {
+    this.isVoucherModalShown = false;
+  }
+
+  /**
+   * handle confirm voucher modal
+   */
+  public handleConfirmVoucherModal() {
+    this.isVoucherModalShown = false;
+  }
+
+  /**
+   * payment for coach
+   */
+  public paymentForCoach(): void {
+    this.isLoadingSpinnerShown = true;
     const makePaymentUrl = `${Config.apiBaseUrl}/
 ${Config.apiPaypalManagementPrefix}/
 ${Config.apiMakePayment}?
-${Config.sumParameter}=${totalPayment}`;
+${Config.sumParameter}=${this.totalCoachPayment}`;
     this.paymentService.makePayment(makePaymentUrl)
       .subscribe((response: any) => {
         if (response) {
@@ -242,10 +343,10 @@ ${Config.sumParameter}=${totalPayment}`;
           localStorage.setItem(Config.checkWhatUserWantToPay, 'coach');
           // save current user profile and current coach and current notification to localStorage just use for payment component
           // then delete after finishing
-          localStorage.setItem(Config.currentCoachMembershipNotification, JSON.stringify(selectedCoachMembershipNotification));
-          localStorage.setItem(Config.currentCoach, JSON.stringify(selectedCoachMembershipNotification.coach));
-          localStorage.setItem(Config.currentUserProfile, JSON.stringify(selectedCoachMembershipNotification.userProfile));
-          localStorage.setItem(Config.totalCoachPayment, JSON.stringify(totalPayment));
+          localStorage.setItem(Config.currentCoachMembershipNotification, JSON.stringify(this.selectedCoachMembershipNotification));
+          localStorage.setItem(Config.currentCoach, JSON.stringify(this.selectedCoachMembershipNotification.coach));
+          localStorage.setItem(Config.currentUserProfile, JSON.stringify(this.selectedCoachMembershipNotification.userProfile));
+          localStorage.setItem(Config.totalCoachPayment, JSON.stringify(this.totalCoachPayment));
           window.location.href = response.redirect_url;
         }
       });

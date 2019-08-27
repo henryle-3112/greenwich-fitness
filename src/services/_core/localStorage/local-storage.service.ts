@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {Config} from '@gw-config/core';
+import { Config } from '@gw-config/core';
 
 @Injectable({
   providedIn: 'root'

@@ -1,7 +1,7 @@
-import {Component, OnInit} from '@angular/core';
-import {PrivacyPolicyService} from '@gw-services/core/api/policy/privacy-policy.service';
-import {PrivacyPolicy} from '@gw-models/core';
-import {Config} from '@gw-config/core';
+import { Component, OnInit } from '@angular/core';
+import { PrivacyPolicyService } from '@gw-services/core/api/policy/privacy-policy.service';
+import { PrivacyPolicy } from '@gw-models/core';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-privacy-policy',

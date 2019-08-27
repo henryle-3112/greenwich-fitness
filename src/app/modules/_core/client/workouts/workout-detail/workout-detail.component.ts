@@ -1,9 +1,9 @@
-import {Component, OnInit} from '@angular/core';
-import {DetailedRounds, Workout, WorkoutExercise} from '@gw-models/core';
-import {ShareWorkoutService} from '@gw-services/core/shared/workout/share-workout.service';
-import {Router} from '@angular/router';
-import {ShareSingleExerciseService} from '@gw-services/core/shared/single-exercise/share-single-exercise.service';
-import {Config} from '@gw-config/core';
+import { Component, OnInit } from '@angular/core';
+import { DetailedRounds, Workout, WorkoutExercise } from '@gw-models/core';
+import { ShareWorkoutService } from '@gw-services/core/shared/workout/share-workout.service';
+import { Router } from '@angular/router';
+import { ShareSingleExerciseService } from '@gw-services/core/shared/single-exercise/share-single-exercise.service';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-workout-detail',
@@ -28,8 +28,8 @@ export class WorkoutDetailComponent implements OnInit {
    * @param router - inject router
    */
   constructor(private shareWorkout: ShareWorkoutService,
-              private shareSingleExercise: ShareSingleExerciseService,
-              private router: Router) {
+    private shareSingleExercise: ShareSingleExerciseService,
+    private router: Router) {
   }
 
   /**
@@ -68,15 +68,15 @@ export class WorkoutDetailComponent implements OnInit {
     this.isLoadingSpinnerShown = true;
     this.shareWorkout
       .currentWorkout.subscribe(selectedWorkout => {
-      if (selectedWorkout) {
-        this.selectedWorkout = selectedWorkout;
-        this.exercises = this.selectedWorkout.detailedRounds[0].exercises;
-        this.setDetailedRounds();
-      } else {
-        this.router.navigate(['/client/workout']);
-      }
-      this.isLoadingSpinnerShown = false;
-    });
+        if (selectedWorkout) {
+          this.selectedWorkout = selectedWorkout;
+          this.exercises = this.selectedWorkout.detailedRounds[0].exercises;
+          this.setDetailedRounds();
+        } else {
+          this.router.navigate(['/client/workout']);
+        }
+        this.isLoadingSpinnerShown = false;
+      });
   }
 
 

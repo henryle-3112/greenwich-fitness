@@ -1,18 +1,18 @@
-import {Component, OnInit, ViewChild, ElementRef} from '@angular/core';
-import {BodyIndexService} from '@gw-services/core/api/user/body-index.service';
-import {Config} from '@gw-config/core';
-import {BodyIndex, UserProfile} from '@gw-models/core';
-import {AuthenticationService} from '@gw-services/core/authentication/authentication.service';
-import {UserAccountService} from '@gw-services/core/api/user/user-account.service';
-import {FacebookAccountService} from '@gw-services/core/api/user/facebook-account.service';
-import {GoogleAccountService} from '@gw-services/core/api/user/google-account.service';
-import {Chart} from 'chart.js';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {CustomValidator} from '@gw-services/core/validate/custom-validator';
-import {Utils} from '@gw-helpers/core';
-import {NzNotificationService} from 'ng-zorro-antd';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
-import {Router} from '@angular/router';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { BodyIndexService } from '@gw-services/core/api/user/body-index.service';
+import { Config } from '@gw-config/core';
+import { BodyIndex, UserProfile } from '@gw-models/core';
+import { AuthenticationService } from '@gw-services/core/authentication/authentication.service';
+import { UserAccountService } from '@gw-services/core/api/user/user-account.service';
+import { FacebookAccountService } from '@gw-services/core/api/user/facebook-account.service';
+import { GoogleAccountService } from '@gw-services/core/api/user/google-account.service';
+import { Chart } from 'chart.js';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CustomValidator } from '@gw-services/core/validate/custom-validator';
+import { Utils } from '@gw-helpers/core';
+import { NzNotificationService } from 'ng-zorro-antd';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-body-index-report',
@@ -55,14 +55,14 @@ export class BodyIndexReportComponent implements OnInit {
    * @param shareUserProfileService - inject shareUserProfileService
    */
   constructor(private bodyIndexService: BodyIndexService,
-              private authentication: AuthenticationService,
-              private userAccountService: UserAccountService,
-              private facebookAccountService: FacebookAccountService,
-              private googleAccountService: GoogleAccountService,
-              private fb: FormBuilder,
-              private router: Router,
-              private notification: NzNotificationService,
-              private shareUserProfileService: ShareUserProfileService) {
+    private authentication: AuthenticationService,
+    private userAccountService: UserAccountService,
+    private facebookAccountService: FacebookAccountService,
+    private googleAccountService: GoogleAccountService,
+    private fb: FormBuilder,
+    private router: Router,
+    private notification: NzNotificationService,
+    private shareUserProfileService: ShareUserProfileService) {
   }
 
   /**
@@ -245,7 +245,7 @@ ${Config.userProfileIdParameter}=${selectedUserProfileId}`;
   public validateWeight(): void {
     if (this.f.weight.value.toString().localeCompare('') === 0) {
       this.f.weight.markAsTouched();
-      this.f.weight.setErrors({'required': true});
+      this.f.weight.setErrors({ 'required': true });
     }
   }
 
@@ -255,7 +255,7 @@ ${Config.userProfileIdParameter}=${selectedUserProfileId}`;
   public validateHeight(): void {
     if (this.f.height.value.toString().localeCompare('') === 0) {
       this.f.height.markAsTouched();
-      this.f.height.setErrors({'required': true});
+      this.f.height.setErrors({ 'required': true });
     }
   }
 

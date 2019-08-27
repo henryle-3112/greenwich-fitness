@@ -5,6 +5,10 @@
   position: relative;
 }
 
+#what-to-know:hover {
+  cursor: pointer;
+}
+
 #image-what-to-know {
   width: 100%;
   border-radius: 15px;

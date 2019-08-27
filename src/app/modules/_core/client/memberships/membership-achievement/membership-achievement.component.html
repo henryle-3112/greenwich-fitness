@@ -1,27 +1,46 @@
 <!--suppress ALL -->
-<div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;">
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
   <!-- loading component -->
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- custom list -->
-  <nz-list [nzDataSource]="userAchievements" [nzRenderItem]="item" [nzItemLayout]="'horizontal'"
-           [ngClass]="{'opacity-loading': isLoadingSpinnerShown, 'mg-bottom-24': true}">
+  <nz-list
+    [nzDataSource]="userAchievements"
+    [nzRenderItem]="item"
+    [nzItemLayout]="'horizontal'"
+    [ngClass]="{
+      'opacity-loading': isLoadingSpinnerShown,
+      'mg-bottom-24': true
+    }"
+  >
     <ng-template #item let-item>
       <nz-list-item>
-        <nz-list-item-meta
-          [nzTitle]="nzTitle"
-          [nzDescription]="nzDescription"
-        >
+        <nz-list-item-meta [nzTitle]="nzTitle" [nzDescription]="nzDescription">
           <ng-template #nzTitle>
             <a href="{{ item.title }}" target="_blank">{{ item.title }}</a>
           </ng-template>
           <ng-template #nzDescription>
-            <div><span>Achievement Time:</span> <span class="achievement-result">{{ item.time }} minutes</span></div>
-            <div><span>Number of reps:</span> <span class="achievement-result">{{ item.nreps }}</span></div>
-            <div><span>Health after finishing:</span> <span class="achievement-result">{{ item.currentHealth }}
-              / 10</span></div>
-            <div><span>Log:</span> <span class="achievement-result">{{ item.log }}</span></div>
+            <div>
+              <span>Achievement Time:</span>
+              <span class="achievement-result">{{ item.time }} minutes</span>
+            </div>
+            <div>
+              <span>Number of reps:</span>
+              <span class="achievement-result">{{ item.nreps }}</span>
+            </div>
+            <div>
+              <span>Health after finishing:</span>
+              <span class="achievement-result"
+                >{{ item.currentHealth }} / 10</span
+              >
+            </div>
+            <div>
+              <span>Log:</span>
+              <span class="achievement-result">{{ item.log }}</span>
+            </div>
           </ng-template>
         </nz-list-item-meta>
       </nz-list-item>
@@ -36,6 +55,7 @@
     [nzPageSize]="nUserAchievementsPerPage"
     [nzTotal]="totalUserAchievements"
     [nzSize]="'small'"
-    (nzPageIndexChange)="userAchievementsPageChange($event)"></nz-pagination>
+    (nzPageIndexChange)="userAchievementsPageChange($event)"
+  ></nz-pagination>
   <!-- end pagination -->
 </div>

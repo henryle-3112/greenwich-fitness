@@ -1,6 +1,6 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {ShareWorkoutService} from '@gw-services/core/shared/workout/share-workout.service';
-import {Router} from '@angular/router';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ShareWorkoutService } from '@gw-services/core/shared/workout/share-workout.service';
+import { Router } from '@angular/router';
 import {
   DetailedRounds,
   Music,
@@ -11,28 +11,29 @@ import {
   Workout,
   WorkoutExercise
 } from '@gw-models/core';
-import {Config} from '@gw-config/core';
-import {NzModalService, NzNotificationService} from 'ng-zorro-antd';
-import {ShareSingleExerciseService} from '@gw-services/core/shared/single-exercise/share-single-exercise.service';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
-import {UserAchievementService} from '@gw-services/core/api/user/user-achievement.service';
-import {ShareMusicService} from '@gw-services/core/shared/music/share-music.service';
-import {MusicService} from '@gw-services/core/api/music/music.service';
-import {TrainingService} from '@gw-services/core/api/training/training.service';
-import {Observable, Observer} from 'rxjs';
-import {ImageValidator} from '@gw-services/core/validate/image-validator';
-import {NewFeedService} from '@gw-services/core/api/feed/new-feed.service';
-import {UploadImageService} from '@gw-services/core/api/upload-image/upload-image.service';
-import {Coffeti} from '@gw-models/core';
-import {Utils} from '@gw-helpers/core';
-import {ShareTrainingService} from '@gw-services/core/shared/training/share-training.service';
+import { Config } from '@gw-config/core';
+import { NzModalService, NzNotificationService } from 'ng-zorro-antd';
+import { ShareSingleExerciseService } from '@gw-services/core/shared/single-exercise/share-single-exercise.service';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { UserAchievementService } from '@gw-services/core/api/user/user-achievement.service';
+import { ShareMusicService } from '@gw-services/core/shared/music/share-music.service';
+import { MusicService } from '@gw-services/core/api/music/music.service';
+import { TrainingService } from '@gw-services/core/api/training/training.service';
+import { Observable, Observer } from 'rxjs';
+import { ImageValidator } from '@gw-services/core/validate/image-validator';
+import { NewFeedService } from '@gw-services/core/api/feed/new-feed.service';
+import { UploadImageService } from '@gw-services/core/api/upload-image/upload-image.service';
+import { Coffeti } from '@gw-models/core';
+import { Utils } from '@gw-helpers/core';
+import { ShareTrainingService } from '@gw-services/core/shared/training/share-training.service';
+import Plyr from 'plyr';
 
 @Component({
   selector: 'app-workout-training',
   templateUrl: './workout-training.component.html',
   styleUrls: ['./workout-training.component.css']
 })
-export class WorkoutTrainingComponent implements OnInit, OnDestroy {
+export class WorkoutTrainingComponent implements OnInit, OnDestroy, AfterViewInit {
   selectedWorkout: Workout;
   isCountDownScreenShown: boolean;
   currentCountDownSeconds: number;
@@ -54,6 +55,8 @@ export class WorkoutTrainingComponent implements OnInit, OnDestroy {
   selectedMusic: Music;
   musics: Music[];
   musicPlayer: any;
+  // import plyr to customize audio interface
+  musicPlyr: any;
   isMusicModalShown: boolean;
   currentMusicsPage = 1;
   musicTitleKeywords: string;
@@ -69,6 +72,8 @@ export class WorkoutTrainingComponent implements OnInit, OnDestroy {
   isUploadImageLoading: boolean;
   coffetiAnimationInterval: any;
   @ViewChild('audioOption') audioPlayerRef: ElementRef;
+  @ViewChild('audioContainer') audioContainerRef: ElementRef;
+  audioContainerNativeElement: any;
   nRepsUserDid: number;
   nMaxReps: number;
   trainingLog: string;
@@ -93,29 +98,29 @@ export class WorkoutTrainingComponent implements OnInit, OnDestroy {
    * @param musicService - inject musicService
    */
   constructor(private shareWorkout: ShareWorkoutService,
-              private shareTrainingService: ShareTrainingService,
-              private router: Router,
-              private modal: NzModalService,
-              private shareSingleExercise: ShareSingleExerciseService,
-              private shareUserProfileService: ShareUserProfileService,
-              private userAchievementService: UserAchievementService,
-              private shareMusicService: ShareMusicService,
-              private trainingService: TrainingService,
-              private newFeedService: NewFeedService,
-              private uploadImageService: UploadImageService,
-              private notification: NzNotificationService,
-              private musicService: MusicService) {
+    private shareTrainingService: ShareTrainingService,
+    private router: Router,
+    private modal: NzModalService,
+    private shareSingleExercise: ShareSingleExerciseService,
+    private shareUserProfileService: ShareUserProfileService,
+    private userAchievementService: UserAchievementService,
+    private shareMusicService: ShareMusicService,
+    private trainingService: TrainingService,
+    private newFeedService: NewFeedService,
+    private uploadImageService: UploadImageService,
+    private notification: NzNotificationService,
+    private musicService: MusicService) {
   }
 
   /**
    * init data
    */
   ngOnInit(): void {
+    this.initMusicPlyr();
     this.trainingLog = '';
     this.currentHealthAfterFinished = 10;
     this.nMusicPerPage = 4;
     this.musicTitleKeywords = '';
-    this.getSelectedMusic();
     this.getAllMusics();
     this.initData();
     this.getSelectedWorkout();
@@ -128,6 +133,23 @@ export class WorkoutTrainingComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * apply plyr to customize audio interface
+   */
+  private initMusicPlyr() {
+    this.musicPlyr = new Plyr('#audio1', {
+      controls: [
+        'restart',
+        'play',
+        'progress',
+        'current-time',
+        'duration',
+        'mute',
+        'volume',
+      ]
+    });
+  }
+
+  /**
    * get selected music
    */
   private getSelectedMusic(): void {
@@ -136,14 +158,17 @@ export class WorkoutTrainingComponent implements OnInit, OnDestroy {
       .subscribe(selectedMusic => {
         this.selectedMusic = selectedMusic;
         if (this.selectedMusic) {
-          that.musicPlayer = <HTMLAudioElement>document.getElementById('music-player');
           if (that.musicPlayer) {
+            that.audioContainerNativeElement.style.opacity = 1;
             that.musicPlayer.onended = function () {
               that.goToNextMusic();
             };
+            that.musicPlayer.src = this.selectedMusic.musicLink;
             that.musicPlayer.currentTime = localStorage.getItem(Config.currentSongPosition) ?
               localStorage.getItem(Config.currentSongPosition) : 0;
           }
+        } else {
+          that.audioContainerNativeElement.style.opacity = 0;
         }
       });
   }
@@ -215,13 +240,13 @@ ${Config.statusParameter}=${musicStatus}`;
   private getSelectedWorkout(): void {
     this.shareWorkout
       .currentWorkout.subscribe(selectedWorkout => {
-      if (selectedWorkout) {
-        this.selectedWorkout = selectedWorkout;
-        this.initFirstDetailedRound();
-      } else {
-        this.router.navigate(['/client/workout']);
-      }
-    });
+        if (selectedWorkout) {
+          this.selectedWorkout = selectedWorkout;
+          this.initFirstDetailedRound();
+        } else {
+          this.router.navigate(['/client/workout']);
+        }
+      });
   }
 
   /**
@@ -750,14 +775,14 @@ ${Config.statusParameter}=${musicStatus}`;
   /**
    * handle submit log modal
    */
-  private handleSubmitLogModal(): void {
+  public handleSubmitLogModal(): void {
     this.validateLogInformation();
   }
 
   /**
    * handle cancel log modal
    */
-  private handleCancelLogModal(): void {
+  public handleCancelLogModal(): void {
     this.validateLogInformation();
   }
 
@@ -772,6 +797,12 @@ ${Config.statusParameter}=${musicStatus}`;
     }
     this.isLogModalShown = false;
     this.addToAchievement();
+  }
+
+  ngAfterViewInit(): void {
+    this.musicPlayer = this.audioPlayerRef.nativeElement;
+    this.audioContainerNativeElement = this.audioContainerRef.nativeElement;
+    this.getSelectedMusic();
   }
 
 }

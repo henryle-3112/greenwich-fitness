@@ -8,9 +8,9 @@ describe('ActiveAccountComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ActiveAccountComponent ]
+      declarations: [ActiveAccountComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

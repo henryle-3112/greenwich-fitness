@@ -1,11 +1,11 @@
-import {Component, OnInit} from '@angular/core';
-import {Coach, Membership} from '@gw-models/core';
-import {Router} from '@angular/router';
-import {Config} from '@gw-config/core';
-import {MembershipService} from '@gw-services/core/api/coach/membership.service';
-import {ShareMembershipService} from '@gw-services/core/shared/membership/share-membership.service';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
-import {ShareCoachService} from '@gw-services/core/shared/coach/share-coach.service';
+import { Component, OnInit } from '@angular/core';
+import { Coach, Membership } from '@gw-models/core';
+import { Router } from '@angular/router';
+import { Config } from '@gw-config/core';
+import { MembershipService } from '@gw-services/core/api/coach/membership.service';
+import { ShareMembershipService } from '@gw-services/core/shared/membership/share-membership.service';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { ShareCoachService } from '@gw-services/core/shared/coach/share-coach.service';
 
 @Component({
   selector: 'app-coach-membership',
@@ -31,10 +31,10 @@ export class CoachMembershipComponent implements OnInit {
    * @param router - inject router
    */
   constructor(private membershipService: MembershipService,
-              private shareMembershipService: ShareMembershipService,
-              private shareUserProfileService: ShareUserProfileService,
-              private shareCoachService: ShareCoachService,
-              private router: Router) {
+    private shareMembershipService: ShareMembershipService,
+    private shareUserProfileService: ShareUserProfileService,
+    private shareCoachService: ShareCoachService,
+    private router: Router) {
   }
 
   /**

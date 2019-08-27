@@ -1,10 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {CoachPaymentService} from '@gw-services/core/api/payment/coach-payment.service';
-import {Coach, UserProfile, CoachPayment} from '@gw-models/core';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
-import {Router} from '@angular/router';
-import {CoachService} from '@gw-services/core/api/coach/coach.service';
-import {Config} from '@gw-config/core';
+import { Component, OnInit } from '@angular/core';
+import { CoachPaymentService } from '@gw-services/core/api/payment/coach-payment.service';
+import { Coach, UserProfile, CoachPayment } from '@gw-models/core';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { Router } from '@angular/router';
+import { CoachService } from '@gw-services/core/api/coach/coach.service';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-revenue',
@@ -32,9 +32,9 @@ export class RevenueComponent implements OnInit {
    * @param router - inject router
    */
   constructor(private coachPaymentService: CoachPaymentService,
-              private coachService: CoachService,
-              private shareUserProfileService: ShareUserProfileService,
-              private router: Router) {
+    private coachService: CoachService,
+    private shareUserProfileService: ShareUserProfileService,
+    private router: Router) {
   }
 
   ngOnInit(): void {
@@ -114,7 +114,7 @@ ${Config.pageParameter}=${this.currentRevenuesPage}`;
    *
    * @param event - month that was selected by users to view their revenue
    */
-  private onMonthChanged(event): void {
+  public onMonthChanged(event): void {
     if (this.selectedDateToViewRevenue) {
       // get month and year to get coach payments list
       this.selectedMonthToViewRevenue = this.selectedDateToViewRevenue.getMonth() + 1;

@@ -1,7 +1,7 @@
-import {Component, OnInit} from '@angular/core';
-import {Contact} from '@gw-models/core';
-import {ContactService} from '@gw-services/core/api/contact/contact.service';
-import {Config} from '@gw-config/core';
+import { Component, OnInit } from '@angular/core';
+import { Contact } from '@gw-models/core';
+import { ContactService } from '@gw-services/core/api/contact/contact.service';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-contact',

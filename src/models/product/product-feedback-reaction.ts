@@ -1,4 +1,4 @@
-import {ProductFeedback, UserProfile} from '@gw-models/core';
+import { ProductFeedback, UserProfile } from '@gw-models/core';
 
 export class ProductFeedbackReaction {
   id?: number;

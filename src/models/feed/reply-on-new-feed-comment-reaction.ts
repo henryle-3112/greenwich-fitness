@@ -1,4 +1,4 @@
-import {ReplyOnNewFeedComment, UserProfile} from '@gw-models/core';
+import { ReplyOnNewFeedComment, UserProfile } from '@gw-models/core';
 
 export class ReplyOnNewFeedCommentReaction {
   id?: number;

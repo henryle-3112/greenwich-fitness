@@ -1,4 +1,4 @@
-import {ProductCategory} from '@gw-models/core';
+import { ProductCategory } from '@gw-models/core';
 
 export class Product {
   id?: number;

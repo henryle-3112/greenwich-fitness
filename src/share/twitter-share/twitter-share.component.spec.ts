@@ -8,9 +8,9 @@ describe('TwitterShareComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TwitterShareComponent ]
+      declarations: [TwitterShareComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

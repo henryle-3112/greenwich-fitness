@@ -1,9 +1,9 @@
-import {Component, OnInit} from '@angular/core';
-import {ShareProductOrderService} from '@gw-services/core/shared/order/share-product-order.service';
-import {Router} from '@angular/router';
-import {ProductOrder, ProductOrderDetail} from '@gw-models/core';
-import {ProductOrderDetailService} from '@gw-services/core/api/product/product-order-detail.service';
-import {Config} from '@gw-config/core';
+import { Component, OnInit } from '@angular/core';
+import { ShareProductOrderService } from '@gw-services/core/shared/order/share-product-order.service';
+import { Router } from '@angular/router';
+import { ProductOrder, ProductOrderDetail } from '@gw-models/core';
+import { ProductOrderDetailService } from '@gw-services/core/api/product/product-order-detail.service';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-buying-history-detail',
@@ -23,8 +23,8 @@ export class BuyingHistoryDetailComponent implements OnInit {
    * @param productOrderDetailService - inject productOrderDetailService
    */
   constructor(private shareProductOrderService: ShareProductOrderService,
-              private router: Router,
-              private productOrderDetailService: ProductOrderDetailService) {
+    private router: Router,
+    private productOrderDetailService: ProductOrderDetailService) {
   }
 
   ngOnInit(): void {

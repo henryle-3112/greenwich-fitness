@@ -1,7 +1,8 @@
 <!-- layout -->
-<div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;">
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
   <nz-tabset>
-
     <!-- tab user-account' profile -->
     <nz-tab nzTitle="User Profile">
       <app-user-information></app-user-information>
@@ -49,6 +50,12 @@
       <app-coach-payment-history></app-coach-payment-history>
     </nz-tab>
     <!-- end coach payment history tab -->
+
+    <!-- gift tab -->
+    <nz-tab nzTitle="Gift">
+      <app-user-gift></app-user-gift>
+    </nz-tab>
+    <!-- end gift tab -->
   </nz-tabset>
 </div>
 <!-- end layout -->

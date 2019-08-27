@@ -4,4 +4,5 @@ export class UserProfile {
   avatar?: string;
   acceptTermsOfService?: number;
   status?: number;
+  point?: number;
 }

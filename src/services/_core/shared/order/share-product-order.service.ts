@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
-import {ProductOrder} from '@gw-models/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { ProductOrder } from '@gw-models/core';
 
 @Injectable({
   providedIn: 'root'

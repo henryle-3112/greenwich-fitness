@@ -1,4 +1,6 @@
-<div style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;">
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
   <!-- loading component -->
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
@@ -12,8 +14,13 @@
   <!-- end month picker -->
 
   <!-- custom list -->
-  <nz-list class="mg-top-24" [nzDataSource]="revenues" [nzRenderItem]="item" [nzItemLayout]="'horizontal'"
-           *ngIf="revenues && revenues.length && !isLoadingSpinnerShown">
+  <nz-list
+    class="mg-top-24"
+    [nzDataSource]="revenues"
+    [nzRenderItem]="item"
+    [nzItemLayout]="'horizontal'"
+    *ngIf="revenues && revenues.length && !isLoadingSpinnerShown"
+  >
     <ng-template #item let-item>
       <nz-list-item>
         <nz-list-item-meta
@@ -21,7 +28,10 @@
           nzAvatar="{{ item.membership.userProfile.avatar }}"
         >
           <ng-template #nzTitle>
-            <span>{{ item.membership.userProfile.fullName }} has pay {{ item.sum }}$ for you</span>
+            <span
+              >{{ item.membership.userProfile.fullName }} has pay
+              {{ item.sum }}$ for you</span
+            >
           </ng-template>
         </nz-list-item-meta>
       </nz-list-item>
@@ -37,21 +47,29 @@
       [nzPageSize]="nRevenuesPerPage"
       [nzTotal]="totalRevenues"
       [nzSize]="'small'"
-      (nzPageIndexChange)="revenuesPageChange($event)"></nz-pagination>
+      (nzPageIndexChange)="revenuesPageChange($event)"
+    ></nz-pagination>
   </div>
   <!-- end pagination -->
 
   <!-- total coach revenue -->
-  <div id="total-revenue-by-selected-month-and-by-selected-year"
-       *ngIf="revenues
-        && revenues.length
-        && !isLoadingSpinnerShown
-        && totalCoachRevenues">
-    <h3 id="total-revenue-by-selected-month-and-by-selected-year-title">Total Revenue
-      in {{ selectedMonthToViewRevenue }}
-      /{{ selectedYearToViewRevenue }}: </h3>
-    <h3 id="total-revenue-by-selected-month-and-by-selected-year-result">{{ totalCoachRevenues }}$</h3>
+  <div
+    id="total-revenue-by-selected-month-and-by-selected-year"
+    *ngIf="
+      revenues &&
+      revenues.length &&
+      !isLoadingSpinnerShown &&
+      totalCoachRevenues
+    "
+  >
+    <h3 id="total-revenue-by-selected-month-and-by-selected-year-title">
+      Total Revenue in {{ selectedMonthToViewRevenue }} /{{
+        selectedYearToViewRevenue
+      }}:
+    </h3>
+    <h3 id="total-revenue-by-selected-month-and-by-selected-year-result">
+      {{ totalCoachRevenues }}$
+    </h3>
   </div>
   <!-- end total coach revenue-->
-
 </div>

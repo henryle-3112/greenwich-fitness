@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   NewFeed,
   NewFeedComment,
@@ -6,14 +6,14 @@ import {
   NewFeedReaction, ReplyOnNewFeedComment, ReplyOnNewFeedCommentReaction,
   UserProfile
 } from '@gw-models/core';
-import {Config} from '@gw-config/core';
-import {NewFeedService} from '@gw-services/core/api/feed/new-feed.service';
-import {NewFeedReactionService} from '@gw-services/core/api/feed/new-feed-reaction.service';
-import {NewFeedCommentService} from '@gw-services/core/api/feed/new-feed-comment.service';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
-import {NewFeedCommentReactionService} from '@gw-services/core/api/feed/new-feed-comment-reaction.service';
-import {ReplyOnNewFeedCommentService} from '@gw-services/core/api/feed/reply-on-new-feed-comment.service';
-import {ReplyOnNewFeedCommentReactionService} from '@gw-services/core/api/feed/reply-on-new-feed-comment-reaction.service';
+import { Config } from '@gw-config/core';
+import { NewFeedService } from '@gw-services/core/api/feed/new-feed.service';
+import { NewFeedReactionService } from '@gw-services/core/api/feed/new-feed-reaction.service';
+import { NewFeedCommentService } from '@gw-services/core/api/feed/new-feed-comment.service';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { NewFeedCommentReactionService } from '@gw-services/core/api/feed/new-feed-comment-reaction.service';
+import { ReplyOnNewFeedCommentService } from '@gw-services/core/api/feed/reply-on-new-feed-comment.service';
+import { ReplyOnNewFeedCommentReactionService } from '@gw-services/core/api/feed/reply-on-new-feed-comment-reaction.service';
 
 @Component({
   selector: 'app-new-feed',
@@ -40,12 +40,12 @@ export class NewFeedComponent implements OnInit {
    * @param newFeedCommentService - inject newFeedCommentService
    */
   constructor(private newFeedService: NewFeedService,
-              private newFeedReactionService: NewFeedReactionService,
-              private shareUserProfileService: ShareUserProfileService,
-              private newFeedCommentReactionService: NewFeedCommentReactionService,
-              private replyOnNewFeedCommentService: ReplyOnNewFeedCommentService,
-              private replyOnNewFeedCommentReactionService: ReplyOnNewFeedCommentReactionService,
-              private newFeedCommentService: NewFeedCommentService) {
+    private newFeedReactionService: NewFeedReactionService,
+    private shareUserProfileService: ShareUserProfileService,
+    private newFeedCommentReactionService: NewFeedCommentReactionService,
+    private replyOnNewFeedCommentService: ReplyOnNewFeedCommentService,
+    private replyOnNewFeedCommentReactionService: ReplyOnNewFeedCommentReactionService,
+    private newFeedCommentService: NewFeedCommentService) {
   }
 
   /**
@@ -248,7 +248,7 @@ ${Config.apiNewFeedCommentReactions}`;
    * @param newFeedCommentReactions - newfeed's comments that user liked and disliked
    */
   private showNewFeedCommentsUserLikedDisliked(newFeedComments: NewFeedComment[],
-                                               newFeedCommentReactions: NewFeedCommentReaction[]): void {
+    newFeedCommentReactions: NewFeedCommentReaction[]): void {
     for (const eachNewFeedCommentReaction of newFeedCommentReactions) {
       for (const eachNewFeedComment of newFeedComments) {
         if (eachNewFeedCommentReaction.newFeedComment.id === eachNewFeedComment.id) {
@@ -264,7 +264,7 @@ ${Config.apiNewFeedCommentReactions}`;
    * @param selectedNewFeedCommentReaction - reaction's value that will be set to selected newfeed
    */
   private changeNewFeedCommentReactionStatus(selectedNewFeedComment: NewFeedComment,
-                                             selectedNewFeedCommentReaction: NewFeedCommentReaction): void {
+    selectedNewFeedCommentReaction: NewFeedCommentReaction): void {
     selectedNewFeedComment.isReacted = true;
     selectedNewFeedComment.isLikeClicked = selectedNewFeedCommentReaction.reaction === 1;
   }
@@ -412,7 +412,7 @@ ${Config.apiReplyOnNewFeedCommentReactions}`;
    * @param replyOnNewFeedCommentReactions - replies on newfeed's comment that user liked and disliked
    */
   private showRepliesOnNewFeedCommentUserLikedDisliked(repliesOnNewFeedComment: ReplyOnNewFeedComment[],
-                                                       replyOnNewFeedCommentReactions: ReplyOnNewFeedCommentReaction[]): void {
+    replyOnNewFeedCommentReactions: ReplyOnNewFeedCommentReaction[]): void {
     for (const eachReplyOnNewFeedCommentReaction of replyOnNewFeedCommentReactions) {
       for (const eachReplyOnNewFeedComment of repliesOnNewFeedComment) {
         if (eachReplyOnNewFeedCommentReaction.replyOnNewFeedComment.id === eachReplyOnNewFeedComment.id) {
@@ -429,7 +429,7 @@ ${Config.apiReplyOnNewFeedCommentReactions}`;
    * @param selectedReplyOnNewFeedCommentReaction - reaction's value that will be set to reply on newfeed's comment
    */
   private changeReplyOnNewFeedCommentReactionStatus(selectedReplyOnNewFeedComment: ReplyOnNewFeedComment,
-                                                    selectedReplyOnNewFeedCommentReaction: ReplyOnNewFeedCommentReaction): void {
+    selectedReplyOnNewFeedCommentReaction: ReplyOnNewFeedCommentReaction): void {
     selectedReplyOnNewFeedComment.isReacted = true;
     selectedReplyOnNewFeedComment.isLikeClicked = selectedReplyOnNewFeedCommentReaction.reaction === 1;
   }
@@ -489,7 +489,7 @@ ${Config.apiRepliesOnNewFeedComment}`;
    * @param reactionValue - reaction value that user has reacted to reply on newfeed's comment
    */
   private submitReplyOnNewFeedCommentReactionToServer(selectedReplyOnNewFeedComment: ReplyOnNewFeedComment,
-                                                      reactionValue: number): void {
+    reactionValue: number): void {
     const replyOnNewFeedCommentReaction = new ReplyOnNewFeedCommentReaction();
     replyOnNewFeedCommentReaction.reaction = reactionValue;
     replyOnNewFeedCommentReaction.replyOnNewFeedComment = selectedReplyOnNewFeedComment;

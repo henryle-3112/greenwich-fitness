@@ -8,9 +8,9 @@ describe('BlogTagComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ BlogTagComponent ]
+      declarations: [BlogTagComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

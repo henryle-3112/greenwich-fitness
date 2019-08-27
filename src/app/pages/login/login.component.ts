@@ -1,12 +1,12 @@
-import {Component, NgZone, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {ActivatedRoute, Router} from '@angular/router';
-import {AuthenticationService} from '@gw-services/core/authentication/authentication.service';
-import {first} from 'rxjs/operators';
-import {CustomValidator} from '@gw-services/core/validate/custom-validator';
-import {FacebookAccount, GoogleAccount, UserProfile} from '@gw-models/core';
-import {NzNotificationService} from 'ng-zorro-antd';
-import {Config} from '@gw-config/core';
+import { Component, NgZone, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AuthenticationService } from '@gw-services/core/authentication/authentication.service';
+import { first } from 'rxjs/operators';
+import { CustomValidator } from '@gw-services/core/validate/custom-validator';
+import { FacebookAccount, GoogleAccount, UserProfile } from '@gw-models/core';
+import { NzNotificationService } from 'ng-zorro-antd';
+import { Config } from '@gw-config/core';
 
 declare const FB: any;
 declare const gapi: any;
@@ -33,11 +33,11 @@ export class LoginComponent implements OnInit {
    * @param zone - inject zone
    */
   constructor(private fb: FormBuilder,
-              private route: ActivatedRoute,
-              private router: Router,
-              private authenticationService: AuthenticationService,
-              private notification: NzNotificationService,
-              private zone: NgZone) {
+    private route: ActivatedRoute,
+    private router: Router,
+    private authenticationService: AuthenticationService,
+    private notification: NzNotificationService,
+    private zone: NgZone) {
   }
 
   /**
@@ -100,7 +100,7 @@ export class LoginComponent implements OnInit {
   validatePassword(): void {
     if (this.f.password.value.toString().localeCompare('') === 0) {
       this.f.password.markAsTouched();
-      this.f.password.setErrors({'required': true});
+      this.f.password.setErrors({ 'required': true });
     }
   }
 
@@ -110,7 +110,7 @@ export class LoginComponent implements OnInit {
   validateEmail(): void {
     if (this.f.userName.value.toString().localeCompare('') === 0) {
       this.f.userName.markAsTouched();
-      this.f.userName.setErrors({'required': true});
+      this.f.userName.setErrors({ 'required': true });
     }
   }
 
@@ -296,7 +296,7 @@ export class LoginComponent implements OnInit {
   /**
    * show isLoadingSpinnerShown component
    */
-  private loginByGoogle(): void {
+  public loginByGoogle(): void {
     this.isLoadingSpinnerShown = true;
   }
 

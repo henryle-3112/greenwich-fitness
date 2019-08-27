@@ -1,9 +1,9 @@
-import {Component, OnInit} from '@angular/core';
-import {Notification, UserProfile} from '@gw-models/core';
-import {Config} from '@gw-config/core';
-import {NotificationService} from '@gw-services/core/api/notification/notification.service';
-import {Router} from '@angular/router';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { Component, OnInit } from '@angular/core';
+import { Notification, UserProfile } from '@gw-models/core';
+import { Config } from '@gw-config/core';
+import { NotificationService } from '@gw-services/core/api/notification/notification.service';
+import { Router } from '@angular/router';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
 
 @Component({
   selector: 'app-notification',
@@ -26,8 +26,8 @@ export class NotificationComponent implements OnInit {
    * @param shareUserProfileService - inject shareUserProfileService
    */
   constructor(private notificationService: NotificationService,
-              private router: Router,
-              private shareUserProfileService: ShareUserProfileService) {
+    private router: Router,
+    private shareUserProfileService: ShareUserProfileService) {
   }
 
   /**

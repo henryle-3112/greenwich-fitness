@@ -1,8 +1,8 @@
-import {Component, OnInit} from '@angular/core';
-import {ReadLocalJsonService} from '@gw-services/core/api/read-local-json/read-local-json.service';
-import {Router} from '@angular/router';
-import {DetailedRounds, SingleExercise, Workout, WorkoutExercise} from '@gw-models/core';
-import {ShareWorkoutService} from '@gw-services/core/shared/workout/share-workout.service';
+import { Component, OnInit } from '@angular/core';
+import { ReadLocalJsonService } from '@gw-services/core/api/read-local-json/read-local-json.service';
+import { Router } from '@angular/router';
+import { DetailedRounds, SingleExercise, Workout, WorkoutExercise } from '@gw-models/core';
+import { ShareWorkoutService } from '@gw-services/core/shared/workout/share-workout.service';
 
 @Component({
   selector: 'app-workout',
@@ -41,8 +41,8 @@ export class WorkoutComponent implements OnInit {
    * @param shareWorkout - inject shareWorkout
    */
   constructor(private readLocalJson: ReadLocalJsonService,
-              private router: Router,
-              private shareWorkout: ShareWorkoutService) {
+    private router: Router,
+    private shareWorkout: ShareWorkoutService) {
   }
 
   ngOnInit() {

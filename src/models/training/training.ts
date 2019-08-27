@@ -1,4 +1,4 @@
-import {Coach, UserProfile} from '@gw-models/core';
+import { Coach, UserProfile } from '@gw-models/core';
 
 export class Training {
   id?: number;
@@ -12,4 +12,3 @@ export class Training {
   currentHealth?: string;
   statusButton?: number;
 }
-

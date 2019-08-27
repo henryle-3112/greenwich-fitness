@@ -1,8 +1,8 @@
-import {Component, OnInit} from '@angular/core';
-import {SingleExercise} from '@gw-models/core';
-import {ShareSingleExerciseService} from '@gw-services/core/shared/single-exercise/share-single-exercise.service';
-import {Router} from '@angular/router';
-import {Config} from '@gw-config/core';
+import { Component, OnInit } from '@angular/core';
+import { SingleExercise } from '@gw-models/core';
+import { ShareSingleExerciseService } from '@gw-services/core/shared/single-exercise/share-single-exercise.service';
+import { Router } from '@angular/router';
+import { Config } from '@gw-config/core';
 
 @Component({
   selector: 'app-exercise-detail',
@@ -22,7 +22,7 @@ export class ExerciseDetailComponent implements OnInit {
    * @param router - inject Router for routing
    */
   constructor(private shareSingleExercise: ShareSingleExerciseService,
-              private router: Router) {
+    private router: Router) {
   }
 
   /**

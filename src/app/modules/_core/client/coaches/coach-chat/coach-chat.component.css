@@ -1,0 +1,19 @@
+/* chat input css */
+#chat-input {
+  position: relative;
+  left: 0;
+  right: 0;
+  top: 270px;
+}
+
+#emoji-toggle {
+  position: absolute;
+  top: 8px;
+  right: -24px;
+}
+
+#emoji-toggle:hover {
+  cursor: pointer;
+}
+
+/* end chat input css */

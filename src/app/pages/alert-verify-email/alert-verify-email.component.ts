@@ -1,6 +1,6 @@
-import {Component, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
-import {Coffeti} from '@gw-models/core';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { Coffeti } from '@gw-models/core';
 
 @Component({
   selector: 'app-alert-verify-email',

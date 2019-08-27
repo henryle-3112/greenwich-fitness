@@ -87,12 +87,9 @@
 }
 /* end customer reviews */
 
-
-
 /* responsive css */
 
-
-@media (min-width:320px)  {
+@media (min-width: 320px) {
   /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
 
   #customer-reviews {
@@ -104,7 +101,7 @@
   }
 }
 
-@media (min-width:480px)  {
+@media (min-width: 480px) {
   /* smartphones, Android phones, landscape iPhone */
 
   #customer-reviews {
@@ -114,14 +111,13 @@
   #btn-write-reviews {
     margin-top: 4px;
   }
-
 }
 
 /*@media screen and (min-width: 600px) , screen and (max-width: 800px) {*/
 /*...*/
 /*}*/
 
-@media (min-width:600px)  {
+@media (min-width: 600px) {
   /* portrait tablets, portrait iPad, e-readers (Nook/Kindle), landscape 800x480 phones (Android) */
 
   #customer-reviews {
@@ -131,9 +127,8 @@
   #btn-write-reviews {
     margin-top: 4px;
   }
-
 }
-@media (min-width:801px)  {
+@media (min-width: 801px) {
   /* tablet, landscape iPad, lo-res laptops ands desktops */
 
   #customer-reviews {
@@ -143,9 +138,8 @@
   #btn-write-reviews {
     margin-top: 4px;
   }
-
 }
-@media (min-width:1025px) {
+@media (min-width: 1025px) {
   /* big landscape tablets, laptops, and desktops */
 
   #customer-reviews {
@@ -155,9 +149,8 @@
   #btn-write-reviews {
     margin-top: 0;
   }
-
 }
-@media (min-width:1281px) {
+@media (min-width: 1281px) {
   /* hi-res laptops and desktops */
 
   #customer-reviews {

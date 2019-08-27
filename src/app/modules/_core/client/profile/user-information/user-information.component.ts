@@ -1,17 +1,17 @@
-import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {NzNotificationService} from 'ng-zorro-antd';
-import {UploadImageService} from '@gw-services/core/api/upload-image/upload-image.service';
-import {Router} from '@angular/router';
-import {ResponseMessage, UserAccount, UserProfile} from '@gw-models/core';
-import {ImageValidator} from '@gw-services/core/validate/image-validator';
-import {Observable, Observer} from 'rxjs';
-import {AuthenticationService} from '@gw-services/core/authentication/authentication.service';
-import {Config} from '@gw-config/core';
-import {UserAccountService} from '@gw-services/core/api/user/user-account.service';
-import {UserProfileService} from '@gw-services/core/api/user/user-profile.service';
-import {ShareUserAccountService} from '@gw-services/core/shared/user-account/share-user-account.service';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NzNotificationService } from 'ng-zorro-antd';
+import { UploadImageService } from '@gw-services/core/api/upload-image/upload-image.service';
+import { Router } from '@angular/router';
+import { ResponseMessage, UserAccount, UserProfile } from '@gw-models/core';
+import { ImageValidator } from '@gw-services/core/validate/image-validator';
+import { Observable, Observer } from 'rxjs';
+import { AuthenticationService } from '@gw-services/core/authentication/authentication.service';
+import { Config } from '@gw-config/core';
+import { UserAccountService } from '@gw-services/core/api/user/user-account.service';
+import { UserProfileService } from '@gw-services/core/api/user/user-profile.service';
+import { ShareUserAccountService } from '@gw-services/core/shared/user-account/share-user-account.service';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
 
 @Component({
   selector: 'app-user-information',
@@ -42,14 +42,14 @@ export class UserInformationComponent implements OnInit {
    * @param shareUserProfileService - inject shareUserProfileService
    */
   constructor(private fb: FormBuilder,
-              private notification: NzNotificationService,
-              private uploadImageService: UploadImageService,
-              private router: Router,
-              private authentication: AuthenticationService,
-              private userAccountService: UserAccountService,
-              private userProfileService: UserProfileService,
-              private shareUserAccountService: ShareUserAccountService,
-              private shareUserProfileService: ShareUserProfileService) {
+    private notification: NzNotificationService,
+    private uploadImageService: UploadImageService,
+    private router: Router,
+    private authentication: AuthenticationService,
+    private userAccountService: UserAccountService,
+    private userProfileService: UserProfileService,
+    private shareUserAccountService: ShareUserAccountService,
+    private shareUserProfileService: ShareUserProfileService) {
   }
 
   /**
@@ -99,7 +99,7 @@ export class UserInformationComponent implements OnInit {
   validateName(): void {
     if (this.f.fullName.value.toString().localeCompare('') === 0) {
       this.f.fullName.markAsTouched();
-      this.f.fullName.setErrors({'required': true});
+      this.f.fullName.setErrors({ 'required': true });
     }
   }
 

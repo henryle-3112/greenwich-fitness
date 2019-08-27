@@ -1,6 +1,8 @@
 <!--suppress ALL -->
-<div [ngClass]="{'opacity-loading': isLoadingSpinnerShown}" style="background-color: white;">
-
+<div
+  [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+  style="background-color: white;"
+>
   <!-- loading component -->
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
@@ -18,28 +20,64 @@
     <!-- post tags-->
     <div id="tags">
       <h2>Tags</h2>
-      <nz-tag *ngFor="let eachPostTag of tagsByPost"
-              (click)="goToPostsByTag(eachPostTag.tag)">{{ eachPostTag.tag.tagName }}</nz-tag>
+      <nz-tag
+        *ngFor="let eachPostTag of tagsByPost"
+        (click)="goToPostsByTag(eachPostTag.tag)"
+        >{{ eachPostTag.tag.tagName }}</nz-tag
+      >
     </div>
     <!-- end post tags-->
 
     <!-- customer reviews -->
     <div nz-row nzGutter="0" style="padding-bottom: 24px;">
-      <div id="customer-reviews" nz-col class="gutter-row" nzXs="24" nzSm="24" nzMd="24" nzLg="24" nzXl="24"
-           style="background: white;">
+      <div
+        id="customer-reviews"
+        nz-col
+        class="gutter-row"
+        nzXs="24"
+        nzSm="24"
+        nzMd="24"
+        nzLg="24"
+        nzXl="24"
+        style="background: white;"
+      >
         <h2 id="title-customer-reviews">Customer Reviews</h2>
-        <button nz-button nzType="default" id="btn-write-reviews" (click)="toggleAddReviewForm()">Write Reviews</button>
+        <button
+          nz-button
+          nzType="default"
+          id="btn-write-reviews"
+          (click)="toggleAddReviewForm()"
+        >
+          Write Reviews
+        </button>
 
         <div class="clear-both"></div>
 
         <!-- add reviews form -->
         <div id="add-reviews-form" *ngIf="isPostReviewFormShown">
-          <nz-rate class="mg-top-24" [ngModel]="selectedPostRateValue"
-                   (ngModelChange)="onRateChanged($event)"></nz-rate>
-          <br/>
-          <textarea class="mg-top-24" id="reviews-text-area" rows="4" nz-input [(ngModel)]="postReviewContent"
-                    placeholder="Write Reviews..."></textarea> <br/>
-          <button nz-button nzType="primary" id="btn-add-reviews" (click)="addPostReview()">Add Reviews</button>
+          <nz-rate
+            class="mg-top-24"
+            [ngModel]="selectedPostRateValue"
+            (ngModelChange)="onRateChanged($event)"
+          ></nz-rate>
+          <br />
+          <textarea
+            class="mg-top-24"
+            id="reviews-text-area"
+            rows="4"
+            nz-input
+            [(ngModel)]="postReviewContent"
+            placeholder="Write Reviews..."
+          ></textarea>
+          <br />
+          <button
+            nz-button
+            nzType="primary"
+            id="btn-add-reviews"
+            (click)="addPostReview()"
+          >
+            Add Reviews
+          </button>
         </div>
         <!-- end add reviews form -->
 
@@ -47,9 +85,18 @@
 
         <!-- reply comment template-->
         <ng-template #commentTemplateReplyRef let-comment="comment">
-          <nz-comment [nzAuthor]="comment.userProfile.fullName"
-                      [nzDatetime]="comment.replyOnPostCommentCreatedDate | date: 'yyyy-MM-dd HH:mm:ss'">
-            <nz-avatar nz-comment-avatar nzIcon="user" [nzSrc]="comment.userProfile.avatar"></nz-avatar>
+          <nz-comment
+            [nzAuthor]="comment.userProfile.fullName"
+            [nzDatetime]="
+              comment.replyOnPostCommentCreatedDate
+                | date: 'yyyy-MM-dd HH:mm:ss'
+            "
+          >
+            <nz-avatar
+              nz-comment-avatar
+              nzIcon="user"
+              [nzSrc]="comment.userProfile.avatar"
+            ></nz-avatar>
             <nz-comment-content>
               <p>{{ comment.replyOnPostCommentContent }}</p>
             </nz-comment-content>
@@ -59,7 +106,9 @@
                 nzTitle="Like"
                 nz-icon
                 type="like"
-                [nzTheme]="comment.isLikeClicked == true ? 'twotone' : 'outline'"
+                [nzTheme]="
+                  comment.isLikeClicked == true ? 'twotone' : 'outline'
+                "
                 (click)="likeReplyOnPostComment(comment)"
               ></i>
               <span class="count like">{{ comment?.numberOfLikes }}</span>
@@ -70,13 +119,17 @@
                 nzTitle="Dislike"
                 nz-icon
                 type="dislike"
-                [nzTheme]="comment.isLikeClicked == false ? 'twotone' : 'outline'"
+                [nzTheme]="
+                  comment.isLikeClicked == false ? 'twotone' : 'outline'
+                "
                 (click)="dislikeReplyOnPostComment(comment)"
               ></i>
               <span class="count dislike">{{ comment?.numberOfDislikes }}</span>
             </nz-comment-action>
             <nz-comment-action>
-              <span (click)="showReplyReplyPostCommentBox(comment)">Reply to</span>
+              <span (click)="showReplyReplyPostCommentBox(comment)"
+                >Reply to</span
+              >
             </nz-comment-action>
           </nz-comment>
         </ng-template>
@@ -84,11 +137,18 @@
 
         <!-- comment template -->
         <ng-template #commentTemplateRef let-comment="comment">
-
           <!-- post's comment content -->
-          <nz-comment [nzAuthor]="comment.userProfile.fullName"
-                      [nzDatetime]="comment.postCommentCreatedDate | date: 'yyyy-MM-dd HH:mm:ss'">
-            <nz-avatar nz-comment-avatar nzIcon="user" [nzSrc]="comment.userProfile.avatar"></nz-avatar>
+          <nz-comment
+            [nzAuthor]="comment.userProfile.fullName"
+            [nzDatetime]="
+              comment.postCommentCreatedDate | date: 'yyyy-MM-dd HH:mm:ss'
+            "
+          >
+            <nz-avatar
+              nz-comment-avatar
+              nzIcon="user"
+              [nzSrc]="comment.userProfile.avatar"
+            ></nz-avatar>
             <nz-comment-content>
               <p>{{ comment.postCommentContent }}</p>
             </nz-comment-content>
@@ -98,7 +158,9 @@
                 nzTitle="Like"
                 nz-icon
                 type="like"
-                [nzTheme]="comment.isLikeClicked == true ? 'twotone' : 'outline'"
+                [nzTheme]="
+                  comment.isLikeClicked == true ? 'twotone' : 'outline'
+                "
                 (click)="like(comment)"
               ></i>
               <span class="count like">{{ comment?.numberOfLikes }}</span>
@@ -109,7 +171,9 @@
                 nzTitle="Dislike"
                 nz-icon
                 type="dislike"
-                [nzTheme]="comment.isLikeClicked == false ? 'twotone' : 'outline'"
+                [nzTheme]="
+                  comment.isLikeClicked == false ? 'twotone' : 'outline'
+                "
                 (click)="dislike(comment)"
               ></i>
               <span class="count dislike">{{ comment?.numberOfDislikes }}</span>
@@ -118,40 +182,54 @@
               <span (click)="showReplyPostCommentBox(comment)">Reply to</span>
             </nz-comment-action>
             <nz-comment-action>
-              <span (click)="viewRepliesOfSelectedPostComment(comment)">View {{ comment?.numberOfReplies }}
-                replies</span>
+              <span (click)="viewRepliesOfSelectedPostComment(comment)"
+                >View {{ comment?.numberOfReplies }} replies</span
+              >
             </nz-comment-action>
             <!-- end  post's comment content -->
 
             <!-- relies of each post's comment -->
             <ng-container *ngIf="comment.replies && comment.replies.length">
               <ng-template ngFor let-child [ngForOf]="comment.replies">
-                <ng-template [ngTemplateOutlet]="commentTemplateReplyRef"
-                             [ngTemplateOutletContext]="{ comment: child }">
+                <ng-template
+                  [ngTemplateOutlet]="commentTemplateReplyRef"
+                  [ngTemplateOutletContext]="{ comment: child }"
+                >
                 </ng-template>
               </ng-template>
             </ng-container>
             <!-- end relies of each post's comment -->
 
             <!-- reply box-->
-            <nz-input-group *ngIf="comment.isReplyBoxShown && comment.isReplyBoxShown == true"
-                            [nzSuffix]="suffixIconMessage"
-                            [ngClass]="{'mg-bottom-24': true, 'width-50': true}">
-              <input type="text" nz-input placeholder="Reply..." #replyBox
-                     (keyup.enter)="replyToPostComment(comment, replyBox.value); replyBox.value = ''"/>
+            <nz-input-group
+              *ngIf="comment.isReplyBoxShown && comment.isReplyBoxShown == true"
+              [nzSuffix]="suffixIconMessage"
+              [ngClass]="{ 'mg-bottom-24': true, 'width-50': true }"
+            >
+              <input
+                type="text"
+                nz-input
+                placeholder="Reply..."
+                #replyBox
+                (keyup.enter)="
+                  replyToPostComment(comment, replyBox.value);
+                  replyBox.value = ''
+                "
+              />
             </nz-input-group>
             <ng-template #suffixIconMessage>
               <i nz-icon type="message"></i>
             </ng-template>
             <!-- end reply box -->
-
           </nz-comment>
         </ng-template>
         <!-- end comment template -->
 
         <div *ngFor="let eachPostComment of postCommentsPerPage">
-          <ng-template [ngTemplateOutlet]="commentTemplateRef"
-                       [ngTemplateOutletContext]="{ comment: eachPostComment }"></ng-template>
+          <ng-template
+            [ngTemplateOutlet]="commentTemplateRef"
+            [ngTemplateOutletContext]="{ comment: eachPostComment }"
+          ></ng-template>
         </div>
 
         <!-- end pagination list -->
@@ -163,12 +241,12 @@
           [nzPageSize]="nPostCommentsPerPage"
           [nzTotal]="totalPostComments"
           nzSize="small"
-          (nzPageIndexChange)="postCommentsPageChange($event)"></nz-pagination>
+          (nzPageIndexChange)="postCommentsPageChange($event)"
+        ></nz-pagination>
         <!-- end pagination -->
       </div>
 
       <!-- end customer reviews -->
-
     </div>
   </div>
   <!-- end post's detail-->

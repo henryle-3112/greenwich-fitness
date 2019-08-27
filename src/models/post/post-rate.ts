@@ -1,4 +1,4 @@
-import {Post, UserProfile} from '@gw-models/core';
+import { Post, UserProfile } from '@gw-models/core';
 
 export class PostRate {
   id?: number;

@@ -1,29 +1,50 @@
 <!--suppress ALL -->
-<div [ngClass]="{'opacity-loading': isLoadingSpinnerShown}">
-
+<div [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }">
   <!-- loading component -->
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- posts -->
   <div>
-
     <div class="title">
       <h2>Search Results</h2>
     </div>
 
     <div class="clear-both"></div>
 
-    <div nz-row nzGutter="16" [ngClass]="{'mg-bottom-24': true}" class="post-search-list">
-      <div nz-col class="gutter-row" nzXs="24" nzSm="24" nzMd="6"
-           nzLg="6" nzXl="6" *ngFor="let eachPost of searchingPosts; let i = index" [attr.data-index]="i">
-        <div class="gutter-box post-item" [ngClass]="{'mg-top-24': i >= 4}" (click)="goToPostDetail(eachPost)">
+    <div
+      nz-row
+      nzGutter="16"
+      [ngClass]="{ 'mg-bottom-24': true }"
+      class="post-search-list"
+    >
+      <div
+        nz-col
+        class="gutter-row"
+        nzXs="24"
+        nzSm="24"
+        nzMd="6"
+        nzLg="6"
+        nzXl="6"
+        *ngFor="let eachPost of searchingPosts; let i = index"
+        [attr.data-index]="i"
+      >
+        <div
+          class="gutter-box post-item"
+          [ngClass]="{ 'mg-top-24': i >= 4 }"
+          (click)="goToPostDetail(eachPost)"
+        >
           <nz-card nzHoverable style="width: 100%;" [nzCover]="coverTemplate">
-            <nz-card-meta nzTitle="{{ eachPost.postTitle }}"
-                          nzDescription="{{ eachPost.userProfile.fullName}}"></nz-card-meta>
+            <nz-card-meta
+              nzTitle="{{ eachPost.postTitle }}"
+              nzDescription="{{ eachPost.userProfile.fullName }}"
+            ></nz-card-meta>
           </nz-card>
           <ng-template #coverTemplate>
-            <img alt="{{ eachPost.postTitle }}" src="{{ eachPost.postImage }}"/>
+            <img
+              alt="{{ eachPost.postTitle }}"
+              src="{{ eachPost.postImage }}"
+            />
           </ng-template>
         </div>
       </div>
@@ -36,10 +57,10 @@
         [nzPageIndex]="currentSearchingPostsPage"
         [nzPageSize]="nSearchingPostsPerPage"
         [nzTotal]="totalSearchingPosts"
-        (nzPageIndexChange)="postsPageChange($event)"></nz-pagination>
+        (nzPageIndexChange)="postsPageChange($event)"
+      ></nz-pagination>
       <!-- end pagination -->
     </div>
   </div>
   <!-- end posts -->
-
 </div>

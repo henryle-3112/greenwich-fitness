@@ -8,9 +8,9 @@ describe('AlertVerifyEmailComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AlertVerifyEmailComponent ]
+      declarations: [AlertVerifyEmailComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

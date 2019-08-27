@@ -1,15 +1,15 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {BodyIndex, UserProfile} from '@gw-models/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {BodyIndexService} from '@gw-services/core/api/user/body-index.service';
-import {AuthenticationService} from '@gw-services/core/authentication/authentication.service';
-import {NzNotificationService} from 'ng-zorro-antd';
-import {Utils} from '@gw-helpers/core';
-import {Config} from '@gw-config/core';
-import {Chart} from 'chart.js';
-import {ShareMembershipService} from '@gw-services/core/shared/membership/share-membership.service';
-import {Router} from '@angular/router';
-import {CustomValidator} from '@gw-services/core/validate/custom-validator';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { BodyIndex, UserProfile } from '@gw-models/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { BodyIndexService } from '@gw-services/core/api/user/body-index.service';
+import { AuthenticationService } from '@gw-services/core/authentication/authentication.service';
+import { NzNotificationService } from 'ng-zorro-antd';
+import { Utils } from '@gw-helpers/core';
+import { Config } from '@gw-config/core';
+import { Chart } from 'chart.js';
+import { ShareMembershipService } from '@gw-services/core/shared/membership/share-membership.service';
+import { Router } from '@angular/router';
+import { CustomValidator } from '@gw-services/core/validate/custom-validator';
 
 @Component({
   selector: 'app-membership-body-index-report',
@@ -48,11 +48,11 @@ export class MembershipBodyIndexReportComponent implements OnInit {
    * @param router - inject router
    */
   constructor(private bodyIndexService: BodyIndexService,
-              private authentication: AuthenticationService,
-              private shareMembershipService: ShareMembershipService,
-              private fb: FormBuilder,
-              private notification: NzNotificationService,
-              private router: Router) {
+    private authentication: AuthenticationService,
+    private shareMembershipService: ShareMembershipService,
+    private fb: FormBuilder,
+    private notification: NzNotificationService,
+    private router: Router) {
   }
 
   /**
@@ -247,7 +247,7 @@ ${Config.userProfileIdParameter}=${this.selectedUserProfileId}`;
   public validateWeight(): void {
     if (this.f.weight.value.toString().localeCompare('') === 0) {
       this.f.weight.markAsTouched();
-      this.f.weight.setErrors({'required': true});
+      this.f.weight.setErrors({ 'required': true });
     }
   }
 
@@ -258,7 +258,7 @@ ${Config.userProfileIdParameter}=${this.selectedUserProfileId}`;
   public validateHeight(): void {
     if (this.f.height.value.toString().localeCompare('') === 0) {
       this.f.height.markAsTouched();
-      this.f.height.setErrors({'required': true});
+      this.f.height.setErrors({ 'required': true });
     }
   }
 

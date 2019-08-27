@@ -1,4 +1,4 @@
-import {Post, ReplyOnPostComment, UserProfile} from '@gw-models/core';
+import { Post, ReplyOnPostComment, UserProfile } from '@gw-models/core';
 
 export class PostComment {
   id?: number;

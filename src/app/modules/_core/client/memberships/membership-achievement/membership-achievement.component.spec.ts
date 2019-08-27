@@ -8,9 +8,9 @@ describe('MembershipAchievementComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ MembershipAchievementComponent ]
+      declarations: [MembershipAchievementComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

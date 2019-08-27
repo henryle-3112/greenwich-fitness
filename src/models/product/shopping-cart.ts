@@ -1,4 +1,4 @@
-import {Product} from '@gw-models/core';
+import { Product } from '@gw-models/core';
 
 export class ShoppingCart {
   quantity?: number;

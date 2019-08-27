@@ -1,4 +1,4 @@
-import {Membership} from '@gw-models/core';
+import { Membership } from '@gw-models/core';
 
 export class CoachPayment {
   id?: number;

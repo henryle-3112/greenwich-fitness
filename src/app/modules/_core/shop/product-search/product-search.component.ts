@@ -1,10 +1,10 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Config} from '@gw-config/core';
-import {Product} from '@gw-models/core';
-import {ProductService} from '@gw-services/core/api/product/product.service';
-import {Router} from '@angular/router';
-import {ShareMessageService} from '@gw-services/core/shared/message/share-message.service';
-import {ShareProductService} from '@gw-services/core/shared/product/share-product.service';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Config } from '@gw-config/core';
+import { Product } from '@gw-models/core';
+import { ProductService } from '@gw-services/core/api/product/product.service';
+import { Router } from '@angular/router';
+import { ShareMessageService } from '@gw-services/core/shared/message/share-message.service';
+import { ShareProductService } from '@gw-services/core/shared/product/share-product.service';
 
 @Component({
   selector: 'app-product-search',
@@ -27,9 +27,9 @@ export class ProductSearchComponent implements OnInit, OnDestroy {
    * @param shareProductService - inject shareProductService
    */
   constructor(private productService: ProductService,
-              private router: Router,
-              private shareMessageService: ShareMessageService,
-              private shareProductService: ShareProductService) {
+    private router: Router,
+    private shareMessageService: ShareMessageService,
+    private shareProductService: ShareProductService) {
   }
 
   ngOnInit(): void {

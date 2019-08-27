@@ -8,9 +8,9 @@ describe('BuyingHistoryDetailComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ BuyingHistoryDetailComponent ]
+      declarations: [BuyingHistoryDetailComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

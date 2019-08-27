@@ -1,7 +1,7 @@
-import {Component, OnInit} from '@angular/core';
-import {PaymentService} from '@gw-services/core/api/payment/payment.service';
-import {Config} from '@gw-config/core';
-import {ActivatedRoute, Router} from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { PaymentService } from '@gw-services/core/api/payment/payment.service';
+import { Config } from '@gw-config/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   Coach, CoachMembershipNotification,
   CoachPayment,
@@ -13,15 +13,15 @@ import {
   UserProfile,
   Notification
 } from '@gw-models/core';
-import {ProductOrderService} from '@gw-services/core/api/product/product-order.service';
-import {ProductOrderDetailService} from '@gw-services/core/api/product/product-order-detail.service';
-import {Coffeti} from '@gw-models/core';
-import {ProductPaymentService} from '@gw-services/core/api/payment/product-payment.service';
-import {CoachPaymentService} from '@gw-services/core/api/payment/coach-payment.service';
-import {CoachRateService} from '@gw-services/core/api/coach/coach-rate.service';
-import {MembershipService} from '@gw-services/core/api/coach/membership.service';
-import {CoachMembershipNotificationService} from '@gw-services/core/api/notification/coach-membership-notification.service';
-import {NotificationService} from '@gw-services/core/api/notification/notification.service';
+import { ProductOrderService } from '@gw-services/core/api/product/product-order.service';
+import { ProductOrderDetailService } from '@gw-services/core/api/product/product-order-detail.service';
+import { Coffeti } from '@gw-models/core';
+import { ProductPaymentService } from '@gw-services/core/api/payment/product-payment.service';
+import { CoachPaymentService } from '@gw-services/core/api/payment/coach-payment.service';
+import { CoachRateService } from '@gw-services/core/api/coach/coach-rate.service';
+import { MembershipService } from '@gw-services/core/api/coach/membership.service';
+import { CoachMembershipNotificationService } from '@gw-services/core/api/notification/coach-membership-notification.service';
+import { NotificationService } from '@gw-services/core/api/notification/notification.service';
 
 @Component({
   selector: 'app-payment-alert',
@@ -59,16 +59,16 @@ export class PaymentAlertComponent implements OnInit {
    * @param productOrderDetailService - inject productOrderDetailService
    */
   constructor(private paymentService: PaymentService,
-              private notificationService: NotificationService,
-              private productPaymentService: ProductPaymentService,
-              private coachMembershipNotificationService: CoachMembershipNotificationService,
-              private coachPaymentService: CoachPaymentService,
-              private coachRateService: CoachRateService,
-              private membershipService: MembershipService,
-              private router: Router,
-              private route: ActivatedRoute,
-              private productOrderService: ProductOrderService,
-              private productOrderDetailService: ProductOrderDetailService) {
+    private notificationService: NotificationService,
+    private productPaymentService: ProductPaymentService,
+    private coachMembershipNotificationService: CoachMembershipNotificationService,
+    private coachPaymentService: CoachPaymentService,
+    private coachRateService: CoachRateService,
+    private membershipService: MembershipService,
+    private router: Router,
+    private route: ActivatedRoute,
+    private productOrderService: ProductOrderService,
+    private productOrderDetailService: ProductOrderDetailService) {
     this.route.queryParams.subscribe(params => {
       this.paymentId = params['paymentId'];
       this.payerId = params['PayerID'];

@@ -8,9 +8,9 @@ describe('PinterestShareComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PinterestShareComponent ]
+      declarations: [PinterestShareComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

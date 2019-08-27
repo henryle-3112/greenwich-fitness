@@ -1,29 +1,30 @@
-import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {animate, style, transition, trigger} from '@angular/animations';
-import {Config} from '@gw-config/core';
-import {FacebookAccount, GoogleAccount, Music, UserAccount, UserProfile} from '@gw-models/core';
-import {AuthenticationService} from '@gw-services/core/authentication/authentication.service';
-import {UserAccountService} from '@gw-services/core/api/user/user-account.service';
-import {FacebookAccountService} from '@gw-services/core/api/user/facebook-account.service';
-import {GoogleAccountService} from '@gw-services/core/api/user/google-account.service';
-import {ShareUserAccountService} from '@gw-services/core/shared/user-account/share-user-account.service';
-import {ShareUserProfileService} from '@gw-services/core/shared/user-profile/share-user-profile.service';
-import {LocalStorageService} from '@gw-services/core/localStorage/local-storage.service';
-import {ShareMusicService} from '@gw-services/core/shared/music/share-music.service';
-import {MusicService} from '@gw-services/core/api/music/music.service';
-import {Router} from '@angular/router';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { animate, style, transition, trigger } from '@angular/animations';
+import { Config } from '@gw-config/core';
+import { FacebookAccount, GoogleAccount, Music, UserAccount, UserProfile } from '@gw-models/core';
+import { AuthenticationService } from '@gw-services/core/authentication/authentication.service';
+import { UserAccountService } from '@gw-services/core/api/user/user-account.service';
+import { FacebookAccountService } from '@gw-services/core/api/user/facebook-account.service';
+import { GoogleAccountService } from '@gw-services/core/api/user/google-account.service';
+import { ShareUserAccountService } from '@gw-services/core/shared/user-account/share-user-account.service';
+import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
+import { LocalStorageService } from '@gw-services/core/localStorage/local-storage.service';
+import { ShareMusicService } from '@gw-services/core/shared/music/share-music.service';
+import { MusicService } from '@gw-services/core/api/music/music.service';
+import { Router } from '@angular/router';
+import Plyr from 'plyr';
 
 @Component({
   selector: 'app-home',
   animations: [
     trigger('fadeInAnimation', [
       transition(':enter', [
-        style({opacity: 0}),
-        animate(200, style({opacity: 1}))
+        style({ opacity: 0 }),
+        animate(200, style({ opacity: 1 }))
       ]),
       transition(':leave', [
-        style({opacity: 1}),
-        animate(200, style({opacity: 0}))
+        style({ opacity: 1 }),
+        animate(200, style({ opacity: 0 }))
       ])
 
     ])
@@ -31,7 +32,7 @@ import {Router} from '@angular/router';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   private browserInnerWidth: any;
   public isDropDownMenuOpened = true;
   // check login type (login by facebook, google or normal account)
@@ -40,8 +41,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   selectedMusic: Music;
   musics: Music[];
   musicPlayer: any;
+  // apply plyr library to custom audio interface
+  musicPlyr: any;
   selectedUserProfile: UserProfile;
   @ViewChild('audioOption') audioPlayerRef: ElementRef;
+  @ViewChild('audioContainer') audioContainerRef: ElementRef;
+  @ViewChild('mainContent') mainContentRef: ElementRef;
+  audioContainerNativeElement: any;
+  mainContentNativeElement: any;
 
   /**
    *
@@ -57,22 +64,24 @@ export class HomeComponent implements OnInit, OnDestroy {
    * @param router - inject router
    */
   constructor(private authentication: AuthenticationService,
-              private userAccountService: UserAccountService,
-              private facebookAccountService: FacebookAccountService,
-              private googleAccountService: GoogleAccountService,
-              private shareUserAccountService: ShareUserAccountService,
-              private shareUserProfileService: ShareUserProfileService,
-              private localStorageService: LocalStorageService,
-              private shareMusicService: ShareMusicService,
-              private musicService: MusicService,
-              private router: Router) {
+    private userAccountService: UserAccountService,
+    private facebookAccountService: FacebookAccountService,
+    private googleAccountService: GoogleAccountService,
+    private shareUserAccountService: ShareUserAccountService,
+    private shareUserProfileService: ShareUserProfileService,
+    private localStorageService: LocalStorageService,
+    private shareMusicService: ShareMusicService,
+    private musicService: MusicService,
+    private router: Router) {
   }
 
   /**
    * init data
    */
   ngOnInit(): void {
-    this.getSelectedMusic();
+    this.isDropDownMenuOpened = false;
+    // apply Plyr to custom audio interface
+    this.initMusicPlyr();
     this.getAllMusics();
     // clear workout's state and single exercise's state if
     // user-account go from workout training or single exercise training
@@ -84,22 +93,44 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * apply plyr to customize audio interface
+   */
+  private initMusicPlyr() {
+    this.musicPlyr = new Plyr('#audio1', {
+      controls: [
+        'restart',
+        'play',
+        'progress',
+        'current-time',
+        'duration',
+        'mute',
+        'volume',
+      ]
+    });
+  }
+
+  /**
    * get selected music
    */
   private getSelectedMusic(): void {
     const that = this;
     this.shareMusicService.currentMusic
       .subscribe(selectedMusic => {
-        this.selectedMusic = selectedMusic;
-        if (this.selectedMusic) {
-          that.musicPlayer = <HTMLAudioElement>document.getElementById('music-player');
-          if (that.musicPlayer) {
-            that.musicPlayer.onended = function () {
-              that.goToNextMusic();
-            };
-            that.musicPlayer.currentTime = localStorage.getItem(Config.currentSongPosition) ?
-              localStorage.getItem(Config.currentSongPosition) : 0;
+        if (selectedMusic) {
+          this.selectedMusic = selectedMusic;
+          if (this.selectedMusic) {
+            if (that.musicPlayer) {
+              that.audioContainerNativeElement.style.opacity = 1;
+              that.musicPlayer.onended = function () {
+                that.goToNextMusic();
+              };
+              that.musicPlayer.src = this.selectedMusic.musicLink;
+              that.musicPlayer.currentTime = localStorage.getItem(Config.currentSongPosition) ?
+                localStorage.getItem(Config.currentSongPosition) : 0;
+            }
           }
+        } else {
+          that.audioContainerNativeElement.style.opacity = 0;
         }
       });
   }
@@ -210,6 +241,11 @@ ${selectedGoogleId}`;
    */
   openDropDownMenu(event): void {
     this.isDropDownMenuOpened = !this.isDropDownMenuOpened;
+    if (this.isDropDownMenuOpened) {
+      this.mainContentNativeElement.style.marginTop = '24px';
+    } else {
+      this.mainContentNativeElement.style.marginTop = '88px';
+    }
   }
 
   /**
@@ -251,5 +287,58 @@ ${selectedGoogleId}`;
    */
   public goToNotification(): void {
     this.router.navigate(['/client/notification']);
+  }
+
+  public goToComponent(selectedComponent: string) {
+    switch (selectedComponent) {
+      case 'feed':
+        this.router.navigate(['/client/feed']);
+        break;
+      case 'profile':
+        this.router.navigate(['/client/profile']);
+        break;
+      case 'exercises':
+        this.router.navigate(['/client/exercise']);
+        break;
+      case 'workouts':
+        this.router.navigate(['/client/workout']);
+        break;
+      case 'coach':
+        this.router.navigate(['/client/coach']);
+        break;
+      case 'blog':
+        this.router.navigate(['/blog/home']);
+        break;
+      case 'shop':
+        this.router.navigate(['/shop/home']);
+        break;
+      case 'music':
+        this.router.navigate(['/client/music']);
+        break;
+      case 'gallery':
+        this.router.navigate(['/client/gallery']);
+        break;
+      case 'gift':
+        this.router.navigate(['/client/gift']);
+        break;
+      default:
+        break;
+    }
+    this.isDropDownMenuOpened = false;
+    if (this.isDropDownMenuOpened) {
+      this.mainContentNativeElement.style.marginTop = '24px';
+    } else {
+      this.mainContentNativeElement.style.marginTop = '88px';
+    }
+  }
+
+  /**
+   * ng after view init
+   */
+  ngAfterViewInit(): void {
+    this.audioContainerNativeElement = this.audioContainerRef.nativeElement;
+    this.musicPlayer = this.audioPlayerRef.nativeElement;
+    this.mainContentNativeElement = this.mainContentRef.nativeElement;
+    this.getSelectedMusic();
   }
 }

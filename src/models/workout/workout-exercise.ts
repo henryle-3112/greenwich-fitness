@@ -1,4 +1,4 @@
-import {SingleExercise} from '@gw-models/core';
+import { SingleExercise } from '@gw-models/core';
 
 export class WorkoutExercise {
   exercise: SingleExercise;

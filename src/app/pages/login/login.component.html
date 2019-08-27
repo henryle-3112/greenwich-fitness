@@ -1,50 +1,96 @@
 <!-- layout -->
-<div nz-row nzType="flex" nzJustify="center" nzAlign="middle"
-     [ngClass]="{'height-100': true, 'position-relative': true}">
+<div
+  nz-row
+  nzType="flex"
+  nzJustify="center"
+  nzAlign="middle"
+  [ngClass]="{ 'height-100': true, 'position-relative': true }"
+>
   <!-- loading component -->
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
   <!-- end loading component -->
 
   <!-- login form -->
-  <form nz-form [formGroup]="loginForm" [ngClass]="{'login-form': true, 'opacity-loading': isLoadingSpinnerShown}">
+  <form
+    nz-form
+    [formGroup]="loginForm"
+    [ngClass]="{ 'login-form': true, 'opacity-loading': isLoadingSpinnerShown }"
+  >
     <h1 align="center">Login</h1>
     <nz-form-item>
       <nz-form-control>
         <nz-input-group [nzPrefix]="prefixUser">
-          <input type="text" nz-input formControlName="userName" placeholder="Username" (blur)="validateEmail()"/>
+          <input
+            type="text"
+            nz-input
+            formControlName="userName"
+            placeholder="Username"
+            (blur)="validateEmail()"
+          />
         </nz-input-group>
         <nz-form-explain
-          *ngIf="loginForm.get('userName').touched && (loginForm.get('userName').hasError('required') || loginForm.get('userName').hasError('invalidEmail'))"
-        >Please input your username! (e.g. abc@gmail.com)
-        </nz-form-explain
-        >
+          *ngIf="
+            loginForm.get('userName').touched &&
+            (loginForm.get('userName').hasError('required') ||
+              loginForm.get('userName').hasError('invalidEmail'))
+          "
+          >Please input your username! (e.g. abc@gmail.com)
+        </nz-form-explain>
       </nz-form-control>
     </nz-form-item>
     <nz-form-item>
       <nz-form-control>
         <nz-input-group [nzPrefix]="prefixLock">
-          <input type="password" nz-input formControlName="password" placeholder="Password"
-                 (blur)="validatePassword()"/>
+          <input
+            type="password"
+            nz-input
+            formControlName="password"
+            placeholder="Password"
+            (blur)="validatePassword()"
+          />
         </nz-input-group>
         <nz-form-explain
-          *ngIf="loginForm.get('password').touched && (loginForm.get('password').hasError('required') || loginForm.get('password').hasError('invalidPassword'))"
-        >Please input your Password!
-        </nz-form-explain
-        >
+          *ngIf="
+            loginForm.get('password').touched &&
+            (loginForm.get('password').hasError('required') ||
+              loginForm.get('password').hasError('invalidPassword'))
+          "
+          >Please input your Password!
+        </nz-form-explain>
       </nz-form-control>
     </nz-form-item>
     <nz-form-item>
       <nz-form-control>
-        <a class="login-form-forgot float-left" routerLink="/forgot-password">Forgot password</a>
-        <button nz-button class="login-form-button" [nzType]="'primary'" (click)="submitForm()">Log in</button>
+        <a class="login-form-forgot float-left" routerLink="/forgot-password"
+          >Forgot password</a
+        >
+        <button
+          nz-button
+          class="login-form-button"
+          [nzType]="'primary'"
+          (click)="submitForm()"
+        >
+          Log in
+        </button>
         <div class="clear-both"></div>
         Or
         <a href="">login with...</a>
-        <button nz-button [nzType]="'primary'" ngClass="facebook-background"
-                (click)="loginByFacebook()">Facebook
+        <button
+          nz-button
+          [nzType]="'primary'"
+          ngClass="facebook-background"
+          (click)="loginByFacebook()"
+        >
+          Facebook
         </button>
-        <button nz-button [nzType]="'primary'" ngClass="google-background"
-                id="google-sign-in-button" (click)="loginByGoogle();">Google
+        <button
+          nz-button
+          [nzType]="'primary'"
+          ngClass="google-background"
+          id="google-sign-in-button"
+          (click)="loginByGoogle()"
+        >
+          Google
         </button>
         Or
         <a routerLink="/register">register now!</a>
@@ -54,6 +100,5 @@
   <ng-template #prefixUser><i nz-icon type="user"></i></ng-template>
   <ng-template #prefixLock><i nz-icon type="lock"></i></ng-template>
   <!-- end login form-->
-
 </div>
 <!-- end layout -->
