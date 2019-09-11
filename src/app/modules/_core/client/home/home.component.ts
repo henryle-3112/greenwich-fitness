@@ -321,6 +321,9 @@ ${selectedGoogleId}`;
       case 'gift':
         this.router.navigate(['/client/gift']);
         break;
+      case 'chat-bot':
+        this.router.navigate(['/client/chat-bot']);
+        break;
       default:
         break;
     }

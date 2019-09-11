@@ -1,3 +1,4 @@
+import { ChatBotComponent } from './chat-bot/chat-bot.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { HomeComponent } from './home/home.component';
@@ -46,10 +47,8 @@ const routes: Routes = [
       { path: 'feed', component: NewFeedComponent },
       { path: 'notification', component: NotificationContainerComponent },
       { path: 'gift', component: GiftComponent },
-      {
-        path: 'music',
-        component: MusicComponent
-      }
+      { path: 'music', component: MusicComponent},
+      { path: 'chat-bot', component: ChatBotComponent}
     ]
   },
   {

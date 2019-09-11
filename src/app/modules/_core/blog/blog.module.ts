@@ -6,16 +6,26 @@ import { NgZorroAntdModule } from 'ng-zorro-antd';
 import { BlogRoutingModule } from './blog-routing.module';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ShareModule } from '../../../../share/share.module';
-import { HomeComponent } from './home/home.component';
-import { MainComponent } from './main/main.component';
-import { BlogCategoryComponent } from './blog-category/blog-category.component';
-import { BlogSearchComponent } from './blog-search/blog-search.component';
-import { BlogDetailComponent } from './blog-detail/blog-detail.component';
-import { BlogTagComponent } from './blog-tag/blog-tag.component';
+
+import { ShareModule } from '@gw-share-module/core/share.module';
+
+import { HomeComponent } from '@gw-modules/core/blog/home/home.component';
+import { MainComponent } from '@gw-modules/core/blog/main/main.component';
+import { BlogCategoryComponent } from '@gw-modules/core/blog/blog-category/blog-category.component';
+import { BlogSearchComponent } from '@gw-modules/core/blog/blog-search/blog-search.component';
+import { BlogDetailComponent } from '@gw-modules/core/blog/blog-detail/blog-detail.component';
+import { BlogTagComponent } from '@gw-modules/core/blog/blog-tag/blog-tag.component';
+
 
 @NgModule({
-  declarations: [HomeComponent, MainComponent, BlogCategoryComponent, BlogSearchComponent, BlogDetailComponent, BlogTagComponent],
+  declarations: [
+    HomeComponent,
+    MainComponent,
+    BlogCategoryComponent,
+    BlogSearchComponent,
+    BlogDetailComponent,
+    BlogTagComponent
+  ],
   imports: [
     CommonModule,
     ShareModule,

@@ -1,31 +1,34 @@
 import { NzModalService } from 'ng-zorro-antd';
-import { Router } from '@angular/router';
-import { Component, OnInit, OnDestroy, ViewEncapsulation, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { ShareMembershipService } from '@gw-services/core/shared/membership/share-membership.service';
+import { Component, OnInit, OnDestroy, ViewEncapsulation, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { Config } from '@gw-config/core';
 import { ShareUserProfileService } from '@gw-services/core/shared/user-profile/share-user-profile.service';
 import { ParticipantService } from '@gw-services/core/api/chat/participant.service';
-import { UserProfile, Coach, Participant, ChatMessage } from '@gw-models/core';
-import { ShareCoachService } from '@gw-services/core/shared/coach/share-coach.service';
+import { UserProfile, Coach, Participant, Membership, ChatMessage } from '@gw-models/core';
+import { Router } from '@angular/router';
+import { CoachService } from '@gw-services/core/api/coach/coach.service';
 import { ChatMessageService } from '@gw-services/core/api/chat/chat-message.service';
 import { SocketService } from '@gw-services/core/api/socket/socket.service';
 
 declare var Peer: any;
 
 @Component({
-  selector: 'app-coach-chat',
-  templateUrl: './coach-chat.component.html',
-  styleUrls: ['./coach-chat.component.css'],
+  selector: 'app-membership-chat',
+  templateUrl: './membership-chat.component.html',
+  styleUrls: ['./membership-chat.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class CoachChatComponent implements OnInit, OnDestroy, AfterViewInit {
+export class MembershipChatComponent implements OnInit, OnDestroy, AfterViewInit {
   isLoadingSpinnerShown: boolean;
   currentUserChatMessage: string;
   emojiIcon: any;
   selectedUserProfile: UserProfile;
   selectedCoach: Coach;
   selectedParticipant: Participant;
+  selectedMembership: Membership;
   socket: any;
   currentChatContent: string;
+
   @ViewChild('remoteStream') remoteStreamElementRef: ElementRef;
   @ViewChild('videoCallModal') videoCallModalElementRef: ElementRef;
   @ViewChild('videoCallModalContent') videoCallModalContentElementRef: ElementRef;
@@ -41,29 +44,27 @@ export class CoachChatComponent implements OnInit, OnDestroy, AfterViewInit {
   isLoadingRemoteStream: boolean;
   localStream: any;
 
-
-  /**
-   *
-   * @param socketService - inject socketService
-   * @param chatMessageService - inject chatMessageService
-   * @param shareUserProfileService - inject shareUserProfileService
-   * @param shareCoachService - inject shareCoachService
-   * @param participantService - inject participantService
-   * @param router - inject router
-   */
   constructor(private socketService: SocketService,
     private chatMessageService: ChatMessageService,
     private shareUserProfileService: ShareUserProfileService,
-    private shareCoachService: ShareCoachService,
+    private shareMembershipService: ShareMembershipService,
     private participantService: ParticipantService,
+    private coachService: CoachService,
     private modalService: NzModalService,
-    private router: Router) {
-  }
+    private router: Router) { }
 
   ngOnInit(): void {
     this.initData();
     this.connectToSocketServer();
     this.peerConnect();
+  }
+
+  /**
+   * peer connect for video call
+   */
+  private peerConnect(): void {
+    this.peer = new Peer({ key: 'lwjd5qra8257b9' });
+    this.onPeerOpened();
     this.onPeerCall();
   }
 
@@ -85,7 +86,7 @@ export class CoachChatComponent implements OnInit, OnDestroy, AfterViewInit {
     const that = this;
     this.modalService.confirm({
       nzTitle: 'Video Call',
-      nzContent: `${this.selectedCoach.userProfile.fullName} is calling you`,
+      nzContent: `${this.selectedMembership.userProfile.fullName} is calling you`,
       nzOnOk: () => {
         this.isLoadingRemoteStream = true;
         this.openStream()
@@ -108,12 +109,21 @@ export class CoachChatComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * peer connect for video call
+   * handle cancel video call modal
    */
-  private peerConnect(): void {
-    this.peer = new Peer({ key: 'lwjd5qra8257b9' });
-    this.onPeerOpened();
+  public handleCancelVideoCallModal(): void {
+    this.socketService.stopVideoCall();
   }
+
+  /**
+   *
+   * @param stream - stream
+   */
+  private playRemoteStream(stream): void {
+    this.remoteStreamNativeElement.srcObject = stream;
+    this.remoteStreamNativeElement.play();
+  }
+
 
   /**
    * on peer opended
@@ -137,7 +147,7 @@ export class CoachChatComponent implements OnInit, OnDestroy, AfterViewInit {
   /**
    * make video call
    */
-  public makeVideoCall(): void {
+  private makeVideoCall(): void {
     this.isLoadingRemoteStream = true;
     this.openStream()
       .then(stream => {
@@ -154,22 +164,6 @@ export class CoachChatComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   *
-   * @param stream - stream
-   */
-  private playRemoteStream(stream): void {
-    this.remoteStreamNativeElement.srcObject = stream;
-    this.remoteStreamNativeElement.play();
-  }
-
-  /**
-   * handle cancele video call modal
-   */
-  public handleCancelVideoCallModal(): void {
-    this.socketService.stopVideoCall();
-  }
-
-  /**
    * init data
    */
   private initData(): void {
@@ -179,14 +173,6 @@ export class CoachChatComponent implements OnInit, OnDestroy, AfterViewInit {
     this.currentChatContent = '';
     this.getSelectedUserProfile();
   }
-
-  /**
-   * connect to socket server
-   */
-  private connectToSocketServer(): void {
-    this.socketService.connect(Config.serverSocketUrl);
-  }
-
 
   /**
    * get selected user's profile
@@ -206,14 +192,38 @@ export class CoachChatComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
+   *
    * get selected coach
    */
   private getSelectedCoach(): void {
     this.isLoadingSpinnerShown = true;
-    this.shareCoachService.currentCoach
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const getCoachUrl = `${Config.apiBaseUrl}/
+${Config.apiCoachManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiCoaches}`;
+    this.coachService.getCoach(getCoachUrl)
       .subscribe((selectedCoach: Coach) => {
         if (selectedCoach) {
           this.selectedCoach = selectedCoach;
+          this.getSelectedMembership();
+        } else {
+          this.router.navigate(['/client']);
+        }
+        this.isLoadingSpinnerShown = false;
+      });
+  }
+
+  /**
+   * get selected membership
+   */
+  private getSelectedMembership(): void {
+    this.isLoadingSpinnerShown = true;
+    this.shareMembershipService.currentMembership
+      .subscribe((selectedMembership: Membership) => {
+        if (selectedMembership) {
+          this.selectedMembership = selectedMembership;
           this.getSelectedParticipant();
         } else {
           this.router.navigate(['/client']);
@@ -225,9 +235,9 @@ export class CoachChatComponent implements OnInit, OnDestroy, AfterViewInit {
   /**
    * get selected participant
    */
-  private getSelectedParticipant(): void {
+  private getSelectedParticipant() {
     this.isLoadingSpinnerShown = true;
-    const selectedUserProfileId = this.selectedUserProfile.id;
+    const selectedUserProfileId = this.selectedMembership.userProfile.id;
     const selectedCoachId = this.selectedCoach.id;
     const getParticipantUrl = `${Config.apiBaseUrl}/
 ${Config.apiChatManagementPrefix}/
@@ -284,7 +294,7 @@ ${Config.chatRoomIdParameter}=${selectedChatRoomId}`;
   /**
    * join chat room between user and coach
    */
-  private joinChatRoomBetweenUserAndCoach(): void {
+  private joinChatRoomBetweenUserAndCoach() {
     const selectedChatRoom = `${this.selectedParticipant.chatRoom.id} - ${this.selectedParticipant.chatRoom.name}`;
     this.socketService.joinChatRoom(selectedChatRoom);
     this.socket = this.socketService.getSocket();
@@ -293,7 +303,41 @@ ${Config.chatRoomIdParameter}=${selectedChatRoomId}`;
     this.listenStopVideoCallEvent();
   }
 
-   /**
+  /**
+   * listen peer ids from server
+   */
+  private listenPeerIdsFromServer() {
+    const that = this;
+    this.socket.on('serverSendPeerToRoom', function(peerIdsArr: any) {
+      console.log(peerIdsArr);
+      that.peerIdsArr = peerIdsArr;
+      that.peerIdsArr.map(eachPeerId => {
+        if (eachPeerId !== that.peerId) {
+          that.remoteId = eachPeerId;
+          console.log(that.remoteId);
+        }
+      });
+    });
+  }
+
+  /**
+  * listen chat messages from server (from other users)
+  */
+  private listenChatMessagesFromServer(): void {
+    const that = this;
+    this.socket.on('serverSendMessageToRoom', function (chatMessage: any) {
+      // if current message is from current user so the message will be go to the left and vice versa
+      if (+chatMessage.sender === that.selectedUserProfile.id) {
+        that.currentChatContent = that.currentChatContent +
+          `<div class="message-right-container"><div class="message-right">${chatMessage.message}</div></div>`;
+      } else {
+        that.currentChatContent = that.currentChatContent +
+          `<div class="message-left-container"><div class="message-left">${chatMessage.message}</div></div>`;
+      }
+    });
+  }
+
+  /**
    * listen stop video call event
    */
   private listenStopVideoCallEvent(): void {
@@ -311,48 +355,16 @@ ${Config.chatRoomIdParameter}=${selectedChatRoomId}`;
   }
 
   /**
-   * listen peer ids from server
-   */
-  private listenPeerIdsFromServer() {
-    const that = this;
-    this.socket.on('serverSendPeerToRoom', function(peerIdsArr: any) {
-      that.peerIdsArr = peerIdsArr;
-      that.peerIdsArr.map(eachPeerId => {
-        if (eachPeerId !== that.peerId) {
-          that.remoteId = eachPeerId;
-          console.log(that.remoteId);
-        }
-      });
-    });
-  }
-
-  /**
-   * listen chat messages from server (from other users)
-   */
-  private listenChatMessagesFromServer(): void {
-    const that = this;
-    this.socket.on('serverSendMessageToRoom', function (chatMessage: any) {
-      // if current message is from current user so the message will be go to the left and vice versa
-      if (+chatMessage.sender === that.selectedUserProfile.id) {
-        that.currentChatContent = that.currentChatContent +
-         `<div class="message-right-container"><div class="message-right">${chatMessage.message}</div></div>`;
-      } else {
-        that.currentChatContent = that.currentChatContent +
-         `<div class="message-left-container"><div class="message-left">${chatMessage.message}</div></div>`;
-      }
-    });
-  }
-
-  /**
    * send chat message
    */
-  public sendChatMessage(): void {
+  public sendChatMessage() {
     const chatMessage = {
       'sender': `${this.selectedUserProfile.id}`,
       'message': `${this.currentUserChatMessage}`
     };
     this.socketService.sendChatMessage(chatMessage);
     this.saveChatMessageToServer(chatMessage);
+    console.log(`${this.currentUserChatMessage}`);
     this.currentUserChatMessage = '';
   }
 
@@ -373,8 +385,15 @@ ${Config.chatRoomIdParameter}=${selectedChatRoomId}`;
   /**
    * add emoji to current chat message
    */
-  public addEmojiToCurrentChatMessage(): void {
+  public addEmojiToCurrentChatMessage() {
     this.currentUserChatMessage += this.emojiIcon;
+  }
+
+  /**
+   * connect to socket server
+   */
+  private connectToSocketServer() {
+    this.socketService.connect(Config.serverSocketUrl);
   }
 
   ngOnDestroy(): void {
@@ -387,4 +406,5 @@ ${Config.chatRoomIdParameter}=${selectedChatRoomId}`;
     this.videoCallModalNativeElement = this.videoCallModalElementRef.nativeElement;
     this.videoCallModalContentNativeElement = this.videoCallModalContentElementRef.nativeElement;
   }
+
 }

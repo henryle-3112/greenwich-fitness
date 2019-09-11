@@ -11,17 +11,20 @@ import {
   ProductPayment,
   ShoppingCart,
   UserProfile,
-  Notification
+  Notification,
+  Participant
 } from '@gw-models/core';
 import { ProductOrderService } from '@gw-services/core/api/product/product-order.service';
 import { ProductOrderDetailService } from '@gw-services/core/api/product/product-order-detail.service';
-import { Coffeti } from '@gw-models/core';
+import { Coffeti, ChatRoom } from '@gw-models/core';
 import { ProductPaymentService } from '@gw-services/core/api/payment/product-payment.service';
 import { CoachPaymentService } from '@gw-services/core/api/payment/coach-payment.service';
 import { CoachRateService } from '@gw-services/core/api/coach/coach-rate.service';
 import { MembershipService } from '@gw-services/core/api/coach/membership.service';
 import { CoachMembershipNotificationService } from '@gw-services/core/api/notification/coach-membership-notification.service';
 import { NotificationService } from '@gw-services/core/api/notification/notification.service';
+import { ChatRoomService } from '@gw-services/core/api/chat/chat-room.service';
+import { ParticipantService } from '@gw-services/core/api/chat/participant.service';
 
 @Component({
   selector: 'app-payment-alert',
@@ -68,7 +71,9 @@ export class PaymentAlertComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private productOrderService: ProductOrderService,
-    private productOrderDetailService: ProductOrderDetailService) {
+    private productOrderDetailService: ProductOrderDetailService,
+    private chatRoomService: ChatRoomService,
+    private participantService: ParticipantService) {
     this.route.queryParams.subscribe(params => {
       this.paymentId = params['paymentId'];
       this.payerId = params['PayerID'];
@@ -156,7 +161,6 @@ ${Config.payerIdParameter}=${this.payerId}`;
     this.paymentService.completePayment(completePaymentUrl)
       .subscribe((response: any) => {
         if (response && response.status.localeCompare('success') === 0) {
-          this.isPaymentSuccessfully = true;
           this.addMembership();
         } else {
           this.isPaymentSuccessfully = false;
@@ -251,6 +255,50 @@ ${Config.apiMemberships}`;
       .subscribe((insertedCoachPayment: CoachPayment) => {
         if (insertedCoachPayment) {
           this.updateCoachMembershipNotification();
+          this.addChatRoom();
+        } else {
+          this.isPaymentSuccessfully = false;
+          this.removeDataFromLocalStorage();
+        }
+        this.isLoadingSpinnerShown = false;
+      });
+  }
+
+  /**
+   * add chat's room betweencoach and user
+   */
+  private addChatRoom(): void {
+    this.isLoadingSpinnerShown = true;
+    const chatRoom = new ChatRoom();
+    chatRoom.name = `${this.selectedCoach.userProfile.fullName} - ${this.selectedUserProfile.fullName}`;
+    chatRoom.type = 1;
+    const addChatRoomUrl = `${Config.apiBaseUrl}/${Config.apiChatManagementPrefix}/${Config.apiChatRooms}`;
+    this.chatRoomService.addChatRoom(addChatRoomUrl, chatRoom)
+      .subscribe((insertedChatRoom: ChatRoom) => {
+        if (insertedChatRoom) {
+          this.addParticipant(insertedChatRoom);
+        } else {
+          this.isPaymentSuccessfully = false;
+          this.removeDataFromLocalStorage();
+        }
+        this.isLoadingSpinnerShown = false;
+      });
+  }
+
+  /**
+   *
+   * @param chatRoom - chat's room that will be used to add to participant
+   */
+  private addParticipant(chatRoom: ChatRoom): void {
+    this.isLoadingSpinnerShown = true;
+    const participant = new Participant();
+    participant.chatRoom = chatRoom;
+    participant.coach = this.selectedCoach;
+    participant.userProfile = this.selectedUserProfile;
+    const addParticipantUrl = `${Config.apiBaseUrl}/${Config.apiChatManagementPrefix}/${Config.apiParticipants}`;
+    this.participantService.addParticipant(addParticipantUrl, participant)
+      .subscribe((insertedParticipant) => {
+        if (insertedParticipant) {
           this.showCoffetiAnimation();
           this.addNotificationForCoach();
           this.addNotificationForUser();

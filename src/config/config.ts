@@ -1,5 +1,10 @@
 export enum Config {
   apiBaseUrl = 'http://localhost:8080/greenwich-fitness/api/v1',
+  serverSocketUrl = 'http://localhost:3000',
+
+  // wit config (to create chatbot - nlp)
+  witClientToken = 'Bearer 73BEUT76XE4MCNHLZEFPTVP7LRDLTPSF',
+  witUrl = 'https://api.wit.ai/message?v=20190907&q=',
 
   // api url parameters
   statusParameter = 'status',
@@ -21,6 +26,7 @@ export enum Config {
   monthParameter = 'month',
   yearParameter = 'year',
   giftTypeIdParameter = 'giftTypeId',
+  chatRoomIdParameter = 'chatRoomId',
 
   // common value
   numberItemsPerPage = 8,
@@ -139,10 +145,20 @@ export enum Config {
   apiUserAccounts = 'accounts',
   apiUserProfiles = 'profiles',
 
-  // api gift manaage prefix
+  // api gift management
   apiGiftManagementPrefix = 'gift-management',
   apiGifts = 'gifts',
   apiUserGifts = 'user-gifts',
+
+  // api chat management
+  apiChatManagementPrefix = 'chat-management',
+  apiChatMessages = 'messages',
+  apiChatRooms = 'rooms',
+  apiParticipants = 'participants',
+
+  // api chat bot management
+  apiChatBotManagementPrefix = 'chat-bot-management',
+  apiChatBotMessages = 'messages',
 
 
   // google credentials

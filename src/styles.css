@@ -4,3 +4,7 @@ body {
   box-sizing: border-box !important;
   background-color: #fafafa !important;
 }
+
+::-webkit-scrollbar {
+  display: none;
+}

@@ -244,7 +244,6 @@ ${Config.apiCoachMembershipNotifications}`;
    * show vocher modal
    */
   public showVoucherModal(selectedCoachMembershipNotification: CoachMembershipNotification) {
-    this.isVoucherModalShown = true;
     this.selectedCoachMembershipNotification = selectedCoachMembershipNotification;
     this.getUserGifts();
   }
@@ -290,6 +289,11 @@ ${Config.pageParameter}=${this.currentUserGiftsPage}`;
       .subscribe(response => {
         this.userGifts = response.body;
         this.totalUserGifts = Number(response.headers.get(Config.headerXTotalCount));
+        if (this.userGifts && this.userGifts.length > 0) {
+          this.isVoucherModalShown = true;
+        } else {
+          this.paymentForCoach();
+        }
         this.isLoadingSpinnerShown = false;
       });
   }

@@ -60,3 +60,7 @@ export { Notification } from './notification/notification';
 export { GiftType } from './gift/gift-type';
 export { Gift } from './gift/gift';
 export { UserGift } from './gift/user-gift';
+export { ChatRoom } from './chat/chat-room';
+export { ChatMessage } from './chat/chat-message';
+export { Participant } from './chat/participant';
+export { ChatBotMessage } from './chat-bot/chat-bot-message';

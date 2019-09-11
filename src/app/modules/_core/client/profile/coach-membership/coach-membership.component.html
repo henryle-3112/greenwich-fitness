@@ -34,7 +34,7 @@
     class="mg-bottom-24"
   >
     <ng-template #item let-item>
-      <nz-list-item (click)="goToMembershipDetail(item)">
+      <nz-list-item (click)="goToMembershipDetail(item)" class="membership-item">
         <nz-list-item-meta
           [nzTitle]="nzTitle"
           nzAvatar="{{ item.userProfile.avatar }}"

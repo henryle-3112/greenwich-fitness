@@ -19,17 +19,20 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { registerLocaleData } from '@angular/common';
 import en from '@angular/common/locales/en';
 
-import { LoginComponent } from './pages/login/login.component';
-import { NotFoundComponent } from './pages/not-found/not-found.component';
-import { RegisterComponent } from './pages/register/register.component';
-import { NavigatorComponent } from './structure/navigator/navigator.component';
-import { PopupComponent } from './structure/popup/popup.component';
-import { JwtInterceptor } from '../helpers/jwt.interceptor';
-import { ErrorInterceptor } from '../helpers/error.interceptor';
-import { ChangePasswordComponent } from './pages/change-password/change-password.component';
-import { AlertVerifyEmailComponent } from './pages/alert-verify-email/alert-verify-email.component';
-import { ActiveAccountComponent } from './pages/active-account/active-account.component';
-import { ShareModule } from '../share/share.module';
+import { LoginComponent } from '@gw-pages/core/login/login.component';
+import { NotFoundComponent } from '@gw-pages/core/not-found/not-found.component';
+import { RegisterComponent } from '@gw-pages/core/register/register.component';
+import { ChangePasswordComponent } from '@gw-pages/core/change-password/change-password.component';
+import { AlertVerifyEmailComponent } from '@gw-pages/core/alert-verify-email/alert-verify-email.component';
+import { ActiveAccountComponent } from '@gw-pages/core/active-account/active-account.component';
+
+
+import { NavigatorComponent } from '@gw-structure/core/navigator/navigator.component';
+import { PopupComponent } from '@gw-structure/core/popup/popup.component';
+
+import { JwtInterceptor, ErrorInterceptor } from '@gw-helpers/core';
+
+import { ShareModule } from '@gw-share-module/core/share.module';
 
 registerLocaleData(en);
 

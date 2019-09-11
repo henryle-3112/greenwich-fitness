@@ -6,7 +6,11 @@
       "@gw-models/core": ["src/models/core"],
       "@gw-services/core/*": ["src/services/_core/*"],
       "@gw-config/core": ["src/config/core"],
-      "@gw-helpers/core": ["src/helpers/core"]
+      "@gw-helpers/core": ["src/helpers/core"],
+      "@gw-pages/core/*": ["src/app/pages/*"],
+      "@gw-structure/core/*": ["src/app/structure/*"],
+      "@gw-modules/core/*": ["src/app/modules/_core/*"],
+      "@gw-share-module/core/*": ["src/share/*"]
     },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,

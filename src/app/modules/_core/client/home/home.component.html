@@ -47,6 +47,9 @@
       <li nz-menu-item class="menu-item" (click)="goToComponent('gift')">
         <span><span class="nav-text">Gift</span></span>
       </li>
+      <li nz-menu-item class="menu-item" (click)="goToComponent('chat-bot')">
+        <span><span class="nav-text">Chat Bot</span></span>
+      </li>
     </ul>
 
     <!-- welcome user -->
@@ -253,6 +256,16 @@
                 <span
                   ><i nz-icon type="gift"></i
                   ><span class="nav-text">Gift</span></span
+                >
+              </li>
+              <li
+                nz-menu-item
+                ngClass="pd-left-0"
+                (click)="goToComponent('chat-bot')"
+              >
+                <span
+                  ><i nz-icon type="gift"></i
+                  ><span class="nav-text">chat Bot</span></span
                 >
               </li>
             </ul>
