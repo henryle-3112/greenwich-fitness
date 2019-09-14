@@ -1,14 +1,17 @@
-import { ActiveAccountComponent } from './pages/active-account/active-account.component';
-import { AlertVerifyEmailComponent } from './pages/alert-verify-email/alert-verify-email.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { LoginComponent } from './pages/login/login.component';
-import { AuthGuard } from '../services/_core/guard/auth.guard';
 import { Role } from '@gw-models/core';
-import { NotFoundComponent } from './pages/not-found/not-found.component';
-import { ForgotPasswordComponent } from '../share/forgot-password/forgot-password.component';
-import { ChangePasswordComponent } from './pages/change-password/change-password.component';
+
+import { AuthGuard } from '@gw-services/core/guard/auth.guard';
+
+import { LoginComponent } from './pages/login/login.component';
+import { ForgotPasswordComponent } from '@gw-share-module/core/forgot-password/forgot-password.component';
+import { ActiveAccountComponent } from './pages/active-account/active-account.component';
+import { AlertVerifyEmailComponent } from './pages/alert-verify-email/alert-verify-email.component';
 import { RegisterComponent } from './pages/register/register.component';
+import { ChangePasswordComponent } from './pages/change-password/change-password.component';
+import { NotFoundComponent } from './pages/not-found/not-found.component';
+
 
 const routes: Routes = [
   {

@@ -1,14 +1,14 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { HomeComponent } from './home/home.component';
-import { ContactComponent } from '../../../../share/contact/contact.component';
-import { AboutComponent } from '../../../../share/about/about.component';
-import { PrivacyPolicyComponent } from '../../../../share/privacy-policy/privacy-policy.component';
-import { BlogSearchComponent } from './blog-search/blog-search.component';
-import { BlogCategoryComponent } from './blog-category/blog-category.component';
-import { BlogDetailComponent } from './blog-detail/blog-detail.component';
-import { MainComponent } from './main/main.component';
-import { BlogTagComponent } from './blog-tag/blog-tag.component';
+import { HomeComponent } from '@gw-modules/core/blog/home/home.component';
+import { MainComponent } from '@gw-modules/core/blog/main/main.component';
+import { BlogCategoryComponent } from '@gw-modules/core/blog/blog-category/blog-category.component';
+import { BlogSearchComponent } from '@gw-modules/core/blog/blog-search/blog-search.component';
+import { BlogDetailComponent } from '@gw-modules/core/blog/blog-detail/blog-detail.component';
+import { BlogTagComponent } from '@gw-modules/core/blog/blog-tag/blog-tag.component';
+import { AboutComponent } from '@gw-share-module/core/about/about.component';
+import { PrivacyPolicyComponent } from '@gw-share-module/core/privacy-policy/privacy-policy.component';
+import { ContactComponent } from '@gw-share-module/core/contact/contact.component';
 
 
 const routes: Routes = [

@@ -1,14 +1,16 @@
+import { ContactComponent } from './../../../../share/contact/contact.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { HomeComponent } from './home/home.component';
-import { MainComponent } from './main/main.component';
-import { ProductCategoryComponent } from './product-category/product-category.component';
-import { ProductSearchComponent } from './product-search/product-search.component';
-import { ProductDetailComponent } from './product-detail/product-detail.component';
-import { AboutComponent } from '../../../../share/about/about.component';
-import { PrivacyPolicyComponent } from '../../../../share/privacy-policy/privacy-policy.component';
-import { ContactComponent } from '../../../../share/contact/contact.component';
-import { ShoppingCartComponent } from './shopping-cart/shopping-cart.component';
+
+import { HomeComponent } from '@gw-modules/core/shop/home/home.component';
+import { MainComponent } from '@gw-modules/core/shop/main/main.component';
+import { ProductCategoryComponent } from '@gw-modules/core/shop/product-category/product-category.component';
+import { ProductSearchComponent } from '@gw-modules/core/shop/product-search/product-search.component';
+import { ProductDetailComponent } from '@gw-modules/core/shop/product-detail/product-detail.component';
+import { ShoppingCartComponent } from '@gw-modules/core/shop/shopping-cart/shopping-cart.component';
+import { AboutComponent } from '@gw-share-module/core/about/about.component';
+import { PrivacyPolicyComponent } from '@gw-share-module/core/privacy-policy/privacy-policy.component';
+
 
 const routes: Routes = [
   {
