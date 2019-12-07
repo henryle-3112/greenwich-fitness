@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { ReplyOnNewFeedCommentReactionService } from './reply-on-new-feed-comment-reaction.service';
+import {ReplyOnNewFeedCommentReactionService} from './reply-on-new-feed-comment-reaction.service';
 
 describe('ReplyOnNewFeedCommentReactionService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

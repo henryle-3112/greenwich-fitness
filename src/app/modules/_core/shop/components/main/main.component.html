@@ -1,0 +1,137 @@
+<div>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- top men products -->
+  <div>
+    <div class="title">
+      <h2>Top Men Products</h2>
+      <button (click)="goToProductCategory('Men')" nz-button nzType="default">
+        More Products
+      </button>
+    </div>
+
+    <div class="clear-both"></div>
+
+    <div class="top-product-list" nz-row nzGutter="16">
+      <div
+        *ngFor="let eachMenProduct of topMenProducts"
+        class="gutter-row"
+        nz-col
+        nzLg="6"
+        nzMd="6"
+        nzSm="24"
+        nzXl="6"
+        nzXs="24"
+      >
+        <div
+          (click)="goToProductDetail(eachMenProduct)"
+          class="gutter-box product-item"
+        >
+          <nz-card [nzCover]="coverTemplate" nzHoverable style="width: 100%;">
+            <nz-card-meta
+              nzDescription="{{ eachMenProduct.productPrice }}$"
+              nzTitle="{{ eachMenProduct.productName }}"
+            ></nz-card-meta>
+          </nz-card>
+          <ng-template #coverTemplate>
+            <img
+              alt="{{ eachMenProduct.productName }}"
+              src="{{ eachMenProduct.productImage }}"
+            />
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end top men products -->
+
+  <!-- top women products -->
+  <div>
+    <div class="title">
+      <h2>Top Women Products</h2>
+      <button (click)="goToProductCategory('Women')" nz-button nzType="default">
+        More Products
+      </button>
+    </div>
+
+    <div class="clear-both"></div>
+
+    <div class="top-product-list" nz-row nzGutter="16">
+      <div
+        *ngFor="let eachWomenProduct of topWomenProducts"
+        class="gutter-row"
+        nz-col
+        nzLg="6"
+        nzMd="6"
+        nzSm="24"
+        nzXl="6"
+        nzXs="24"
+      >
+        <div
+          (click)="goToProductDetail(eachWomenProduct)"
+          class="gutter-box product-item"
+        >
+          <nz-card [nzCover]="coverTemplate" nzHoverable style="width: 100%;">
+            <nz-card-meta
+              nzDescription="{{ eachWomenProduct.productPrice }}$"
+              nzTitle="{{ eachWomenProduct.productName }}"
+            ></nz-card-meta>
+          </nz-card>
+          <ng-template #coverTemplate>
+            <img
+              alt="{{ eachWomenProduct.productName }}"
+              src="{{ eachWomenProduct.productImage }}"
+            />
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end top women products -->
+
+  <!-- top gear products -->
+  <div>
+    <div class="title">
+      <h2>Top Gear Products</h2>
+      <button (click)="goToProductCategory('Gear')" nz-button nzType="default">
+        More Products
+      </button>
+    </div>
+
+    <div class="clear-both"></div>
+
+    <div class="top-product-list" nz-row nzGutter="16">
+      <div
+        *ngFor="let eachGearProduct of topGearProducts"
+        class="gutter-row"
+        nz-col
+        nzLg="6"
+        nzMd="6"
+        nzSm="24"
+        nzXl="6"
+        nzXs="24"
+      >
+        <div
+          (click)="goToProductDetail(eachGearProduct)"
+          class="gutter-box product-item"
+        >
+          <nz-card [nzCover]="coverTemplate" nzHoverable style="width: 100%;">
+            <nz-card-meta
+              nzDescription="{{ eachGearProduct.productPrice }}$"
+              nzTitle="{{ eachGearProduct.productName }}"
+            ></nz-card-meta>
+          </nz-card>
+          <ng-template #coverTemplate>
+            <img
+              alt="{{ eachGearProduct.productName }}"
+              src="{{ eachGearProduct.productImage }}"
+            />
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end top gear products -->
+</div>

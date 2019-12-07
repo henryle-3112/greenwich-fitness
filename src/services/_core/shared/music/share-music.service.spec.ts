@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { ShareMusicService } from './share-music.service';
+import {ShareMusicService} from './share-music.service';
 
 describe('ShareMusicService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

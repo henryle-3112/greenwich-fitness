@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { ReadLocalJsonService } from './read-local-json.service';
+import {ReadLocalJsonService} from './read-local-json.service';
 
 describe('ReadLocalJsonService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

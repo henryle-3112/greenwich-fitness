@@ -1,0 +1,25 @@
+<div
+  *ngIf="selectedContactContent"
+  [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+  nz-row
+  nzGutter="0"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- contact's content-->
+  <div
+    class="gutter-row"
+    nz-col
+    nzLg="12"
+    nzMd="24"
+    nzSm="24"
+    nzXl="12"
+    nzXs="24"
+  >
+    <h1>{{ selectedContactContent?.contactName }}</h1>
+    <p>{{ selectedContactContent?.contactContent }}</p>
+  </div>
+  <!-- end contact's content -->
+</div>

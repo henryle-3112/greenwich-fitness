@@ -1,0 +1,61 @@
+<!--suppress ALL -->
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- custom list -->
+  <nz-list
+    [ngClass]="{
+      'opacity-loading': isLoadingSpinnerShown,
+      'mg-bottom-24': true
+    }"
+    [nzDataSource]="userAchievements"
+    [nzItemLayout]="'horizontal'"
+    [nzRenderItem]="item"
+  >
+    <ng-template #item let-item>
+      <nz-list-item>
+        <nz-list-item-meta [nzDescription]="nzDescription" [nzTitle]="nzTitle">
+          <ng-template #nzTitle>
+            <span class="achievement-title">{{ item.title }}</span>
+          </ng-template>
+          <ng-template #nzDescription>
+            <div>
+              <span>Achievement Time:</span>
+              <span class="achievement-result">{{ item.time }} minutes</span>
+            </div>
+            <div>
+              <span>Number of reps:</span>
+              <span class="achievement-result">{{ item.nreps }}</span>
+            </div>
+            <div>
+              <span>Health after finishing:</span>
+              <span class="achievement-result"
+              >{{ item.currentHealth }} / 10</span
+              >
+            </div>
+            <div>
+              <span>Log:</span>
+              <span class="achievement-result">{{ item.log }}</span>
+            </div>
+          </ng-template>
+        </nz-list-item-meta>
+      </nz-list-item>
+    </ng-template>
+  </nz-list>
+  <!-- end custom list -->
+
+  <!-- pagination -->
+  <nz-pagination
+    (nzPageIndexChange)="userAchievementsPageChange($event)"
+    *ngIf="userAchievements && userAchievements.length"
+    [nzPageIndex]="currentUserAchievementsPage"
+    [nzPageSize]="nUserAchievementsPerPage"
+    [nzSize]="'small'"
+    [nzTotal]="totalUserAchievements"
+  ></nz-pagination>
+  <!-- end pagination -->
+</div>

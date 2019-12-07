@@ -1,8 +1,8 @@
-import { Coffeti, ResponseMessage, UserAccount } from '@gw-models/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ActiveAccountService } from '@gw-services/core/api/user/active-account.service';
-import { Component, OnInit } from '@angular/core';
-import { Config } from '@gw-config/core';
+import {Coffeti, ResponseMessage, UserAccount} from '@gw-models';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ActiveAccountService} from '@gw-services/api';
+import {Component, OnInit} from '@angular/core';
+import {Config} from '@gw-config';
 
 @Component({
   selector: 'app-active-account',
@@ -23,8 +23,8 @@ export class ActiveAccountComponent implements OnInit {
    * @param router - inject router
    */
   constructor(private activeAccountService: ActiveAccountService,
-    private route: ActivatedRoute,
-    private router: Router) {
+              private route: ActivatedRoute,
+              private router: Router) {
   }
 
   /**
@@ -58,6 +58,14 @@ export class ActiveAccountComponent implements OnInit {
   }
 
   /**
+   * go to login page
+   */
+  public goToLogin(): void {
+    clearInterval(this.coffetiAnimationInterval);
+    this.router.navigate(['/login']);
+  }
+
+  /**
    * show coffeti animation
    */
   private showCoffetiAnimation(): void {
@@ -65,13 +73,5 @@ export class ActiveAccountComponent implements OnInit {
     this.coffetiAnimationInterval = setInterval(() => {
       coffeti.shoot();
     }, 1000);
-  }
-
-  /**
-   * go to login page
-   */
-  public goToLogin(): void {
-    clearInterval(this.coffetiAnimationInterval);
-    this.router.navigate(['/login']);
   }
 }

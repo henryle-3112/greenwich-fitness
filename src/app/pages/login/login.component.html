@@ -1,10 +1,10 @@
 <!-- layout -->
 <div
-  nz-row
-  nzType="flex"
-  nzJustify="center"
-  nzAlign="middle"
   [ngClass]="{ 'height-100': true, 'position-relative': true }"
+  nz-row
+  nzAlign="middle"
+  nzJustify="center"
+  nzType="flex"
 >
   <!-- loading component -->
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
@@ -12,20 +12,20 @@
 
   <!-- login form -->
   <form
-    nz-form
     [formGroup]="loginForm"
     [ngClass]="{ 'login-form': true, 'opacity-loading': isLoadingSpinnerShown }"
+    nz-form
   >
     <h1 align="center">Login</h1>
     <nz-form-item>
       <nz-form-control>
         <nz-input-group [nzPrefix]="prefixUser">
           <input
-            type="text"
-            nz-input
-            formControlName="userName"
-            placeholder="Username"
             (blur)="validateEmail()"
+            formControlName="userName"
+            nz-input
+            placeholder="Username"
+            type="text"
           />
         </nz-input-group>
         <nz-form-explain
@@ -34,7 +34,7 @@
             (loginForm.get('userName').hasError('required') ||
               loginForm.get('userName').hasError('invalidEmail'))
           "
-          >Please input your username! (e.g. abc@gmail.com)
+        >Please input your username! (e.g. abc@gmail.com)
         </nz-form-explain>
       </nz-form-control>
     </nz-form-item>
@@ -42,11 +42,11 @@
       <nz-form-control>
         <nz-input-group [nzPrefix]="prefixLock">
           <input
-            type="password"
-            nz-input
-            formControlName="password"
-            placeholder="Password"
             (blur)="validatePassword()"
+            formControlName="password"
+            nz-input
+            placeholder="Password"
+            type="password"
           />
         </nz-input-group>
         <nz-form-explain
@@ -55,20 +55,20 @@
             (loginForm.get('password').hasError('required') ||
               loginForm.get('password').hasError('invalidPassword'))
           "
-          >Please input your Password!
+        >Please input your Password!
         </nz-form-explain>
       </nz-form-control>
     </nz-form-item>
     <nz-form-item>
       <nz-form-control>
         <a class="login-form-forgot float-left" routerLink="/forgot-password"
-          >Forgot password</a
+        >Forgot password</a
         >
         <button
-          nz-button
-          class="login-form-button"
-          [nzType]="'primary'"
           (click)="submitForm()"
+          [nzType]="'primary'"
+          class="login-form-button"
+          nz-button
         >
           Log in
         </button>
@@ -76,19 +76,19 @@
         Or
         <a href="">login with...</a>
         <button
-          nz-button
+          (click)="loginByFacebook()"
           [nzType]="'primary'"
           ngClass="facebook-background"
-          (click)="loginByFacebook()"
+          nz-button
         >
           Facebook
         </button>
         <button
-          nz-button
-          [nzType]="'primary'"
-          ngClass="google-background"
-          id="google-sign-in-button"
           (click)="loginByGoogle()"
+          [nzType]="'primary'"
+          id="google-sign-in-button"
+          ngClass="google-background"
+          nz-button
         >
           Google
         </button>

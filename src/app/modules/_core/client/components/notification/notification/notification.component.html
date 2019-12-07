@@ -1,0 +1,57 @@
+<!--suppress ALL -->
+<div
+  [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- search box-->
+  <nz-input-group
+    *ngIf="notifications && notifications.length"
+    [ngClass]="{ 'mg-bottom-24': true, 'width-50': true }"
+    [nzSuffix]="suffixIconSearch"
+  >
+    <input
+        #searchBox
+        (keyup.enter)="searchNotifications(searchBox.value)"
+        nz-input
+        placeholder="Name..."
+        type="text"
+    />
+  </nz-input-group>
+  <ng-template #suffixIconSearch>
+    <i nz-icon type="search"></i>
+  </ng-template>
+  <!-- end search box -->
+
+  <!-- custom list -->
+  <nz-list
+    [nzDataSource]="notifications"
+    [nzItemLayout]="'horizontal'"
+    [nzRenderItem]="item"
+  >
+    <ng-template #item let-item>
+      <nz-list-item>
+        <nz-list-item-meta [nzTitle]="nzTitle">
+          <ng-template #nzTitle>
+            <span>{{ item.content }}</span>
+          </ng-template>
+        </nz-list-item-meta>
+      </nz-list-item>
+    </ng-template>
+  </nz-list>
+  <!-- end custom list-->
+
+  <!-- pagination -->
+  <nz-pagination
+    (nzPageIndexChange)="notificationsPageChange($event)"
+    *ngIf="notifications && notifications.length"
+    [nzPageIndex]="currentNotificationsPage"
+    [nzPageSize]="nNotificationsPerPage"
+    [nzSize]="'small'"
+    [nzTotal]="totalNotification"
+  ></nz-pagination>
+  <!-- end pagination -->
+</div>

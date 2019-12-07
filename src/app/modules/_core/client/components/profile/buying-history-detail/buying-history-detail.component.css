@@ -1,0 +1,28 @@
+/* buying history list css */
+.buying-history-row {
+  background-color: white;
+}
+
+.product-image {
+  width: 64px;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border-radius: 20px;
+}
+
+#total-price {
+  padding: 24px;
+  background-color: white;
+}
+
+#total-price-title {
+  display: inline-block;
+  float: left;
+}
+
+#total-price-value {
+  display: inline-block;
+  float: right;
+}
+
+/* end buying history list css */

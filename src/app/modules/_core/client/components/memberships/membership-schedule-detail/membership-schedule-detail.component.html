@@ -1,0 +1,43 @@
+<div
+  [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+  nz-row
+  nzAlign="middle"
+  nzJustify="center"
+  nzType="flex"
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <div id="title">
+    <h3>Training - {{ selectedMembershipSchedule?.trainingDate }}</h3>
+  </div>
+
+  <div class="line"></div>
+
+  <nz-transfer
+    (nzChange)="change($event)"
+    (nzSearchChange)="search($event)"
+    (nzSelectChange)="select($event)"
+    [nzDataSource]="dataSource"
+    [nzDisabled]="isTransferComponentDisabled"
+    [nzFilterOption]="filterOption"
+    nzShowSearch
+  >
+  </nz-transfer>
+
+  <div *ngIf="isTransferComponentDisabled" id="cannot-update-msg">
+    *(you cannot update schedule for this date)
+  </div>
+
+  <button
+    (click)="saveMembershipSchedule()"
+    *ngIf="!isTransferComponentDisabled"
+    [nzType]="'primary'"
+    id="save-schedule-btn"
+    nz-button
+  >
+    Save Schedule
+  </button>
+</div>

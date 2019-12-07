@@ -1,0 +1,61 @@
+<!-- layout -->
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
+  <nz-tabset>
+    <!-- tab user-account' profile -->
+    <nz-tab nzTitle="User Profile">
+      <app-user-information></app-user-information>
+    </nz-tab>
+    <!-- end tab user-account's profile -->
+
+    <!-- tab report -->
+    <nz-tab nzTitle="Report">
+      <app-body-index-report></app-body-index-report>
+    </nz-tab>
+    <!-- end tab report's title -->
+
+    <!-- tab achievement -->
+    <nz-tab nzTitle="Achievement">
+      <app-user-achievement></app-user-achievement>
+    </nz-tab>
+    <!-- end tab achievement -->
+
+    <!-- tab buying history -->
+    <nz-tab nzTitle="Buying History">
+      <app-buying-history></app-buying-history>
+    </nz-tab>
+    <!-- end buy history tab-->
+
+    <!-- tab memberships if user is coach -->
+    <nz-tab *ngIf="selectedCoach" nzTitle="Memberships">
+      <app-coach-membership></app-coach-membership>
+    </nz-tab>
+    <!-- end memberships tab-->
+
+    <!-- coaches tab -->
+    <nz-tab nzTitle="Coaches">
+      <app-user-coach></app-user-coach>
+    </nz-tab>
+    <!-- end coaches tab -->
+
+    <!-- revenue tab -->
+    <nz-tab *ngIf="selectedCoach" nzTitle="Revenue">
+      <app-revenue></app-revenue>
+    </nz-tab>
+    <!-- end revenue tab -->
+
+    <!-- coach payment history tab -->
+    <nz-tab nzTitle="Coach Payment History">
+      <app-coach-payment-history></app-coach-payment-history>
+    </nz-tab>
+    <!-- end coach payment history tab -->
+
+    <!-- gift tab -->
+    <nz-tab nzTitle="Gift">
+      <app-user-gift></app-user-gift>
+    </nz-tab>
+    <!-- end gift tab -->
+  </nz-tabset>
+</div>
+<!-- end layout -->

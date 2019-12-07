@@ -1,4 +1,4 @@
-import { UserProfile } from '@gw-models/core';
+import {UserProfile} from '@gw-models';
 
 export class Coach {
   id?: number;

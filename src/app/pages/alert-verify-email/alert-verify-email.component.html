@@ -1,14 +1,14 @@
 <div
-  id="verify-email-container"
   [ngClass]="{ 'height-100': true, 'pd-top-200': true }"
   [ngStyle]="{ 'background-image': 'url(' + backgroundImage + ')' }"
+  id="verify-email-container"
 >
   <h1 align="center">
     Thank you for your registration! Please go to your email to verify your
     account!
   </h1>
   <div align="center">
-    <button nz-button [nzType]="'primary'" (click)="goToLogin()">
+    <button (click)="goToLogin()" [nzType]="'primary'" nz-button>
       Go to Log In
     </button>
   </div>

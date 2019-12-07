@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import * as io from 'socket.io-client';
 
 @Injectable({
@@ -7,7 +7,8 @@ import * as io from 'socket.io-client';
 export class SocketService {
   socket: any;
 
-  constructor() { }
+  constructor() {
+  }
 
   /**
    *

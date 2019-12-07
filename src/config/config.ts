@@ -6,6 +6,10 @@ export enum Config {
   witClientToken = 'Bearer 73BEUT76XE4MCNHLZEFPTVP7LRDLTPSF',
   witUrl = 'https://api.wit.ai/message?v=20190907&q=',
 
+  // recommendation system url
+  recommendationSysUrl = 'http://localhost:5000',
+  recommendedCoachesUrl = 'recommend-coach',
+
   // api url parameters
   statusParameter = 'status',
   userProfileIdParameter = 'userProfileId',
@@ -20,6 +24,7 @@ export enum Config {
   maxPriceParameter = 'maxPrice',
   sumParameter = 'sum',
   coachIdParameter = 'coachId',
+  coachIds = 'coachIds',
   trainingDateParameter = 'trainingDate',
   paymentIdParameter = 'paymentId',
   payerIdParameter = 'payerId',

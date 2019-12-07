@@ -1,0 +1,24 @@
+<!--suppress ALL -->
+<div
+  [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+  style="width: 100%; height: 450px; background-color: #fff; padding: 24px;"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- chat content -->
+  <div [innerHtml]="currentChatContent" id="chat-content"></div>
+  <!-- end chat content -->
+
+  <!-- chat input -->
+  <div id="chat-input">
+    <input
+      (keyup.enter)="sendChatMessage()"
+      [(ngModel)]="currentUserChatMessage"
+      nz-input
+      placeholder="Please input your message"
+    />
+  </div>
+  <!-- end chat input -->
+</div>

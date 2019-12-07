@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { BodyIndexService } from './body-index.service';
+import {BodyIndexService} from './body-index.service';
 
 describe('BodyIndexService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

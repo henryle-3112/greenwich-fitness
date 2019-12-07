@@ -1,15 +1,13 @@
-import { Router } from '@angular/router';
-import { SignupService } from '@gw-services/core/api/user/signup.service';
-import { ResponseMessage, UserAccount, UserProfile } from '@gw-models/core';
-import { UploadImageService } from '@gw-services/core/api/upload-image/upload-image.service';
-import { ImageValidator } from '@gw-services/core/validate/image-validator';
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { CustomValidator } from '@gw-services/core/validate/custom-validator';
-import { NzNotificationService } from 'ng-zorro-antd';
-import { Observable, Observer } from 'rxjs';
-import { UserAccountStatus } from 'src/models/user/user-account-status';
-import { Config } from '@gw-config/core';
+import {Router} from '@angular/router';
+import {SignupService, UploadImageService} from '@gw-services/api';
+import {ResponseMessage, UserAccount, UserProfile} from '@gw-models';
+import {CustomValidator, ImageValidator} from '@gw-services/validate';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {NzNotificationService} from 'ng-zorro-antd';
+import {Observable, Observer} from 'rxjs';
+import {UserAccountStatus} from 'src/models/user/user-account-status';
+import {Config} from '@gw-config';
 
 @Component({
   selector: 'app-register',
@@ -31,10 +29,17 @@ export class RegisterComponent implements OnInit {
    * @param router - inject router
    */
   constructor(private fb: FormBuilder,
-    private notification: NzNotificationService,
-    private uploadImageService: UploadImageService,
-    private signUpService: SignupService,
-    private router: Router) {
+              private notification: NzNotificationService,
+              private uploadImageService: UploadImageService,
+              private signUpService: SignupService,
+              private router: Router) {
+  }
+
+  /**
+   * convenience getter for easy access to form fields
+   */
+  get f() {
+    return this.registerForm.controls;
   }
 
   /**
@@ -69,13 +74,6 @@ export class RegisterComponent implements OnInit {
   }
 
   /**
-   * convenience getter for easy access to form fields
-   */
-  get f() {
-    return this.registerForm.controls;
-  }
-
-  /**
    * submit login form
    */
   submitForm(): void {
@@ -101,48 +99,12 @@ export class RegisterComponent implements OnInit {
   }
 
   /**
-   * create user account's status
-   */
-  private createUserAccountStatus(): UserAccountStatus {
-    const userAccountStatus = new UserAccountStatus();
-    userAccountStatus.id = 2;
-    userAccountStatus.name = 'EMAIL_NOT_CONFIRMED';
-    return userAccountStatus;
-  }
-
-  /**
-   * create user profile
-   */
-  private createUserProfile(): UserProfile {
-    const userProfile = new UserProfile();
-    userProfile.fullName = this.f.fullName.value;
-    userProfile.acceptTermsOfService = 1;
-    userProfile.avatar = this.savedAvatarUrl;
-    userProfile.status = 1;
-    return userProfile;
-  }
-
-  /**
-   *
-   * @param userAccountStatus - user's account's status that will be set to user's account
-   * @param userProfile - user's profile that will be set to user's account
-   */
-  private createUserAccount(userAccountStatus: UserAccountStatus, userProfile: UserProfile) {
-    const userAccount = new UserAccount();
-    userAccount.userName = this.f.userName.value;
-    userAccount.password = this.f.password.value;
-    userAccount.userAccountStatus = userAccountStatus;
-    userAccount.userProfile = userProfile;
-    return userAccount;
-  }
-
-  /**
    * validate password when user-account blured password field
    */
   validatePassword(): void {
     if (this.f.password.value.toString().localeCompare('') === 0) {
       this.f.password.markAsTouched();
-      this.f.password.setErrors({ 'required': true });
+      this.f.password.setErrors({'required': true});
     }
   }
 
@@ -152,7 +114,7 @@ export class RegisterComponent implements OnInit {
   validateEmail(): void {
     if (this.f.userName.value.toString().localeCompare('') === 0) {
       this.f.userName.markAsTouched();
-      this.f.userName.setErrors({ 'required': true });
+      this.f.userName.setErrors({'required': true});
     }
   }
 
@@ -162,7 +124,7 @@ export class RegisterComponent implements OnInit {
   validateName(): void {
     if (this.f.fullName.value.toString().localeCompare('') === 0) {
       this.f.fullName.markAsTouched();
-      this.f.fullName.setErrors({ 'required': true });
+      this.f.fullName.setErrors({'required': true});
     }
   }
 
@@ -172,7 +134,7 @@ export class RegisterComponent implements OnInit {
   validateConfirmPassword(): void {
     if (this.f.confirmPassword.value.toString().localeCompare('') === 0) {
       this.f.confirmPassword.markAsTouched();
-      this.f.confirmPassword.setErrors({ 'required': true });
+      this.f.confirmPassword.setErrors({'required': true});
     }
   }
 
@@ -182,7 +144,7 @@ export class RegisterComponent implements OnInit {
   checkKeyUpValidateConfirmPassword(): void {
     if (this.f.confirmPassword.value.toString().localeCompare(this.f.password.value.toString()) !== 0) {
       this.f.confirmPassword.markAsTouched();
-      this.f.confirmPassword.setErrors({ 'required': true });
+      this.f.confirmPassword.setErrors({'required': true});
     } else {
       this.f.confirmPassword.setErrors(null);
     }
@@ -218,6 +180,42 @@ export class RegisterComponent implements OnInit {
         }
       });
     });
+  };
+
+  /**
+   * create user account's status
+   */
+  private createUserAccountStatus(): UserAccountStatus {
+    const userAccountStatus = new UserAccountStatus();
+    userAccountStatus.id = 2;
+    userAccountStatus.name = 'EMAIL_NOT_CONFIRMED';
+    return userAccountStatus;
+  }
+
+  /**
+   * create user profile
+   */
+  private createUserProfile(): UserProfile {
+    const userProfile = new UserProfile();
+    userProfile.fullName = this.f.fullName.value;
+    userProfile.acceptTermsOfService = 1;
+    userProfile.avatar = this.savedAvatarUrl;
+    userProfile.status = 1;
+    return userProfile;
+  }
+
+  /**
+   *
+   * @param userAccountStatus - user's account's status that will be set to user's account
+   * @param userProfile - user's profile that will be set to user's account
+   */
+  private createUserAccount(userAccountStatus: UserAccountStatus, userProfile: UserProfile) {
+    const userAccount = new UserAccount();
+    userAccount.userName = this.f.userName.value;
+    userAccount.password = this.f.password.value;
+    userAccount.userAccountStatus = userAccountStatus;
+    userAccount.userProfile = userProfile;
+    return userAccount;
   }
 
   /**

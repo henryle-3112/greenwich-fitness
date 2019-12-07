@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { ShareProductOrderService } from './share-product-order.service';
+import {ShareProductOrderService} from './share-product-order.service';
 
 describe('ShareProductOrderService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

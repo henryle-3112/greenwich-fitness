@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { ReplyOnCoachFeedbackService } from './reply-on-coach-feedback.service';
+import {ReplyOnCoachFeedbackService} from './reply-on-coach-feedback.service';
 
 describe('ReplyOnCoachFeedbackService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

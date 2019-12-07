@@ -1,5 +1,5 @@
-import { UserProfile, Coach } from '@gw-models/core';
-import { ChatRoom } from './chat-room';
+import {Coach, UserProfile} from '@gw-models';
+import {ChatRoom} from './chat-room';
 
 export class Participant {
   id?: number;

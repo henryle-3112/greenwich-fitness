@@ -1,0 +1,566 @@
+/* animations */
+@keyframes rotate360deg {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(90deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  75% {
+    transform: rotate(270deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* end animations */
+
+/* layout css */
+#layout {
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+/* end layout css */
+
+/* header css */
+.header {
+  position: fixed;
+  right: 0;
+  left: 0;
+  top: 0;
+  z-index: 2;
+}
+
+.logo {
+  width: 120px;
+  height: 31px;
+  float: left;
+}
+
+.logo-text {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.logo-text:hover {
+  color: #ffffff;
+  cursor: pointer;
+}
+
+[nz-menu] {
+  line-height: 64px;
+}
+
+nz-breadcrumb {
+  margin: 16px 0;
+}
+
+.menu-item:hover {
+  background: #1890ff;
+  color: #ffffff;
+}
+
+/* end header css */
+
+/* content css */
+.content {
+  margin-top: 88px;
+}
+
+/* end content css*/
+
+@media (min-width: 320px) {
+  /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */
+  /* header css */
+  .header {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  /* menu icon css */
+  .menu-icon {
+    display: inline-block;
+    color: #ffffff;
+    float: right;
+  }
+
+  /* welcome user css */
+  #welcome-user-mobile {
+    display: inline;
+    margin-left: 12px;
+  }
+
+  #user-avatar-mobile {
+    display: inline;
+    margin-right: 12px;
+  }
+
+  #welcome-user-message-mobile {
+    display: inline;
+    color: black;
+  }
+
+  .user-option {
+    color: black;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+
+  .user-option:hover {
+    cursor: pointer;
+  }
+
+  #welcome-user {
+    display: none;
+  }
+
+  /* end welcome user css */
+  /* horizontal menu css */
+  .horizontal-menu {
+    display: none;
+  }
+
+  /* drop down mennu css */
+  .drop-down-menu {
+    margin-top: 64px;
+  }
+
+  /* audio css */
+  #music-title {
+    padding-left: 12px;
+  }
+
+  #music-image-small-screen {
+    display: inline;
+  }
+
+  #music-image-wide-screen {
+    display: none;
+  }
+}
+
+@media (min-width: 480px) {
+  /* smartphones, Android phones, landscape iPhone */
+  /* header css */
+  .header {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  /* menu icon css */
+  .menu-icon {
+    display: inline-block;
+    color: #ffffff;
+    float: right;
+  }
+
+  /* welcome user css */
+  #welcome-user-mobile {
+    display: inline;
+    margin-left: 12px;
+  }
+
+  #user-avatar-mobile {
+    display: inline;
+    margin-right: 12px;
+  }
+
+  #welcome-user-message-mobile {
+    display: inline;
+    color: black;
+  }
+
+  .user-option {
+    color: black;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+
+  .user-option:hover {
+    cursor: pointer;
+  }
+
+  #welcome-user {
+    display: none;
+  }
+
+  /* end welcome user css */
+  /* horizontal menu css */
+  .horizontal-menu {
+    display: none;
+  }
+
+  /* drop down mennu css */
+  .drop-down-menu {
+    margin-top: 64px;
+  }
+
+  /* audio css */
+  #music-title {
+    padding-left: 12px;
+  }
+
+  #music-image-small-screen {
+    display: inline;
+  }
+
+  #music-image-wide-screen {
+    display: none;
+  }
+}
+
+/*@media screen and (min-width: 600px) , screen and (max-width: 800px) {*/
+/*...*/
+/*}*/
+
+@media (min-width: 600px) {
+  /* portrait tablets, portrait iPad, e-readers (Nook/Kindle), landscape 800x480 phones (Android) */
+  /* header css */
+  .header {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  /* menu icon css */
+  .menu-icon {
+    display: inline-block;
+    color: #ffffff;
+    float: right;
+  }
+
+  /* welcome user css */
+  #welcome-user-mobile {
+    display: inline;
+    margin-left: 12px;
+  }
+
+  #user-avatar-mobile {
+    display: inline;
+    margin-right: 12px;
+  }
+
+  #welcome-user-message-mobile {
+    display: inline;
+    color: black;
+  }
+
+  .user-option {
+    color: black;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+
+  .user-option:hover {
+    cursor: pointer;
+  }
+
+  #welcome-user {
+    display: none;
+  }
+
+  /* end welcome user css */
+  /* horizontal menu css */
+  .horizontal-menu {
+    display: none;
+  }
+
+  /* drop down mennu css */
+  .drop-down-menu {
+    margin-top: 64px;
+  }
+
+  /* audio css */
+  #music-title {
+    padding-left: 12px;
+  }
+
+  #music-image-small-screen {
+    display: inline;
+  }
+
+  #music-image-wide-screen {
+    display: none;
+  }
+}
+
+@media (min-width: 801px) {
+  /* tablet, landscape iPad, lo-res laptops ands desktops */
+  /* header css */
+  .header {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  /* menu icon css */
+  .menu-icon {
+    display: inline-block;
+    color: #ffffff;
+    float: right;
+  }
+
+  /* welcome user css */
+  #welcome-user-mobile {
+    display: inline;
+    margin-left: 12px;
+  }
+
+  #user-avatar-mobile {
+    display: inline;
+    margin-right: 12px;
+  }
+
+  #welcome-user-message-mobile {
+    display: inline;
+    color: black;
+  }
+
+  .user-option {
+    color: black;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+
+  .user-option:hover {
+    cursor: pointer;
+  }
+
+  #welcome-user {
+    display: none;
+  }
+
+  /* end welcome user css */
+  /* horizontal menu css */
+  .horizontal-menu {
+    display: none;
+  }
+
+  /* drop down mennu css */
+  .drop-down-menu {
+    margin-top: 64px;
+  }
+
+  /* audio css */
+  #music-title {
+    padding-left: 12px;
+  }
+
+  #music-image-small-screen {
+    display: inline;
+  }
+
+  #music-image-wide-screen {
+    display: none;
+  }
+}
+
+@media (min-width: 1025px) {
+  /* big landscape tablets, laptops, and desktops */
+  .header {
+    padding-left: 24px;
+    padding-right: 72px;
+  }
+
+  /* menu icon css */
+  .menu-icon {
+    display: none;
+  }
+
+  /* welcome user css */
+  #welcome-user {
+    display: inline;
+    float: right;
+  }
+
+  #user-avatar {
+    display: inline;
+    margin-right: 12px;
+  }
+
+  #welcome-user-message {
+    display: inline;
+    color: white;
+  }
+
+  .user-option {
+    color: black;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+
+  .user-option:hover {
+    cursor: pointer;
+  }
+
+  #welcome-user-mobile {
+    display: none;
+  }
+
+  /* end welcome user css */
+  /* drop down menu css */
+  .drop-down-menu {
+    display: none;
+  }
+
+  /* end drop down menu  css */
+  /* horizontal menu css */
+  .horizontal-menu {
+    display: inline-block;
+  }
+
+  /* audio css */
+  #music-title {
+    padding-left: 0;
+  }
+
+  #music-image-small-screen {
+    display: none;
+  }
+
+  #music-image-wide-screen {
+    display: inline;
+  }
+}
+
+@media (min-width: 1281px) {
+  /* hi-res laptops and desktops */
+  /* header css */
+  .header {
+    padding-left: 24px;
+    padding-right: 72px;
+  }
+
+  /* menu icon css */
+  .menu-icon {
+    display: none;
+  }
+
+  /* welcome user css */
+  #welcome-user {
+    display: inline;
+    float: right;
+  }
+
+  #user-avatar {
+    display: inline;
+    margin-right: 12px;
+  }
+
+  #welcome-user-message {
+    display: inline;
+    color: white;
+  }
+
+  .user-option {
+    color: black;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+
+  .user-option:hover {
+    cursor: pointer;
+  }
+
+  #welcome-user-mobile {
+    display: none;
+  }
+
+  /* end welcome user css */
+  /* drop down menu css */
+  .drop-down-menu {
+    display: none;
+  }
+
+  /* end drop down menu  css */
+  /* horizontal menu css */
+  .horizontal-menu {
+    display: inline-block;
+  }
+
+  /* audio css */
+  #music-title {
+    padding-left: 0;
+  }
+
+  #music-image-small-screen {
+    display: none;
+  }
+
+  #music-image-wide-screen {
+    display: inline;
+  }
+}
+
+/* media queries for audio */
+@media (max-width: 320px) {
+  #audio0 {
+    width: 324px;
+  }
+}
+
+@media (min-width: 360px) and (max-width: 400px) {
+  #audio0 {
+    width: 368px;
+  }
+}
+
+@media (min-width: 400px) and (max-width: 500px) {
+  #audio0 {
+    width: 416px;
+  }
+}
+
+@media (min-width: 500px) {
+  #audio0 {
+    width: 500px;
+  }
+}
+
+/* audio css */
+#audio-container {
+  position: fixed;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background: #001529;
+  padding-top: 12px;
+}
+
+#audio0 {
+  margin: 0 auto;
+}
+
+#music-image {
+  display: inline-block;
+  position: absolute;
+  left: 380px;
+  top: 40px;
+}
+
+#music-title {
+  width: 500px;
+  margin: 0 auto;
+}
+
+.music-image-detail {
+  width: 32px;
+  border-radius: 50%;
+  animation: rotate360deg 5s infinite 0s linear;
+}
+
+#music-title span {
+  color: #fff;
+  margin-left: 18px;
+}
+
+/* end audio css */
+
+/* footer css */
+#footer {
+  padding: 50px 50px;
+}
+
+/* end footer css */

@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { CoachMembershipNotificationService } from './coach-membership-notification.service';
+import {CoachMembershipNotificationService} from './coach-membership-notification.service';
 
 describe('CoachMembershipNotificationService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

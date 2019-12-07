@@ -1,0 +1,91 @@
+<!--suppress ALL -->
+<!-- layout -->
+<div
+  [ngClass]="{ 'height-100': true, 'position-relative': true }"
+  nz-row
+  nzType="flex"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- user-account' information's form -->
+  <form
+    (ngSubmit)="submitForm()"
+    [formGroup]="userInformationForm"
+    [ngClass]="{
+      'user-information-form': true,
+      'opacity-loading': isLoadingSpinnerShown
+    }"
+    nz-form
+  >
+    <nz-form-item>
+      <nz-form-control>
+        <nz-upload
+          [nzBeforeUpload]="beforeUpload"
+          [nzShowUploadList]="false"
+          class="avatar-uploader"
+          nzAction=""
+          nzListType="picture-card"
+          nzName="avatar"
+        >
+          <ng-container *ngIf="!avatarUrl">
+            <i
+              [nzType]="isLoadingSpinnerShown ? 'loading' : 'plus'"
+              class="upload-icon"
+              nz-icon
+            ></i>
+            <div class="ant-upload-text">Upload</div>
+          </ng-container>
+          <img *ngIf="avatarUrl" [src]="avatarUrl" class="avatar"/>
+        </nz-upload>
+        <span>
+          (Click here to upload your avatar!)
+        </span>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-control>
+        <nz-input-group [nzPrefix]="prefixUser">
+          <input
+            (blur)="validateName()"
+            formControlName="fullName"
+            nz-input
+            placeholder="Name"
+            type="text"
+          />
+        </nz-input-group>
+        <nz-form-explain
+          *ngIf="
+            userInformationForm.get('fullName').touched &&
+            userInformationForm.get('fullName').hasError('required')
+          "
+        >Please input your full name!
+        </nz-form-explain>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-form-item>
+      <nz-form-control>
+        <button
+          [nzType]="'primary'"
+          class="user-information-form-button"
+          nz-button
+        >
+          Change Information
+        </button>
+      </nz-form-control>
+    </nz-form-item>
+  </form>
+  <!-- end user-account's information form -->
+
+  <!-- change password menu -->
+  <div *ngIf="loginType == 'normal'" class="line"></div>
+  <div *ngIf="loginType == 'normal'" id="change-password">
+    <i nz-icon nzTheme="outline" nzType="lock"></i
+    ><a routerLink="/client/change-password">Change Password</a>
+  </div>
+  <div *ngIf="loginType == 'normal'" class="line"></div>
+  <ng-template #prefixUser><i nz-icon type="user"></i></ng-template>
+  <!-- end change password menu -->
+</div>
+<!-- end layout -->

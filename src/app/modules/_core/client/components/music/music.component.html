@@ -1,0 +1,61 @@
+<!--suppress ALL -->
+<div
+  [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- search box-->
+  <nz-input-group
+    *ngIf="musics && musics.length"
+    [ngClass]="{ 'mg-bottom-24': true, 'width-50': true }"
+    [nzSuffix]="suffixIconSearch"
+  >
+    <input
+        #searchBox
+        (keyup.enter)="searchMusic(searchBox.value)"
+        nz-input
+        placeholder="Name..."
+        type="text"
+    />
+  </nz-input-group>
+  <ng-template #suffixIconSearch>
+    <i nz-icon type="search"></i>
+  </ng-template>
+  <!-- end search box -->
+
+  <!-- custom list -->
+  <nz-list
+    [nzDataSource]="musics"
+    [nzItemLayout]="'horizontal'"
+    [nzRenderItem]="item"
+  >
+    <ng-template #item let-item>
+      <nz-list-item (click)="changeSong(item)" class="music-item">
+        <nz-list-item-meta
+          [nzTitle]="nzTitle"
+          nzAvatar="{{ item.musicImage }}"
+          nzDescription="{{ item.musicAuthor }}"
+        >
+          <ng-template #nzTitle>
+            <span>{{ item.musicName }}</span>
+          </ng-template>
+        </nz-list-item-meta>
+      </nz-list-item>
+    </ng-template>
+  </nz-list>
+  <!-- end custom list-->
+
+  <!-- pagination -->
+  <nz-pagination
+    (nzPageIndexChange)="musicPageChange($event)"
+    *ngIf="musics && musics.length"
+    [nzPageIndex]="currentMusicsPage"
+    [nzPageSize]="nMusicPerPage"
+    [nzSize]="'small'"
+    [nzTotal]="totalMusic"
+  ></nz-pagination>
+  <!-- end pagination -->
+</div>

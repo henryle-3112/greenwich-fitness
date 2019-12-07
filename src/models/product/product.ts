@@ -1,5 +1,3 @@
-import { ProductCategory } from '@gw-models/core';
-
 export class Product {
   id?: number;
   productName?: string;

@@ -1,0 +1,31 @@
+<!-- layout -->
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
+  <nz-tabset>
+    <!-- tab user-account' profile -->
+    <nz-tab *ngIf="isCoachInformationShow" nzTitle="Coach Profile">
+      <app-coach-information></app-coach-information>
+    </nz-tab>
+    <!-- end tab user-account's profile -->
+
+    <!-- tab achievement -->
+    <nz-tab nzTitle="Achievement">
+      <app-coach-achievement></app-coach-achievement>
+    </nz-tab>
+    <!-- end tab achievement -->
+
+    <!-- tab coach schedule -->
+    <nz-tab *ngIf="isRelationshipBetWeenUserAndCoachExisted" nzTitle="Schedule">
+      <app-coach-schedule></app-coach-schedule>
+    </nz-tab>
+    <!-- end coach schedule -->
+
+    <!-- chat tab -->
+    <nz-tab *ngIf="isRelationshipBetWeenUserAndCoachExisted" nzTitle="Chat">
+      <app-coach-chat></app-coach-chat>
+    </nz-tab>
+    <!-- end chat tab -->
+  </nz-tabset>
+</div>
+<!-- end layout -->

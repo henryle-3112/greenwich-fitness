@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { ProductOrderDetailService } from './product-order-detail.service';
+import {ProductOrderDetailService} from './product-order-detail.service';
 
 describe('ProductOrderDetailService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

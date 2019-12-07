@@ -1,12 +1,12 @@
-import { Component, NgZone, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AuthenticationService } from '@gw-services/core/authentication/authentication.service';
-import { first } from 'rxjs/operators';
-import { CustomValidator } from '@gw-services/core/validate/custom-validator';
-import { FacebookAccount, GoogleAccount, UserProfile } from '@gw-models/core';
-import { NzNotificationService } from 'ng-zorro-antd';
-import { Config } from '@gw-config/core';
+import {Component, NgZone, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import {ActivatedRoute, Router} from '@angular/router';
+import {AuthenticationService} from '@gw-services/authentication';
+import {first} from 'rxjs/operators';
+import {CustomValidator} from '@gw-services/validate';
+import {FacebookAccount, GoogleAccount, UserProfile} from '@gw-models';
+import {NzNotificationService} from 'ng-zorro-antd';
+import {Config} from '@gw-config';
 
 declare const FB: any;
 declare const gapi: any;
@@ -33,11 +33,18 @@ export class LoginComponent implements OnInit {
    * @param zone - inject zone
    */
   constructor(private fb: FormBuilder,
-    private route: ActivatedRoute,
-    private router: Router,
-    private authenticationService: AuthenticationService,
-    private notification: NzNotificationService,
-    private zone: NgZone) {
+              private route: ActivatedRoute,
+              private router: Router,
+              private authenticationService: AuthenticationService,
+              private notification: NzNotificationService,
+              private zone: NgZone) {
+  }
+
+  /**
+   * convenience getter for easy access to form fields
+   */
+  get f(): any {
+    return this.loginForm.controls;
   }
 
   /**
@@ -48,13 +55,6 @@ export class LoginComponent implements OnInit {
     this.checkUserAuthenticatedOrNot();
     this.configureFacebookLogin();
     this.configureGoogleLogin();
-  }
-
-  /**
-   * convenience getter for easy access to form fields
-   */
-  get f(): any {
-    return this.loginForm.controls;
   }
 
   /**
@@ -69,6 +69,60 @@ export class LoginComponent implements OnInit {
     this.authenticateUserAccount();
   }
 
+  /**
+   * validate password when user-account blured password field
+   */
+  validatePassword(): void {
+    if (this.f.password.value.toString().localeCompare('') === 0) {
+      this.f.password.markAsTouched();
+      this.f.password.setErrors({'required': true});
+    }
+  }
+
+  /**
+   * validate email when user-account blured email field
+   */
+  validateEmail(): void {
+    if (this.f.userName.value.toString().localeCompare('') === 0) {
+      this.f.userName.markAsTouched();
+      this.f.userName.setErrors({'required': true});
+    }
+  }
+
+  /**
+   * login by facebook
+   */
+  public loginByFacebook(): void {
+    const that = this;
+    FB.login((response) => {
+      if (response.authResponse) {
+        that.isLoadingSpinnerShown = true;
+        const selectedUserId = response.authResponse.userID;
+        that.getFacebookUserInformation(selectedUserId);
+      }
+    });
+  }
+
+  /**
+   *
+   * @param type - type of notification
+   * @param title - title of notification
+   * @param content - content of notification
+   */
+  createNotification(type: string, title: string, content: string): void {
+    this.notification.create(
+      type,
+      title,
+      content
+    );
+  }
+
+  /**
+   * show isLoadingSpinnerShown component
+   */
+  public loginByGoogle(): void {
+    this.isLoadingSpinnerShown = true;
+  }
 
   /**
    * get user-account's name and user-account's password, then authenticate user-account's account
@@ -92,26 +146,6 @@ export class LoginComponent implements OnInit {
           this.isLoadingSpinnerShown = false;
         }
       );
-  }
-
-  /**
-   * validate password when user-account blured password field
-   */
-  validatePassword(): void {
-    if (this.f.password.value.toString().localeCompare('') === 0) {
-      this.f.password.markAsTouched();
-      this.f.password.setErrors({ 'required': true });
-    }
-  }
-
-  /**
-   * validate email when user-account blured email field
-   */
-  validateEmail(): void {
-    if (this.f.userName.value.toString().localeCompare('') === 0) {
-      this.f.userName.markAsTouched();
-      this.f.userName.setErrors({ 'required': true });
-    }
   }
 
   /**
@@ -173,20 +207,6 @@ export class LoginComponent implements OnInit {
   }
 
   /**
-   * login by facebook
-   */
-  public loginByFacebook(): void {
-    const that = this;
-    FB.login((response) => {
-      if (response.authResponse) {
-        that.isLoadingSpinnerShown = true;
-        const selectedUserId = response.authResponse.userID;
-        that.getFacebookUserInformation(selectedUserId);
-      }
-    });
-  }
-
-  /**
    *
    * @param userId - get facebook's user-account's information
    */
@@ -243,20 +263,6 @@ export class LoginComponent implements OnInit {
   }
 
   /**
-   *
-   * @param type - type of notification
-   * @param title - title of notification
-   * @param content - content of notification
-   */
-  createNotification(type: string, title: string, content: string): void {
-    this.notification.create(
-      type,
-      title,
-      content
-    );
-  }
-
-  /**
    * configure google login
    */
   private configureGoogleLogin(): void {
@@ -291,13 +297,6 @@ export class LoginComponent implements OnInit {
     googleAccount.googleId = googleId;
     googleAccount.userProfile = userProfile;
     return googleAccount;
-  }
-
-  /**
-   * show isLoadingSpinnerShown component
-   */
-  public loginByGoogle(): void {
-    this.isLoadingSpinnerShown = true;
   }
 
   /**

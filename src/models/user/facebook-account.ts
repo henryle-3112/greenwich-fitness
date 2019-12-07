@@ -1,4 +1,5 @@
-import { UserProfile } from './user-profile';
+import {UserProfile} from '@gw-models';
+
 export class FacebookAccount {
   facebookId?: string;
   userProfile: UserProfile;

@@ -1,5 +1,6 @@
-import { ChatRoom } from './chat-room';
-import { UserProfile } from './../user/user-profile';
+import {ChatRoom} from './chat-room';
+import {UserProfile} from '@gw-models';
+
 export class ChatMessage {
   id?: number;
   userProfile?: UserProfile;

@@ -1,0 +1,72 @@
+<!--suppress ALL -->
+<div
+  [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- search box-->
+  <nz-input-group
+    *ngIf="gifts && gifts.length"
+    [ngClass]="{ 'mg-bottom-24': true, 'width-50': true }"
+    [nzSuffix]="suffixIconSearch"
+  >
+    <input
+        #searchBox
+        (keyup.enter)="searchGift(searchBox.value)"
+        nz-input
+        placeholder="Name..."
+        type="text"
+    />
+  </nz-input-group>
+  <ng-template #suffixIconSearch>
+    <i nz-icon type="search"></i>
+  </ng-template>
+  <!-- end search box -->
+
+  <!-- custom list -->
+  <nz-list
+    [nzDataSource]="gifts"
+    [nzItemLayout]="'horizontal'"
+    [nzRenderItem]="item"
+  >
+    <ng-template #item let-item>
+      <nz-list-item>
+        <nz-list-item-meta
+          [nzDescription]="nzDesription"
+          [nzTitle]="nzTitle"
+          nzAvatar="{{ item.image }}"
+        >
+          <ng-template #nzTitle>
+            <span>{{ item.name }}</span>
+          </ng-template>
+          <ng-template #nzDesription>
+            <span>{{ item.point }} point</span> <br/>
+            <button
+              (click)="getGift(item)"
+              [nzType]="'primary'"
+              class="mg-top-12"
+              nz-button
+            >
+              Get
+            </button>
+          </ng-template>
+        </nz-list-item-meta>
+      </nz-list-item>
+    </ng-template>
+  </nz-list>
+  <!-- end custom list-->
+
+  <!-- pagination -->
+  <nz-pagination
+    (nzPageIndexChange)="giftPageChange($event)"
+    *ngIf="gifts && gifts.length"
+    [nzPageIndex]="currentGiftsPage"
+    [nzPageSize]="nGiftPerPage"
+    [nzSize]="'small'"
+    [nzTotal]="totalGifts"
+  ></nz-pagination>
+  <!-- end pagination -->
+</div>

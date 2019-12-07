@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { PostSlideService } from './post-slide.service';
+import {PostSlideService} from './post-slide.service';
 
 describe('PostSlideService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

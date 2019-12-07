@@ -1,22 +1,22 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { Role } from '@gw-models/core';
-
-import { AuthGuard } from '@gw-services/core/guard/auth.guard';
-
-import { LoginComponent } from './pages/login/login.component';
-import { ForgotPasswordComponent } from '@gw-share-module/core/forgot-password/forgot-password.component';
-import { ActiveAccountComponent } from './pages/active-account/active-account.component';
-import { AlertVerifyEmailComponent } from './pages/alert-verify-email/alert-verify-email.component';
-import { RegisterComponent } from './pages/register/register.component';
-import { ChangePasswordComponent } from './pages/change-password/change-password.component';
-import { NotFoundComponent } from './pages/not-found/not-found.component';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
+import {AuthGuard} from '@gw-services/guard';
+import {
+  ActiveAccountComponent,
+  AlertVerifyEmailComponent,
+  ChangePasswordComponent,
+  LoginComponent,
+  NotFoundComponent,
+  RegisterComponent
+} from '@gw-pages';
+import {Role} from '@gw-models';
+import {ForgotPasswordComponent} from '@gw-share-module/components';
 
 
 const routes: Routes = [
   {
     path: 'client',
-    loadChildren: './modules/_core/client/client.module#ClientModule',
+    loadChildren: '@gw-client-module/client.module#ClientModule',
     canActivate: [AuthGuard],
     data: {
       roles: [Role.Admin, Role.Coach, Role.User]
@@ -24,7 +24,7 @@ const routes: Routes = [
   },
   {
     path: 'shop',
-    loadChildren: './modules/_core/shop/shop.module#ShopModule',
+    loadChildren: '@gw-shop-module/shop.module#ShopModule',
     canActivate: [AuthGuard],
     data: {
       roles: [Role.Admin, Role.Coach, Role.User]
@@ -32,7 +32,7 @@ const routes: Routes = [
   },
   {
     path: 'blog',
-    loadChildren: './modules/_core/blog/blog.module#BlogModule',
+    loadChildren: '@gw-blog-module/blog.module#BlogModule',
     canActivate: [AuthGuard],
     data: {
       roles: [Role.Admin, Role.Coach, Role.User]

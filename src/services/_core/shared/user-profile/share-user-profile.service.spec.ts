@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { ShareUserProfileService } from './share-user-profile.service';
+import {ShareUserProfileService} from './share-user-profile.service';
 
 describe('ShareUserProfileService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

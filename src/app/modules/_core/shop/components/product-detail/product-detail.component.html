@@ -1,0 +1,305 @@
+<!--suppress ALL -->
+<div
+  *ngIf="selectedProduct"
+  [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- products detail-->
+  <div nz-row nzGutter="0">
+    <!-- product image-->
+    <div
+      class="gutter-row"
+      nz-col
+      nzLg="12"
+      nzMd="24"
+      nzSm="24"
+      nzXl="12"
+      nzXs="24"
+    >
+      <img
+        alt="{{ selectedProduct.productName }}"
+        class="img-product-detail"
+        src="{{ selectedProduct?.productImage }}"
+      />
+    </div>
+    <!-- end product image -->
+
+    <!-- product information -->
+    <div
+      class="gutter-row"
+      id="product-information"
+      nz-col
+      nzLg="12"
+      nzMd="24"
+      nzSm="24"
+      nzXl="12"
+      nzXs="24"
+    >
+      <h1>{{ selectedProduct?.productName }}</h1>
+      <h2>{{ selectedProduct?.productPrice }}$</h2>
+
+      <div class="share-buttons">
+        <app-facebook-like></app-facebook-like>
+        <app-twitter-share></app-twitter-share>
+      </div>
+      <p *ngIf="selectedProduct.productIncludeVat == 1" class="mg-top-12">
+        incl. VAT, excl. shipping<br/>
+        Delivery time: 2-7 days*
+      </p>
+      <div id="product-quantity">
+        <nz-input-number
+          [(ngModel)]="selectedProductQuantity"
+          [nzMin]="1"
+          [nzStep]="1"
+          style="z-index: 2;"
+        ></nz-input-number>
+      </div>
+      <div class="buttons">
+        <button
+          (click)="addProductToCart()"
+          id="btn-add-to-cart"
+          nz-button
+          nzType="primary"
+          style="z-index: 2;"
+        >
+          <i nz-icon nzType="shopping-cart"></i>
+          Add to Cart
+        </button>
+      </div>
+      <div id="product-description">
+        <div class="line"></div>
+        <p>
+          {{ selectedProduct?.productMetaDescription }}
+        </p>
+        <div class="line"></div>
+      </div>
+    </div>
+    <!-- end product information -->
+
+    <!-- customer reviews -->
+    <div nz-row nzGutter="0">
+      <div
+        class="gutter-row"
+        id="customer-reviews"
+        nz-col
+        nzLg="24"
+        nzMd="24"
+        nzSm="24"
+        nzXl="24"
+        nzXs="24"
+      >
+        <h2 id="title-customer-reviews">Customer Reviews</h2>
+        <button
+          (click)="toggleAddReviewForm()"
+          id="btn-write-reviews"
+          nz-button
+          nzType="default"
+        >
+          Write Reviews
+        </button>
+
+        <div class="clear-both"></div>
+
+        <!-- add reviews form -->
+        <div *ngIf="isProductReviewFormShown" id="add-reviews-form">
+          <nz-rate
+            (ngModelChange)="onRateChanged($event)"
+            [ngModel]="selectedProductRateValue"
+            class="mg-top-24"
+          ></nz-rate>
+          <br/>
+          <textarea
+            [(ngModel)]="productReviewContent"
+            class="mg-top-24"
+            id="reviews-text-area"
+            nz-input
+            placeholder="Write Reviews..."
+            rows="4"
+          ></textarea>
+          <br/>
+          <button
+            (click)="addProductReview()"
+            id="btn-add-reviews"
+            nz-button
+            nzType="primary"
+          >
+            Add Reviews
+          </button>
+        </div>
+        <!-- end add reviews form -->
+
+        <!-- pagination list -->
+
+        <!-- reply comment template-->
+        <ng-template #commentTemplateReplyRef let-comment="comment">
+          <nz-comment
+            [nzAuthor]="comment.userProfile.fullName"
+            [nzDatetime]="
+              comment.replyOnProductFeedbackCreateDate
+                | date: 'yyyy-MM-dd HH:mm:ss'
+            "
+          >
+            <nz-avatar
+              [nzSrc]="comment.userProfile.avatar"
+              nz-comment-avatar
+              nzIcon="user"
+            ></nz-avatar>
+            <nz-comment-content>
+              <p>{{ comment.replyOnProductFeedbackContent }}</p>
+            </nz-comment-content>
+            <nz-comment-action>
+              <i
+                (click)="likeReplyOnProductFeedback(comment)"
+                [nzTheme]="
+                  comment.isLikeClicked == true ? 'twotone' : 'outline'
+                "
+                nz-icon
+                nz-tooltip
+                nzTitle="Like"
+                type="like"
+              ></i>
+              <span class="count like">{{ comment?.numberOfLikes }}</span>
+            </nz-comment-action>
+            <nz-comment-action>
+              <i
+                (click)="dislikeReplyOnProductFeedback(comment)"
+                [nzTheme]="
+                  comment.isLikeClicked == false ? 'twotone' : 'outline'
+                "
+                nz-icon
+                nz-tooltip
+                nzTitle="Dislike"
+                type="dislike"
+              ></i>
+              <span class="count dislike">{{ comment?.numberOfDislikes }}</span>
+            </nz-comment-action>
+            <nz-comment-action>
+              <span (click)="showReplyReplyProductFeedbackBox(comment)"
+              >Reply to</span
+              >
+            </nz-comment-action>
+          </nz-comment>
+        </ng-template>
+        <!-- end reply comment template -->
+
+        <!-- comment template -->
+        <ng-template #commentTemplateRef let-comment="comment">
+          <!-- product's feedback content -->
+          <nz-comment
+            [nzAuthor]="comment.userProfile.fullName"
+            [nzDatetime]="
+              comment.feedbackCreatedDate | date: 'yyyy-MM-dd HH:mm:ss'
+            "
+          >
+            <nz-avatar
+              [nzSrc]="comment.userProfile.avatar"
+              nz-comment-avatar
+              nzIcon="user"
+            ></nz-avatar>
+            <nz-comment-content>
+              <p>{{ comment.feedbackContent }}</p>
+            </nz-comment-content>
+            <nz-comment-action>
+              <i
+                (click)="like(comment)"
+                [nzTheme]="
+                  comment.isLikeClicked == true ? 'twotone' : 'outline'
+                "
+                nz-icon
+                nz-tooltip
+                nzTitle="Like"
+                type="like"
+              ></i>
+              <span class="count like">{{ comment?.numberOfLikes }}</span>
+            </nz-comment-action>
+            <nz-comment-action>
+              <i
+                (click)="dislike(comment)"
+                [nzTheme]="
+                  comment.isLikeClicked == false ? 'twotone' : 'outline'
+                "
+                nz-icon
+                nz-tooltip
+                nzTitle="Dislike"
+                type="dislike"
+              ></i>
+              <span class="count dislike">{{ comment?.numberOfDislikes }}</span>
+            </nz-comment-action>
+            <nz-comment-action>
+              <span (click)="showReplyProductFeedbackBox(comment)"
+              >Reply to</span
+              >
+            </nz-comment-action>
+            <nz-comment-action>
+              <span (click)="viewRepliesOfSelectedProductFeedback(comment)"
+              >View {{ comment?.numberOfReplies }} replies</span
+              >
+            </nz-comment-action>
+            <!-- end  product's feedback content -->
+
+            <!-- relies of each product's feedback -->
+            <ng-container *ngIf="comment.replies && comment.replies.length">
+              <ng-template [ngForOf]="comment.replies" let-child ngFor>
+                <ng-template
+                  [ngTemplateOutletContext]="{ comment: child }"
+                  [ngTemplateOutlet]="commentTemplateReplyRef"
+                >
+                </ng-template>
+              </ng-template>
+            </ng-container>
+            <!-- end relies of each product's feedback -->
+
+            <!-- reply box-->
+            <nz-input-group
+              *ngIf="comment.isReplyBoxShown && comment.isReplyBoxShown == true"
+              [ngClass]="{ 'mg-bottom-24': true, 'width-50': true }"
+              [nzSuffix]="suffixIconMessage"
+            >
+              <input
+                  #replyBox
+                  (keyup.enter)="
+                  replyToProductFeedback(comment, replyBox.value);
+                  replyBox.value = ''
+                "
+                  nz-input
+                  placeholder="Reply..."
+                  type="text"
+              />
+            </nz-input-group>
+            <ng-template #suffixIconMessage>
+              <i nz-icon type="message"></i>
+            </ng-template>
+            <!-- end reply box -->
+          </nz-comment>
+        </ng-template>
+        <!-- end comment template -->
+
+        <div *ngFor="let eachProductFeedbackComment of productFeedbacksPerPage">
+          <ng-template
+            [ngTemplateOutletContext]="{ comment: eachProductFeedbackComment }"
+            [ngTemplateOutlet]="commentTemplateRef"
+          ></ng-template>
+        </div>
+
+        <!-- end pagination list -->
+
+        <!-- pagination -->
+        <nz-pagination
+          (nzPageIndexChange)="productFeedbacksPageChange($event)"
+          *ngIf="productFeedbacks && productFeedbacks.length"
+          [nzPageIndex]="currentProductFeedbacksPage"
+          [nzPageSize]="nProductFeedbacksPerPage"
+          [nzTotal]="totalProductFeedbacks"
+          nzSize="small"
+        ></nz-pagination>
+        <!-- end pagination -->
+      </div>
+
+      <!-- end customer reviews -->
+    </div>
+  </div>
+  <!-- end products detail-->
+</div>

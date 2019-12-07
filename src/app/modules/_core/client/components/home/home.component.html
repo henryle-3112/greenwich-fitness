@@ -1,0 +1,333 @@
+<!--suppress ALL -->
+<nz-layout
+  [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+  class="layout"
+  id="layout"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- navbar -->
+  <nz-header ngClass="pd-left-72 header">
+    <div class="logo">
+      <p ngClass="logo-text">
+        Greenwich Fitness
+      </p>
+    </div>
+
+    <ul class="horizontal-menu" nz-menu nzMode="horizontal" nzTheme="dark">
+      <li (click)="goToComponent('feed')" class="menu-item" nz-menu-item>
+        <span><span class="nav-text">Feeds</span></span>
+      </li>
+      <li (click)="goToComponent('profile')" class="menu-item" nz-menu-item>
+        <span><span class="nav-text">Profile</span></span>
+      </li>
+      <li (click)="goToComponent('exercises')" class="menu-item" nz-menu-item>
+        <span><span class="nav-text">Exercises</span></span>
+      </li>
+      <li (click)="goToComponent('workouts')" class="menu-item" nz-menu-item>
+        <span><span class="nav-text">Workouts</span></span>
+      </li>
+      <li (click)="goToComponent('coach')" class="menu-item" nz-menu-item>
+        <span><span class="nav-text">Coach</span></span>
+      </li>
+      <li (click)="goToComponent('blog')" class="menu-item" nz-menu-item>
+        <span><span class="nav-text">Blog</span></span>
+      </li>
+      <li (click)="goToComponent('shop')" class="menu-item" nz-menu-item>
+        <span><span class="nav-text">Shop</span></span>
+      </li>
+      <li (click)="goToComponent('music')" class="menu-item" nz-menu-item>
+        <span><span class="nav-text">Music</span></span>
+      </li>
+      <li (click)="goToComponent('gallery')" class="menu-item" nz-menu-item>
+        <span><span class="nav-text">Gallery</span></span>
+      </li>
+      <li (click)="goToComponent('gift')" class="menu-item" nz-menu-item>
+        <span><span class="nav-text">Gift</span></span>
+      </li>
+      <li (click)="goToComponent('chat-bot')" class="menu-item" nz-menu-item>
+        <span><span class="nav-text">Chat Bot</span></span>
+      </li>
+    </ul>
+
+    <!-- welcome user -->
+    <div id="welcome-user">
+      <div id="user-avatar">
+        <nz-avatar
+          [nzSize]="32"
+          nzIcon="user"
+          nzSrc="{{ selectedUserProfile?.avatar }}"
+        ></nz-avatar>
+      </div>
+      <div id="welcome-user-message">
+        <span class="mg-right-12"
+        >Welcome, {{ selectedUserProfile?.fullName }}</span
+        >
+        <span>
+          <i
+            [nzContent]="contentTemplate"
+            nz-icon
+            nz-popover
+            nzPlacement="bottom"
+            nzTitle="Options"
+            nzTrigger="click"
+            type="caret-down"
+          ></i>
+          <ng-template #contentTemplate>
+            <div (click)="logout()" class="user-option">Logout</div>
+            <div (click)="goToUserProfile()" class="user-option">Profile</div>
+            <div (click)="goToNotification()" class="user-option">
+              Notifications
+            </div>
+          </ng-template>
+        </span>
+      </div>
+      <div class="clear-both"></div>
+    </div>
+    <!-- end welcome user -->
+
+    <!-- icon to open dropdown menu -->
+    <div (click)="openDropDownMenu($event)" class="menu-icon">
+      <span>
+        <i nz-icon type="align-right"></i>
+      </span>
+    </div>
+    <!-- end icon to open dropdown menu -->
+  </nz-header>
+  <!-- end navbar -->
+
+  <!-- content -->
+  <nz-content class="main-content">
+    <div class="gutter-example">
+      <div nz-row nzGutter="24">
+        <!-- col menu -->
+        <div
+          *ngIf="isDropDownMenuOpened"
+          [@fadeInAnimation]
+          class="gutter-row drop-down-menu"
+          nz-col
+          nzLg="24"
+          nzMd="24"
+          nzSm="24"
+          nzXl="24"
+          nzXs="24"
+        >
+          <div
+            class="gutter-box left-menu"
+            style="background-color: #fff; min-height: 280px; padding: 24px;"
+          >
+            <h3>Menu</h3>
+            <nz-divider></nz-divider>
+            <!-- welcome user -->
+            <div id="welcome-user-mobile">
+              <div id="user-avatar-mobile">
+                <nz-avatar
+                  [nzSize]="32"
+                  nzIcon="user"
+                  nzSrc="{{ selectedUserProfile?.avatar }}"
+                ></nz-avatar>
+              </div>
+              <div id="welcome-user-message-mobile">
+                <span class="mg-right-12"
+                >Welcome, {{ selectedUserProfile?.fullName }}</span
+                >
+                <span>
+                  <i
+                    [nzContent]="contentTemplate"
+                    nz-icon
+                    nz-popover
+                    nzPlacement="bottom"
+                    nzTitle="Options"
+                    nzTrigger="click"
+                    type="caret-down"
+                  ></i>
+                  <ng-template #contentTemplate>
+                    <div (click)="logout()" class="user-option">Logout</div>
+                    <div (click)="goToUserProfile()" class="user-option">
+                      Profile
+                    </div>
+                    <div (click)="goToNotification()" class="user-option">
+                      Notifications
+                    </div>
+                  </ng-template>
+                </span>
+              </div>
+              <div class="clear-both"></div>
+            </div>
+            <!-- end welcome user -->
+            <ul ngClass="none-border" nz-menu>
+              <li
+                (click)="goToComponent('feed')"
+                ngClass="pd-left-0"
+                nz-menu-item
+              >
+                <span
+                ><i nz-icon type="home"></i
+                ><span class="nav-text">Feeds</span></span
+                >
+              </li>
+              <li
+                (click)="goToComponent('profile')"
+                ngClass="pd-left-0"
+                nz-menu-item
+              >
+                <span
+                ><i nz-icon type="profile"></i
+                ><span class="nav-text">Profile</span></span
+                >
+              </li>
+              <li
+                (click)="goToComponent('exercises')"
+                ngClass="pd-left-0"
+                nz-menu-item
+              >
+                <span
+                ><i nz-icon type="rocket"></i
+                ><span class="nav-text">Exercises</span></span
+                >
+              </li>
+              <li
+                (click)="goToComponent('workouts')"
+                ngClass="pd-left-0"
+                nz-menu-item
+              >
+                <span
+                ><i nz-icon type="ant-design"></i
+                ><span class="nav-text">Workouts</span></span
+                >
+              </li>
+              <li
+                (click)="goToComponent('coach')"
+                ngClass="pd-left-0"
+                nz-menu-item
+              >
+                <span
+                ><i nz-icon type="team"></i
+                ><span class="nav-text">Coach</span></span
+                >
+              </li>
+              <li
+                (click)="goToComponent('blog')"
+                ngClass="pd-left-0"
+                nz-menu-item
+              >
+                <span
+                ><i nz-icon type="read"></i
+                ><span class="nav-text">Blog</span></span
+                >
+              </li>
+              <li
+                (click)="goToComponent('shop')"
+                ngClass="pd-left-0"
+                nz-menu-item
+              >
+                <span
+                ><i nz-icon type="shopping-cart"></i
+                ><span class="nav-text">Shop</span></span
+                >
+              </li>
+              <li
+                (click)="goToComponent('music')"
+                ngClass="pd-left-0"
+                nz-menu-item
+              >
+                <span
+                ><i nz-icon type="customer-service"></i
+                ><span class="nav-text">Music</span></span
+                >
+              </li>
+              <li
+                (click)="goToComponent('gallery')"
+                ngClass="pd-left-0"
+                nz-menu-item
+              >
+                <span
+                ><i nz-icon type="picture"></i
+                ><span class="nav-text">Gallery</span></span
+                >
+              </li>
+              <li
+                (click)="goToComponent('gift')"
+                ngClass="pd-left-0"
+                nz-menu-item
+              >
+                <span
+                ><i nz-icon type="gift"></i
+                ><span class="nav-text">Gift</span></span
+                >
+              </li>
+              <li
+                (click)="goToComponent('chat-bot')"
+                ngClass="pd-left-0"
+                nz-menu-item
+              >
+                <span
+                ><i nz-icon type="gift"></i
+                ><span class="nav-text">chat Bot</span></span
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <!-- end col menu -->
+
+        <!-- main content-->
+        <div
+            #mainContent
+            [nzLg]="{ span: 24, offset: 0 }"
+            [nzMd]="{ span: 24, offset: 0 }"
+            [nzSm]="{ span: 24, offset: 0 }"
+            [nzXl]="{ span: 10, offset: 7 }"
+            [nzXs]="{ span: 24, offset: 0 }"
+            class="gutter-row content"
+            nz-col
+        >
+          <!--
+            style="background-color: #fff; min-height: 280px; padding: 24px;"
+          -->
+          <div class="gutter-box">
+            <router-outlet></router-outlet>
+          </div>
+        </div>
+        <!-- end main content -->
+      </div>
+    </div>
+  </nz-content>
+  <!-- end content -->
+
+  <div #audioContainer id="audio-container">
+    <div id="music-selection-information">
+      <div id="music-image">
+        <img
+          alt="{{ selectedMusic?.musicName }}"
+          class="music-image-detail"
+          id="music-image-wide-screen"
+          src="{{ selectedMusic?.musicImage }}"
+        />
+      </div>
+      <div id="music-title">
+        <img
+          alt="{{ selectedMusic?.musicName }}"
+          class="music-image-detail"
+          id="music-image-small-screen"
+          src="{{ selectedMusic?.musicImage }}"
+        />
+        <span
+        >{{ selectedMusic?.musicName }} -
+          {{ selectedMusic?.musicAuthor }}</span
+        >
+      </div>
+    </div>
+    <div id="audio0">
+      <audio #audioOption autoplay controls id="audio1"></audio>
+    </div>
+  </div>
+
+  <!-- footer -->
+  <nz-footer id="footer" style="text-align: center;"
+  >Greenwich Fitness ©2019 Implement By Henry Le
+  </nz-footer>
+  <!-- end footer -->
+</nz-layout>

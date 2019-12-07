@@ -1,0 +1,25 @@
+<div
+  *ngIf="selectedAboutContent"
+  [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+  nz-row
+  nzGutter="0"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- about's content-->
+  <div
+    class="gutter-row"
+    nz-col
+    nzLg="12"
+    nzMd="24"
+    nzSm="24"
+    nzXl="12"
+    nzXs="24"
+  >
+    <h1>{{ selectedAboutContent?.aboutName }}</h1>
+    <p>{{ selectedAboutContent?.aboutContent }}</p>
+  </div>
+  <!-- end about's content -->
+</div>

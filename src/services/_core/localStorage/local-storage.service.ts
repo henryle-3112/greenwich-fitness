@@ -1,12 +1,13 @@
-import { Injectable } from '@angular/core';
-import { Config } from '@gw-config/core';
+import {Injectable} from '@angular/core';
+import {Config} from '@gw-config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LocalStorageService {
 
-  constructor() { }
+  constructor() {
+  }
 
   /**
    * remove single exercise's state

@@ -1,4 +1,4 @@
-import { Product, UserProfile } from '@gw-models/core';
+import {Product, UserProfile} from '@gw-models';
 
 export class ProductRate {
   id?: number;

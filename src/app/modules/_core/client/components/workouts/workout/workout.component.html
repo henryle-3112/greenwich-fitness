@@ -1,0 +1,174 @@
+<!--suppress ALL -->
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- search box-->
+  <nz-input-group
+    [ngClass]="{ 'mg-bottom-24': true, 'width-50': true }"
+    [nzSuffix]="suffixIconSearch"
+  >
+    <input
+        #searchBox
+        (keyup.enter)="searchWorkouts(searchBox.value)"
+        nz-input
+        placeholder="Name..."
+        type="text"
+    />
+  </nz-input-group>
+  <ng-template #suffixIconSearch>
+    <i nz-icon type="search"></i>
+  </ng-template>
+  <!-- end search box -->
+
+  <!-- tag to filter the list -->
+  <div>
+    <nz-tag
+      (click)="handleTagActive('beginner')"
+      [ngClass]="{
+        'tag-active': isBeginnerTagActive,
+        'tag-unactive': !isBeginnerTagActive
+      }"
+      class="mg-bottom-12 workout-tag"
+    >Beginner
+    </nz-tag>
+    <nz-tag
+      (click)="handleTagActive('intermediate')"
+      [ngClass]="{
+        'tag-active': isIntermediateTagActive,
+        'tag-unactive': !isIntermediateTagActive
+      }"
+      class="mg-bottom-12 workout-tag"
+    >Intermediate
+    </nz-tag>
+    <nz-tag
+      (click)="handleTagActive('advanced')"
+      [ngClass]="{
+        'tag-active': isAdvancedTagActive,
+        'tag-unactive': !isAdvancedTagActive
+      }"
+      class="mg-bottom-12 workout-tag"
+    >Advanced
+    </nz-tag>
+    <nz-tag
+      (click)="handleTagActive('short')"
+      [ngClass]="{
+        'tag-active': isShortTagActive,
+        'tag-unactive': !isShortTagActive
+      }"
+      class="mg-bottom-12 workout-tag"
+    >Short
+    </nz-tag>
+    <nz-tag
+      (click)="handleTagActive('medium')"
+      [ngClass]="{
+        'tag-active': isMediumTagActive,
+        'tag-unactive': !isMediumTagActive
+      }"
+      class="mg-bottom-12 workout-tag"
+    >Medium
+    </nz-tag>
+    <nz-tag
+      (click)="handleTagActive('long')"
+      [ngClass]="{
+        'tag-active': isLongTagActive,
+        'tag-unactive': !isLongTagActive
+      }"
+      class="mg-bottom-12 workout-tag"
+    >Long
+    </nz-tag>
+    <nz-tag
+      (click)="handleTagActive('full_body')"
+      [ngClass]="{
+        'tag-active': isFullBodyTagActive,
+        'tag-unactive': !isFullBodyTagActive
+      }"
+      class="mg-bottom-12 workout-tag"
+    >Full Body
+    </nz-tag>
+    <nz-tag
+      (click)="handleTagActive('upper')"
+      [ngClass]="{
+        'tag-active': isUpperTagActive,
+        'tag-unactive': !isUpperTagActive
+      }"
+      class="mg-bottom-12 workout-tag"
+    >Upper
+    </nz-tag>
+    <nz-tag
+      (click)="handleTagActive('core')"
+      [ngClass]="{
+        'tag-active': isCoreTagActive,
+        'tag-unactive': !isCoreTagActive
+      }"
+      class="mg-bottom-12 workout-tag"
+    >Core
+    </nz-tag>
+    <nz-tag
+      (click)="handleTagActive('lower')"
+      [ngClass]="{
+        'tag-active': isLowerTagActive,
+        'tag-unactive': !isLowerTagActive
+      }"
+      class="mg-bottom-12 workout-tag"
+    >Lower
+    </nz-tag>
+    <nz-tag
+      (click)="handleTagActive('no_distance')"
+      [ngClass]="{
+        'tag-active': isNoDistanceTagActive,
+        'tag-unactive': !isNoDistanceTagActive
+      }"
+      class="mg-bottom-12 workout-tag"
+    >No Distance
+    </nz-tag>
+    <nz-tag
+      (click)="handleTagActive('no_equipment')"
+      [ngClass]="{
+        'tag-active': isNoEquipmentTagActive,
+        'tag-unactive': !isNoEquipmentTagActive
+      }"
+      class="mg-bottom-12 workout-tag"
+    >No Equipment
+    </nz-tag>
+  </div>
+  <!-- end tag filter -->
+
+  <!-- custom list -->
+  <nz-list
+    [ngClass]="{
+      'opacity-loading': isLoadingSpinnerShown,
+      'mg-bottom-24': true
+    }"
+    [nzDataSource]="workoutsPerPage"
+    [nzItemLayout]="'horizontal'"
+    [nzRenderItem]="item"
+  >
+    <ng-template #item let-item>
+      <nz-list-item (click)="goToWorkoutDetail(item)" class="workout-item">
+        <nz-list-item-meta
+          [nzTitle]="nzTitle"
+          nzAvatar="{{ item.smallMobileRetinaPictureUrl }}"
+        >
+          <ng-template #nzTitle>
+            <span>{{ item.title }}</span>
+          </ng-template>
+        </nz-list-item-meta>
+      </nz-list-item>
+    </ng-template>
+  </nz-list>
+  <!-- end custom list -->
+
+  <!-- pagination -->
+  <nz-pagination
+    (nzPageIndexChange)="workoutPageChange($event)"
+    [nzPageIndex]="currentWorkoutsPage"
+    [nzPageSize]="nWorkoutPerPage"
+    [nzSize]="'small'"
+    [nzTotal]="totalWorkouts"
+  ></nz-pagination>
+  <!-- end pagination -->
+</div>

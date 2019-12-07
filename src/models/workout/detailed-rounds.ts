@@ -1,4 +1,4 @@
-import { WorkoutExercise } from './workout-exercise';
+import {WorkoutExercise} from '@gw-models';
 
 export class DetailedRounds {
   exercises: WorkoutExercise[];

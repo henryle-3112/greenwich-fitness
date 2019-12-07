@@ -1,8 +1,8 @@
 <!-- layout -->
 <div
-  id="active-account-container"
   [ngClass]="{ 'height-100': true, 'pd-top-200': true }"
   [ngStyle]="{ 'background-image': 'url(' + backgroundImage + ')' }"
+  id="active-account-container"
 >
   <!-- loading component -->
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
@@ -14,8 +14,8 @@
   <h1 *ngIf="isActivated && !isLoadingSpinnerShown" class="message">
     Your account is activated!
   </h1>
-  <div align="center" *ngIf="!isLoadingSpinnerShown">
-    <button nz-button [nzType]="'primary'" (click)="goToLogin()">
+  <div *ngIf="!isLoadingSpinnerShown" align="center">
+    <button (click)="goToLogin()" [nzType]="'primary'" nz-button>
       Go to Log In
     </button>
   </div>

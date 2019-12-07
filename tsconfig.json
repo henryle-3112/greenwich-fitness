@@ -3,14 +3,75 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "@gw-models/core": ["src/models/core"],
-      "@gw-services/core/*": ["src/services/_core/*"],
-      "@gw-config/core": ["src/config/core"],
-      "@gw-helpers/core": ["src/helpers/core"],
-      "@gw-pages/core/*": ["src/app/pages/*"],
-      "@gw-structure/core/*": ["src/app/structure/*"],
-      "@gw-modules/core/*": ["src/app/modules/_core/*"],
-      "@gw-share-module/core/*": ["src/share/*"]
+      "@gw-models": [
+        "src/models/index"
+      ],
+      "@gw-services/api": [
+        "src/services/_core/api/index"
+      ],
+      "@gw-services/authentication": [
+        "src/services/_core/authentication/index"
+      ],
+      "@gw-services/guard": [
+        "src/services/_core/guard/index"
+      ],
+      "@gw-services/localStorage": [
+        "src/services/_core/localStorage/index"
+      ],
+      "@gw-services/validate": [
+        "src/services/_core/validate/index"
+      ],
+      "@gw-services/shared": [
+        "src/services/_core/shared/index"
+      ],
+      "@gw-config": [
+        "src/config/index"
+      ],
+      "@gw-helpers": [
+        "src/helpers/index"
+      ],
+      "@gw-pages": [
+        "src/app/pages/index"
+      ],
+      "@gw-structure": [
+        "src/app/structure/index"
+      ],
+      "@gw-blog-module/components": [
+        "src/app/modules/_core/blog/components/index"
+      ],
+      "@gw-client-module/components": [
+        "src/app/modules/_core/client/components/index"
+      ],
+      "@gw-shop-module/components": [
+        "src/app/modules/_core/shop/components/index"
+      ],
+      "@gw-share-module/components": [
+        "src/share/components/index"
+      ],
+      "@gw-blog-module": [
+        "src/app/modules/_core/blog/index"
+      ],
+      "@gw-client-module": [
+        "src/app/modules/_core/client/index"
+      ],
+      "@gw-shop-module": [
+        "src/app/modules/_core/shop/index"
+      ],
+      "@gw-share-module": [
+        "src/share/index"
+      ],
+      "@gw-blog-module/*": [
+        "src/app/modules/_core/blog/*"
+      ],
+      "@gw-client-module/*": [
+        "src/app/modules/_core/client/*"
+      ],
+      "@gw-shop-module/*": [
+        "src/app/modules/_core/shop/*"
+      ],
+      "@gw-share-module/*": [
+        "src/share/*"
+      ]
     },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
@@ -21,7 +82,13 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "es5",
-    "typeRoots": ["node_modules/@types"],
-    "lib": ["es2018", "dom"]
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2018",
+      "dom"
+    ]
   }
 }
+

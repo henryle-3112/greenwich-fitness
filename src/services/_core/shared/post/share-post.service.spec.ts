@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { SharePostService } from './share-post.service';
+import {SharePostService} from './share-post.service';
 
 describe('SharePostService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

@@ -1,4 +1,4 @@
-import { ProductOrder } from '@gw-models/core';
+import {ProductOrder} from '@gw-models';
 
 export class ProductPayment {
   id?: number;

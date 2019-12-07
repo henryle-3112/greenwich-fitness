@@ -1,4 +1,4 @@
-import { GiftType } from '@gw-models/core';
+import {GiftType} from '@gw-models';
 
 export class Gift {
   id?: number;

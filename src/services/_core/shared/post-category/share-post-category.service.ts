@@ -1,16 +1,15 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { PostCategory } from '@gw-models/core';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {PostCategory} from '@gw-models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SharePostCategoryService {
-  private currentPostCategorySubject: BehaviorSubject<PostCategory>;
   public currentPostCategory: Observable<PostCategory>;
-
-  private currentPostCategoriesSubject: BehaviorSubject<PostCategory[]>;
   public currentPostCategories: Observable<PostCategory[]>;
+  private currentPostCategorySubject: BehaviorSubject<PostCategory>;
+  private currentPostCategoriesSubject: BehaviorSubject<PostCategory[]>;
 
   constructor() {
     this.currentPostCategorySubject = new BehaviorSubject<PostCategory>(null);

@@ -1,13 +1,13 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { UserAccount, UserProfile } from '@gw-models/core';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {UserProfile} from '@gw-models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ShareUserProfileService {
-  private currentUserProfileService: BehaviorSubject<UserProfile>;
   public currentUserProfile: Observable<UserProfile>;
+  private currentUserProfileService: BehaviorSubject<UserProfile>;
 
   constructor() {
     this.currentUserProfileService = new BehaviorSubject<UserProfile>(null);

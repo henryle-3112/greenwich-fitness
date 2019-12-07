@@ -1,0 +1,98 @@
+<!--suppress ALL -->
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- What to knnow -->
+  <h3>What to know</h3>
+  <div id="what-to-know">
+    <nz-carousel [nzAutoPlaySpeed]="1000" [nzEffect]="'fade'" nzAutoPlay>
+      <div
+        (click)="goToExerciseVideo(eachExercise.exercise)"
+        *ngFor="let eachExercise of exercises"
+        nz-carousel-content
+      >
+        <img
+          alt="{{ eachExercise?.exercise.title }}"
+          id="image-what-to-know"
+          src="{{ eachExercise?.exercise.largeMobileRetinaPictureUrl }}"
+        />
+        <!-- play video -->
+        <div id="play-video">
+          <img
+            alt="Play Video"
+            id="image-play-video"
+            src="./assets/images/ic_play.png"
+          />
+        </div>
+        <!-- title exercise -->
+        <h4 id="exercise-title">{{ eachExercise?.exercise.title }}</h4>
+      </div>
+    </nz-carousel>
+  </div>
+  <!-- end what to know-->
+
+  <!-- Volume -->
+  <h3 id="volume-title">Volume</h3>
+  <div (click)="openModalChangeVolume()" id="volume">
+    <h4 id="current-volume">{{ currentVolume }}</h4>
+    <i id="ic-edit-volume" nz-icon nzTheme="outline" nzType="edit"></i>
+  </div>
+  <div class="clear-both"></div>
+  <!-- end Volume-->
+
+  <!-- Volume  -->
+  <h3 id="summary-title">Summary</h3>
+  <div
+    *ngFor="let eachDetailedRound of detailedRounds; let i = index"
+    [attr.data-index]="i"
+    id="summary"
+  >
+    <h4>Round {{ i + 1 }} / {{ nDetailedRoundsTemp }}</h4>
+    <div
+      *ngFor="let eachExercise of eachDetailedRound.exercises"
+      class="mg-bottom-12"
+    >
+      <img
+        alt=""
+        id="img-summary"
+        src="{{ eachExercise.exercise?.smallMobileRetinaPictureUrl }}"
+      />
+      <h4 id="exercise-quantity">
+        {{ eachExercise.quantity }} x {{ eachExercise.exercise?.title }}
+      </h4>
+      <div class="clear-both"></div>
+    </div>
+  </div>
+  <!-- end Volume -->
+
+  <!-- button start -->
+  <button
+    (click)="startTraining()"
+    id="btn-start"
+    nz-button
+    nzBlock
+    nzType="primary"
+  >
+    Start
+  </button>
+  <!-- end button start -->
+
+  <!-- modal change repetitions -->
+  <nz-modal
+    (nzOnCancel)="handleCancelChangeVolumeModal()"
+    (nzOnOk)="handleConfirmChangeVolumeModal()"
+    [(nzVisible)]="isChangeVolumeModelShow"
+    nzTitle="Volume"
+  >
+    <nz-radio-group [(ngModel)]="radioVolumeValue">
+      <label class="radio-volume" nz-radio nzValue="x1">x1</label>
+      <label class="radio-volume" nz-radio nzValue="x2">x2</label>
+      <label class="radio-volume" nz-radio nzValue="x3">x3</label>
+    </nz-radio-group>
+  </nz-modal>
+  <!-- end modal change repetitions -->
+</div>

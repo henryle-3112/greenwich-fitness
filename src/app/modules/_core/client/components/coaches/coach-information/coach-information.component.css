@@ -1,0 +1,95 @@
+#coach-avatar {
+  width: 64px;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border-radius: 20px;
+}
+
+#avatar {
+  width: 100%;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+#coach-name {
+  width: 100%;
+}
+
+#coach-name p {
+  font-weight: bold;
+  text-align: center;
+}
+
+#total-memberships-rating {
+  width: 100%;
+}
+
+#total-memberships-rating p {
+  font-weight: bold;
+  text-align: center;
+}
+
+.line {
+  width: 100%;
+  height: 1px;
+  background: #ccc;
+}
+
+#coach-about p {
+  text-align: justify;
+  line-height: 29px;
+  margin-bottom: 0;
+  font-weight: bold;
+  font-style: italic;
+}
+
+/* customer reviews */
+
+#title-customer-reviews {
+  display: inline;
+  float: left;
+}
+
+#btn-write-reviews {
+  float: right;
+  font-weight: bold;
+  color: black;
+  border-color: black;
+  background: none;
+  font-size: 12px;
+}
+
+#btn-write-reviews:hover {
+  color: #1890ff;
+  border-color: #1890ff;
+}
+
+#customer-reviews {
+  width: 100%;
+}
+
+#reviews-text-area {
+  width: 500px;
+}
+
+#btn-add-reviews {
+  margin-top: 24px;
+}
+
+/* end customer reviews */
+
+/* hire coach button css */
+.hire-coach-btn {
+  width: 100%;
+  margin-top: 24px;
+}
+
+/* end hrie coach button css */
+
+/* processing button */
+.processing-btn {
+  width: 100%;
+  margin-top: 24px;
+}
+
+/* end processing button */

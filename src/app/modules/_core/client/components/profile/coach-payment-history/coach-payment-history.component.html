@@ -1,0 +1,85 @@
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!--month picker -->
+  <nz-month-picker
+    (ngModelChange)="onMonthChanged($event)"
+    [(ngModel)]="selectedDateToViewCoachPaymentHistories"
+    nzPlaceHolder="Select Month"
+  ></nz-month-picker>
+  <!-- end month picker -->
+
+  <!-- custom list -->
+  <nz-list
+    *ngIf="
+      coachPaymentHistories &&
+      coachPaymentHistories.length &&
+      !isLoadingSpinnerShown
+    "
+    [nzDataSource]="coachPaymentHistories"
+    [nzItemLayout]="'horizontal'"
+    [nzRenderItem]="item"
+    class="mg-top-24"
+  >
+    <ng-template #item let-item>
+      <nz-list-item>
+        <nz-list-item-meta [nzTitle]="nzTitle">
+          <ng-template #nzTitle>
+            <span
+            >You has pay {{ item.sum }}$ for
+              {{ item.membership.coach.userProfile.fullName }}</span
+            >
+          </ng-template>
+        </nz-list-item-meta>
+      </nz-list-item>
+    </ng-template>
+  </nz-list>
+  <!-- end custom list-->
+
+  <!-- pagination -->
+  <div id="pagination">
+    <nz-pagination
+      (nzPageIndexChange)="coachPaymentHistoriesPageChanged($event)"
+      *ngIf="
+        coachPaymentHistories &&
+        coachPaymentHistories.length &&
+        !isLoadingSpinnerShown
+      "
+      [nzPageIndex]="currentCoachPaymentHistoriesPage"
+      [nzPageSize]="nCoachPaymentHistories"
+      [nzSize]="'small'"
+      [nzTotal]="totalCoachPaymentHistories"
+    ></nz-pagination>
+  </div>
+  <!-- end pagination -->
+
+  <!-- total coach revenue -->
+  <div
+    *ngIf="
+      coachPaymentHistories &&
+      coachPaymentHistories.length &&
+      !isLoadingSpinnerShown &&
+      totalCoachPaymentVal
+    "
+    id="total-coach-payment-histories-by-selected-month-and-by-selected-year"
+  >
+    <h3
+      id="total-coach-payment-histories-by-selected-month-and-by-selected-year-title"
+    >
+      Total Coach Payment Histories in
+      {{ selectedMonthToViewCoachPaymentHistories }} /{{
+        selectedYearToViewCoachPaymentHistories
+      }}:
+    </h3>
+    <h3
+      id="total-coach-payment-histories-by-selected-month-and-by-selected-year-result"
+    >
+      {{ totalCoachPaymentVal }} $
+    </h3>
+  </div>
+  <!-- end total coach revenue-->
+</div>

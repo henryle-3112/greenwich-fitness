@@ -1,0 +1,65 @@
+<div
+  [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- custom list -->
+  <nz-list
+    [nzDataSource]="trainings"
+    [nzItemLayout]="'horizontal'"
+    [nzRenderItem]="item"
+    class="mg-bottom-24"
+  >
+    <ng-template #item let-item>
+      <nz-list-item (click)="goToScheduleDetail(item)">
+        <nz-list-item-meta [nzTitle]="nzTitle">
+          <ng-template #nzTitle>
+            <span>Training - {{ item.trainingDate | date: "MM/dd/yyyy" }}</span>
+          </ng-template>
+        </nz-list-item-meta>
+      </nz-list-item>
+    </ng-template>
+  </nz-list>
+  <!-- end custom list-->
+
+  <!-- pagination -->
+  <nz-pagination
+    (nzPageIndexChange)="trainingsPageChange($event)"
+    *ngIf="trainings && trainings.length"
+    [nzPageIndex]="currentTrainingsPage"
+    [nzPageSize]="nTrainingsPerPage"
+    [nzSize]="'small'"
+    [nzTotal]="totalTrainings"
+  ></nz-pagination>
+  <!-- end pagination -->
+
+  <!-- add schedule button -->
+  <button
+    (click)="goToAddScheduleComponent()"
+    *ngIf="
+      !isRelationshipBetweenUserAndCoachExpired &&
+      selectedMembership &&
+      selectedMembership.status != 0
+    "
+    [nzType]="'primary'"
+    id="add-schedule-btn"
+    nz-button
+  >
+    Add Schedule for Today
+  </button>
+  <!--  end add schedule button -->
+
+  <div
+    *ngIf="
+      isRelationshipBetweenUserAndCoachExpired ||
+      (selectedMembership && selectedMembership.status == 0)
+    "
+    id="expired-message"
+  >
+    *(30 days is over, {{ selectedMembership.userProfile.fullName }} needs to do
+    payment for you. Therefore, you cannot add training schedule right now)
+  </div>
+</div>

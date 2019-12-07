@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { ShareTagService } from './share-tag.service';
+import {ShareTagService} from './share-tag.service';
 
 describe('ShareTagService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

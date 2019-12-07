@@ -1,4 +1,4 @@
-import { DetailedRounds } from './detailed-rounds';
+import {DetailedRounds} from '@gw-models';
 
 export class Workout {
   slug?: string;

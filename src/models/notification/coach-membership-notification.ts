@@ -1,4 +1,4 @@
-import { Coach, UserProfile } from '@gw-models/core';
+import {Coach, UserProfile} from '@gw-models';
 
 export class CoachMembershipNotification {
   id?: number;

@@ -1,6 +1,6 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { NavigatorComponent } from './navigator.component';
+import {NavigatorComponent} from './navigator.component';
 
 describe('NavigatorComponent', () => {
   let component: NavigatorComponent;

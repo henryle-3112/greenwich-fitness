@@ -1,0 +1,253 @@
+<!--suppress ALL -->
+<div
+  [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+  style="background-color: white;"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- post's content -->
+  <h2 id="category-name">
+    {{ selectedPost?.postCategory.postCategoryName }}
+  </h2>
+
+  <div #postContainer></div>
+  <!-- end post's content-->
+
+  <!-- post detail-->
+  <div nz-row nzGutter="0">
+    <!-- post tags-->
+    <div id="tags">
+      <h2>Tags</h2>
+      <nz-tag
+        (click)="goToPostsByTag(eachPostTag.tag)"
+        *ngFor="let eachPostTag of tagsByPost"
+      >{{ eachPostTag.tag.tagName }}</nz-tag
+      >
+    </div>
+    <!-- end post tags-->
+
+    <!-- customer reviews -->
+    <div nz-row nzGutter="0" style="padding-bottom: 24px;">
+      <div
+        class="gutter-row"
+        id="customer-reviews"
+        nz-col
+        nzLg="24"
+        nzMd="24"
+        nzSm="24"
+        nzXl="24"
+        nzXs="24"
+        style="background: white;"
+      >
+        <h2 id="title-customer-reviews">Customer Reviews</h2>
+        <button
+          (click)="toggleAddReviewForm()"
+          id="btn-write-reviews"
+          nz-button
+          nzType="default"
+        >
+          Write Reviews
+        </button>
+
+        <div class="clear-both"></div>
+
+        <!-- add reviews form -->
+        <div *ngIf="isPostReviewFormShown" id="add-reviews-form">
+          <nz-rate
+            (ngModelChange)="onRateChanged($event)"
+            [ngModel]="selectedPostRateValue"
+            class="mg-top-24"
+          ></nz-rate>
+          <br/>
+          <textarea
+            [(ngModel)]="postReviewContent"
+            class="mg-top-24"
+            id="reviews-text-area"
+            nz-input
+            placeholder="Write Reviews..."
+            rows="4"
+          ></textarea>
+          <br/>
+          <button
+            (click)="addPostReview()"
+            id="btn-add-reviews"
+            nz-button
+            nzType="primary"
+          >
+            Add Reviews
+          </button>
+        </div>
+        <!-- end add reviews form -->
+
+        <!-- pagination list -->
+
+        <!-- reply comment template-->
+        <ng-template #commentTemplateReplyRef let-comment="comment">
+          <nz-comment
+            [nzAuthor]="comment.userProfile.fullName"
+            [nzDatetime]="
+              comment.replyOnPostCommentCreatedDate
+                | date: 'yyyy-MM-dd HH:mm:ss'
+            "
+          >
+            <nz-avatar
+              [nzSrc]="comment.userProfile.avatar"
+              nz-comment-avatar
+              nzIcon="user"
+            ></nz-avatar>
+            <nz-comment-content>
+              <p>{{ comment.replyOnPostCommentContent }}</p>
+            </nz-comment-content>
+            <nz-comment-action>
+              <i
+                (click)="likeReplyOnPostComment(comment)"
+                [nzTheme]="
+                  comment.isLikeClicked == true ? 'twotone' : 'outline'
+                "
+                nz-icon
+                nz-tooltip
+                nzTitle="Like"
+                type="like"
+              ></i>
+              <span class="count like">{{ comment?.numberOfLikes }}</span>
+            </nz-comment-action>
+            <nz-comment-action>
+              <i
+                (click)="dislikeReplyOnPostComment(comment)"
+                [nzTheme]="
+                  comment.isLikeClicked == false ? 'twotone' : 'outline'
+                "
+                nz-icon
+                nz-tooltip
+                nzTitle="Dislike"
+                type="dislike"
+              ></i>
+              <span class="count dislike">{{ comment?.numberOfDislikes }}</span>
+            </nz-comment-action>
+            <nz-comment-action>
+              <span (click)="showReplyReplyPostCommentBox(comment)"
+              >Reply to</span
+              >
+            </nz-comment-action>
+          </nz-comment>
+        </ng-template>
+        <!-- end reply comment template -->
+
+        <!-- comment template -->
+        <ng-template #commentTemplateRef let-comment="comment">
+          <!-- post's comment content -->
+          <nz-comment
+            [nzAuthor]="comment.userProfile.fullName"
+            [nzDatetime]="
+              comment.postCommentCreatedDate | date: 'yyyy-MM-dd HH:mm:ss'
+            "
+          >
+            <nz-avatar
+              [nzSrc]="comment.userProfile.avatar"
+              nz-comment-avatar
+              nzIcon="user"
+            ></nz-avatar>
+            <nz-comment-content>
+              <p>{{ comment.postCommentContent }}</p>
+            </nz-comment-content>
+            <nz-comment-action>
+              <i
+                (click)="like(comment)"
+                [nzTheme]="
+                  comment.isLikeClicked == true ? 'twotone' : 'outline'
+                "
+                nz-icon
+                nz-tooltip
+                nzTitle="Like"
+                type="like"
+              ></i>
+              <span class="count like">{{ comment?.numberOfLikes }}</span>
+            </nz-comment-action>
+            <nz-comment-action>
+              <i
+                (click)="dislike(comment)"
+                [nzTheme]="
+                  comment.isLikeClicked == false ? 'twotone' : 'outline'
+                "
+                nz-icon
+                nz-tooltip
+                nzTitle="Dislike"
+                type="dislike"
+              ></i>
+              <span class="count dislike">{{ comment?.numberOfDislikes }}</span>
+            </nz-comment-action>
+            <nz-comment-action>
+              <span (click)="showReplyPostCommentBox(comment)">Reply to</span>
+            </nz-comment-action>
+            <nz-comment-action>
+              <span (click)="viewRepliesOfSelectedPostComment(comment)"
+              >View {{ comment?.numberOfReplies }} replies</span
+              >
+            </nz-comment-action>
+            <!-- end  post's comment content -->
+
+            <!-- relies of each post's comment -->
+            <ng-container *ngIf="comment.replies && comment.replies.length">
+              <ng-template [ngForOf]="comment.replies" let-child ngFor>
+                <ng-template
+                  [ngTemplateOutletContext]="{ comment: child }"
+                  [ngTemplateOutlet]="commentTemplateReplyRef"
+                >
+                </ng-template>
+              </ng-template>
+            </ng-container>
+            <!-- end relies of each post's comment -->
+
+            <!-- reply box-->
+            <nz-input-group
+              *ngIf="comment.isReplyBoxShown && comment.isReplyBoxShown == true"
+              [ngClass]="{ 'mg-bottom-24': true, 'width-50': true }"
+              [nzSuffix]="suffixIconMessage"
+            >
+              <input
+                  #replyBox
+                  (keyup.enter)="
+                  replyToPostComment(comment, replyBox.value);
+                  replyBox.value = ''
+                "
+                  nz-input
+                  placeholder="Reply..."
+                  type="text"
+              />
+            </nz-input-group>
+            <ng-template #suffixIconMessage>
+              <i nz-icon type="message"></i>
+            </ng-template>
+            <!-- end reply box -->
+          </nz-comment>
+        </ng-template>
+        <!-- end comment template -->
+
+        <div *ngFor="let eachPostComment of postCommentsPerPage">
+          <ng-template
+            [ngTemplateOutletContext]="{ comment: eachPostComment }"
+            [ngTemplateOutlet]="commentTemplateRef"
+          ></ng-template>
+        </div>
+
+        <!-- end pagination list -->
+
+        <!-- pagination -->
+        <nz-pagination
+          (nzPageIndexChange)="postCommentsPageChange($event)"
+          *ngIf="postComments && postComments.length"
+          [nzPageIndex]="currentPostCommentsPage"
+          [nzPageSize]="nPostCommentsPerPage"
+          [nzTotal]="totalPostComments"
+          nzSize="small"
+        ></nz-pagination>
+        <!-- end pagination -->
+      </div>
+
+      <!-- end customer reviews -->
+    </div>
+  </div>
+  <!-- end post's detail-->
+</div>

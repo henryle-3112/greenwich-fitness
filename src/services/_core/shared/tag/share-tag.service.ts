@@ -1,14 +1,14 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { Tag } from '@gw-models/core';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {Tag} from '@gw-models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ShareTagService {
 
-  private currentTagSubject: BehaviorSubject<Tag>;
   public currentTag: Observable<Tag>;
+  private currentTagSubject: BehaviorSubject<Tag>;
 
   constructor() {
     this.currentTagSubject = new BehaviorSubject<Tag>(null);

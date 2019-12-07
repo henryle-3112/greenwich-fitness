@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { ShareMembershipScheduleService } from './share-membership-schedule.service';
+import {ShareMembershipScheduleService} from './share-membership-schedule.service';
 
 describe('ShareMembershipScheduleService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

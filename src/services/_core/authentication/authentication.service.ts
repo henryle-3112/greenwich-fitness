@@ -1,18 +1,18 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { AuthenticationUser, FacebookAccount, GoogleAccount } from '@gw-models/core';
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
+import {AuthenticationUser, FacebookAccount, GoogleAccount} from '@gw-models';
 
 const httpOptions = {
-  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  headers: new HttpHeaders({'Content-Type': 'application/json'})
 };
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class AuthenticationService {
-  private currentUserSubject: BehaviorSubject<AuthenticationUser>;
-  public currentUser: Observable<AuthenticationUser>;
 
+  public currentUser: Observable<AuthenticationUser>;
+  private currentUserSubject: BehaviorSubject<AuthenticationUser>;
 
   constructor(private http: HttpClient) {
     this.currentUserSubject = new BehaviorSubject<AuthenticationUser>(JSON.parse(localStorage.getItem('currentUser')));
@@ -33,7 +33,7 @@ export class AuthenticationService {
    * @param password - user's password that will be used to login
    */
   login(url: string, username: string, password: string) {
-    return this.http.post<any>(url, { userName: username, password: password })
+    return this.http.post<any>(url, {userName: username, password: password})
       .pipe(map(response => {
         const responseJson = JSON.parse(response);
         if (responseJson != null && responseJson.userName != null && responseJson.token != null) {

@@ -1,0 +1,68 @@
+<!--suppress ALL -->
+<div [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }">
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- products -->
+  <div>
+    <div class="title">
+      <h2>
+        Products For "{{ selectedProductCategory?.productCategoryName }}"
+        Category
+      </h2>
+    </div>
+
+    <div class="clear-both"></div>
+
+    <div
+      [ngClass]="{ 'mg-bottom-24': true }"
+      class="product-category-list"
+      nz-row
+      nzGutter="16"
+    >
+      <div
+        *ngFor="let eachProduct of productsByCategory; let i = index"
+        [attr.data-index]="i"
+        class="gutter-row"
+        nz-col
+        nzLg="6"
+        nzMd="6"
+        nzSm="24"
+        nzXl="6"
+        nzXs="24"
+      >
+        <div
+          (click)="goToProductDetail(eachProduct)"
+          [ngClass]="{ 'mg-top-24': i >= 4 }"
+          class="gutter-box product-item"
+        >
+          <nz-card [nzCover]="coverTemplate" nzHoverable style="width: 100%;">
+            <nz-card-meta
+              nzDescription="{{ eachProduct.productPrice }}$"
+              nzTitle="{{ eachProduct.productName }}"
+            ></nz-card-meta>
+          </nz-card>
+          <ng-template #coverTemplate>
+            <img
+              alt="{{ eachProduct.productName }}"
+              src="{{ eachProduct.productImage }}"
+            />
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <div id="pagination">
+      <!-- pagination -->
+      <nz-pagination
+        (nzPageIndexChange)="productsPageChange($event)"
+        [nzPageIndex]="currentProductsByCategoryPage"
+        [nzPageSize]="nProductsByCategoryPerPage"
+        [nzTotal]="totalProductsByCategory"
+      ></nz-pagination>
+      <!-- end pagination -->
+    </div>
+  </div>
+  <!-- end products -->
+</div>

@@ -1,14 +1,14 @@
-import { Injectable } from '@angular/core';
-import { HttpHeaders, HttpClient, HttpBackend } from '@angular/common/http';
-import { Config } from '@gw-config/core';
-import { ChatBotMessage } from '@gw-models/core';
+import {Injectable} from '@angular/core';
+import {HttpBackend, HttpClient, HttpHeaders} from '@angular/common/http';
+import {Config} from '@gw-config';
+import {ChatBotMessage} from '@gw-models';
 
 const httpOptionsForWit = {
-  headers: new HttpHeaders({ 'Authorization': `${Config.witClientToken}` })
+  headers: new HttpHeaders({'Authorization': `${Config.witClientToken}`})
 };
 
 const httpOptions = {
-  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  headers: new HttpHeaders({'Content-Type': 'application/json'})
 };
 
 @Injectable({
@@ -18,7 +18,7 @@ export class ChatBotService {
   private httpClient: HttpClient;
 
   constructor(handler: HttpBackend,
-  private http: HttpClient) {
+              private http: HttpClient) {
     this.httpClient = new HttpClient(handler);
   }
 

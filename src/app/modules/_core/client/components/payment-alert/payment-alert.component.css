@@ -1,0 +1,66 @@
+.message {
+  text-align: center;
+}
+
+/* shopping cart css */
+.shopping-cart-row {
+  background-color: white;
+}
+
+.product-image {
+  width: 64px;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border-radius: 20px;
+}
+
+#total-price {
+  padding: 24px;
+  background-color: white;
+}
+
+#total-price-title {
+  display: inline-block;
+  float: left;
+}
+
+#total-price-value {
+  display: inline-block;
+  float: right;
+}
+
+/* end shopping cart css */
+
+/* coach information css */
+#coach-avatar {
+  width: 64px;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border-radius: 20px;
+}
+
+#avatar {
+  width: 100%;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+#coach-name {
+  width: 100%;
+}
+
+#coach-name p {
+  font-weight: bold;
+  text-align: center;
+}
+
+#total-memberships-rating {
+  width: 100%;
+}
+
+#total-memberships-rating p {
+  font-weight: bold;
+  text-align: center;
+}
+
+/* end coach information css */

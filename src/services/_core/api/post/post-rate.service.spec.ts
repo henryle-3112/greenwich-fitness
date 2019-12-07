@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { PostRateService } from './post-rate.service';
+import {PostRateService} from './post-rate.service';
 
 describe('PostRateService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

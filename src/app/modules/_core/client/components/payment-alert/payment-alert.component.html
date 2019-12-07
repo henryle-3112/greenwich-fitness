@@ -1,0 +1,156 @@
+<!--suppress ALL -->
+<!-- layout -->
+<div
+  [ngClass]="{
+    'height-100': true,
+    'mg-top-72': true,
+    'pd-left-24': true,
+    'pd-right-24': true
+  }"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+  <!-- message -->
+  <h1 *ngIf="!isPaymentSuccessfully && !isLoadingSpinnerShown" class="message">
+    Failure to handle your payment! Please try again!
+  </h1>
+  <h1 *ngIf="isPaymentSuccessfully && !isLoadingSpinnerShown" class="message">
+    Thank you for your payment! We will contact you soon!
+  </h1>
+  <!-- message -->
+
+  <!-- shopping cart component -->
+  <div
+    *ngIf="checkWhatUserWantToPay == 'product' && !isLoadingSpinnerShown"
+    class="mg-top-24"
+    nz-row
+    nzGutter="16"
+  >
+    <div
+      class="gutter-row"
+      nz-col
+      nzLg="24"
+      nzMd="24"
+      nzSm="24"
+      nzXl="24"
+      nzXs="24"
+    >
+      <!-- shopping cart detail -->
+      <div id="shoping-cart-detail">
+        <nz-table
+            #shoppingCartTable
+            [nzData]="shoppingCartProducts"
+            nzShowPagination="false"
+        >
+          <thead>
+          <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let eachShoppingCartProduct of shoppingCartProducts">
+            <td class="shopping-cart-row">
+              <img
+                alt="{{ eachShoppingCartProduct?.product.productName }}"
+                class="product-image"
+                src="{{ eachShoppingCartProduct?.product.productImage }}"
+              />
+            </td>
+            <td class="shopping-cart-row">
+              {{ eachShoppingCartProduct?.product.productName }}
+            </td>
+            <td class="shopping-cart-row">
+              {{ eachShoppingCartProduct?.product.productPrice }}$
+            </td>
+            <td class="shopping-cart-row">
+              <div id="product-quantity">
+                {{ eachShoppingCartProduct?.quantity }}
+              </div>
+            </td>
+            <td class="shopping-cart-row">
+              {{
+                eachShoppingCartProduct?.quantity *
+                eachShoppingCartProduct?.product.productPrice
+              }}
+              $
+            </td>
+          </tr>
+          </tbody>
+        </nz-table>
+        <!-- total price -->
+        <div id="total-price">
+          <h2 id="total-price-title">Total:</h2>
+          <h2 id="total-price-value">{{ totalShoppingCartPrice }}$</h2>
+          <div class="clear-both"></div>
+        </div>
+        <!-- end total price-->
+        <!-- end shopping cart detail -->
+      </div>
+    </div>
+  </div>
+  <!-- end shopping cart component -->
+
+  <!-- coach information -->
+  <div
+    *ngIf="checkWhatUserWantToPay == 'coach' && !isLoadingSpinnerShown"
+    [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+    nz-row
+    nzAlign="middle"
+    nzJustify="center"
+    nzType="flex"
+  >
+    <!-- avatar -->
+    <div id="avatar">
+      <img
+        alt="{{ selectedCoach.userProfile.fullName }}"
+        id="coach-avatar"
+        src="{{ selectedCoach.userProfile.avatar }}"
+      />
+    </div>
+    <!-- end avatar -->
+
+    <!-- name -->
+    <div id="coach-name">
+      <p>
+        {{ selectedCoach.userProfile.fullName }}
+      </p>
+    </div>
+    <!-- name -->
+
+    <!-- total membership rating -->
+    <div id="total-memberships-rating">
+      <p>
+        {{ selectedCoach.numberOfMemberships }} Memberships Enrolled -
+        {{ selectedCoach.ratingAverage }} stars
+      </p>
+    </div>
+    <!-- end membership rating -->
+
+    <!-- average rate-->
+    <nz-rate
+      [ngModel]="selectedCoach.ratingAverage"
+      class="mg-bottom-24"
+      nzDisabled
+    ></nz-rate>
+    <!-- end average rate -->
+  </div>
+  <!-- end coach information -->
+
+  <!-- go to feed -->
+  <div align="center">
+    <button
+      (click)="goToFeed()"
+      *ngIf="!isLoadingSpinnerShown"
+      [nzType]="'primary'"
+      nz-button
+    >
+      Go to Feed
+    </button>
+  </div>
+  <!-- end go to feed -->
+</div>

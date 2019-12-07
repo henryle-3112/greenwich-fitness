@@ -1,0 +1,142 @@
+<!--suppress ALL -->
+<div>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- top training posts -->
+  <div>
+    <div class="title">
+      <h2>Top Training Articles</h2>
+      <button (click)="goToPostCategory('Training')" nz-button nzType="default">
+        More Articles
+      </button>
+    </div>
+
+    <div class="clear-both"></div>
+
+    <div class="top-post-list" nz-row nzGutter="16">
+      <div
+        *ngFor="let eachTrainingPost of topTrainingPosts"
+        class="gutter-row"
+        nz-col
+        nzLg="6"
+        nzMd="6"
+        nzSm="24"
+        nzXl="6"
+        nzXs="24"
+      >
+        <div
+          (click)="goToPostDetail(eachTrainingPost)"
+          class="gutter-box post-item"
+        >
+          <nz-card [nzCover]="coverTemplate" nzHoverable style="width: 100%;">
+            <nz-card-meta
+              nzDescription="{{ eachTrainingPost.userProfile.fullName }}"
+              nzTitle="{{ eachTrainingPost.postTitle }}"
+            ></nz-card-meta>
+          </nz-card>
+          <ng-template #coverTemplate>
+            <img
+              alt="{{ eachTrainingPost.postTitle }}"
+              src="{{ eachTrainingPost.postImage }}"
+            />
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end top training posts -->
+
+  <!-- top nutrition posts -->
+  <div>
+    <div class="title">
+      <h2>Top Nutrition Posts</h2>
+      <button
+        (click)="goToPostCategory('Nutrition')"
+        nz-button
+        nzType="default"
+      >
+        More Articles
+      </button>
+    </div>
+
+    <div class="clear-both"></div>
+
+    <div class="top-post-list" nz-row nzGutter="16">
+      <div
+        *ngFor="let eachNutritionPost of topNutritionPosts"
+        class="gutter-row"
+        nz-col
+        nzLg="6"
+        nzMd="6"
+        nzSm="24"
+        nzXl="6"
+        nzXs="24"
+      >
+        <div
+          (click)="goToPostDetail(eachNutritionPost)"
+          class="gutter-box post-item"
+        >
+          <nz-card [nzCover]="coverTemplate" nzHoverable style="width: 100%;">
+            <nz-card-meta
+              nzDescription="{{ eachNutritionPost.userProfile.fullName }}"
+              nzTitle="{{ eachNutritionPost.postTitle }}"
+            ></nz-card-meta>
+          </nz-card>
+          <ng-template #coverTemplate>
+            <img
+              alt="{{ eachNutritionPost.postTitle }}"
+              src="{{ eachNutritionPost.postImage }}"
+            />
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end top nutrition's posts -->
+
+  <!-- top science's posts -->
+  <div style="margin-bottom: 24px;">
+    <div class="title">
+      <h2>Top Science Posts</h2>
+      <button (click)="goToPostCategory('Science')" nz-button nzType="default">
+        More Articles
+      </button>
+    </div>
+
+    <div class="clear-both"></div>
+
+    <div class="top-post-list" nz-row nzGutter="16">
+      <div
+        *ngFor="let eachSciencePost of topSciencePosts"
+        class="gutter-row"
+        nz-col
+        nzLg="6"
+        nzMd="6"
+        nzSm="24"
+        nzXl="6"
+        nzXs="24"
+      >
+        <div
+          (click)="goToPostDetail(eachSciencePost)"
+          class="gutter-box post-item"
+        >
+          <nz-card [nzCover]="coverTemplate" nzHoverable style="width: 100%;">
+            <nz-card-meta
+              nzDescription="{{ eachSciencePost.userProfile.fullName }}"
+              nzTitle="{{ eachSciencePost.postTitle }}"
+            ></nz-card-meta>
+          </nz-card>
+          <ng-template #coverTemplate>
+            <img
+              alt="{{ eachSciencePost.postTitle }}"
+              src="{{ eachSciencePost.postImage }}"
+            />
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end top science's posts -->
+</div>

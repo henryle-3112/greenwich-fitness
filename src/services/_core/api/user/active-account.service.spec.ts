@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { ActiveAccountService } from './active-account.service';
+import {ActiveAccountService} from './active-account.service';
 
 describe('ActiveAccountService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

@@ -1,13 +1,13 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { Workout } from '@gw-models/core';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {Workout} from '@gw-models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ShareWorkoutService {
-  private currentWorkoutSubject: BehaviorSubject<Workout>;
   public currentWorkout: Observable<Workout>;
+  private currentWorkoutSubject: BehaviorSubject<Workout>;
 
   constructor() {
     this.currentWorkoutSubject = new BehaviorSubject<Workout>(null);

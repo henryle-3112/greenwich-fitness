@@ -1,0 +1,266 @@
+<!--suppress ALL -->
+<div
+  [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- search box-->
+  <nz-input-group
+    *ngIf="newFeeds && newFeeds.length"
+    [ngClass]="{ 'mg-bottom-24': true, 'width-50': true }"
+    [nzSuffix]="suffixIconSearch"
+  >
+    <input
+        #searchBox
+        (keyup.enter)="searchNewFeed(searchBox.value)"
+        nz-input
+        placeholder="Username..."
+        type="text"
+    />
+  </nz-input-group>
+  <ng-template #suffixIconSearch>
+    <i nz-icon type="search"></i>
+  </ng-template>
+  <!-- end search box -->
+
+  <!-- new feed content -->
+  <div id="main-feed">
+    <div *ngFor="let eachNewFeed of newFeeds" class="feed-content">
+      <nz-card
+        [nzActions]="[actionSetting, actionEdit, actionEllipsis]"
+        [nzCover]="coverTemplate"
+        class="new-feed-card"
+      >
+        <nz-card-meta
+          [nzAvatar]="avatarTemplate"
+          [nzDescription]="descriptionTemplate"
+          nzTitle="{{ eachNewFeed?.userProfile.fullName }}"
+        ></nz-card-meta>
+      </nz-card>
+      <ng-template #descriptionTemplate>
+        <div class="description-achievement">
+          {{ eachNewFeed.achievement }} -
+          {{ eachNewFeed.achievementTime }} minutes
+        </div>
+        <span class="description-content">{{ eachNewFeed?.content }}</span>
+      </ng-template>
+      <ng-template #avatarTemplate>
+        <nz-avatar nzSrc="{{ eachNewFeed?.userProfile.avatar }}"></nz-avatar>
+      </ng-template>
+      <ng-template #coverTemplate>
+        <img alt="example" src="{{ eachNewFeed?.image }}"/>
+      </ng-template>
+      <ng-template #actionSetting>
+        <span class="status-value">{{ eachNewFeed.numberOfLikes }}</span>
+        <i
+          (click)="likeNewFeed(eachNewFeed)"
+          [nzTheme]="eachNewFeed.isLikeClicked == true ? 'twotone' : 'outline'"
+          nz-icon
+          nzType="like"
+        ></i>
+      </ng-template>
+      <ng-template #actionEdit>
+        <span class="status-value">{{ eachNewFeed.numberOfDislikes }}</span>
+        <i
+          (click)="dislikeNewFeed(eachNewFeed)"
+          [nzTheme]="eachNewFeed.isLikeClicked == false ? 'twotone' : 'outline'"
+          nz-icon
+          nzType="dislike"
+        ></i>
+      </ng-template>
+      <ng-template #actionEllipsis>
+        <span class="status-value">{{ eachNewFeed.numberOfComments }}</span>
+        <i
+          (click)="viewNewFeedCommentsOfSelectedNewFeed(eachNewFeed)"
+          nz-icon
+          nzType="message"
+        ></i>
+      </ng-template>
+
+      <!-- reply new feed comment template-->
+      <ng-template #commentTemplateReplyRef let-comment="comment">
+        <nz-comment
+          [nzAuthor]="comment.userProfile.fullName"
+          [nzDatetime]="
+            comment.replyOnNewFeedCommentCreatedDate
+              | date: 'yyyy-MM-dd HH:mm:ss'
+          "
+        >
+          <nz-avatar
+            [nzSrc]="comment.userProfile.avatar"
+            nz-comment-avatar
+            nzIcon="user"
+          ></nz-avatar>
+          <nz-comment-content>
+            <p>{{ comment.replyOnNewFeedCommentContent }}</p>
+          </nz-comment-content>
+          <nz-comment-action>
+            <i
+              (click)="likeReplyOnNewFeedComment(comment)"
+              [theme]="comment.isLikeClicked == true ? 'twotone' : 'outline'"
+              nz-icon
+              nz-tooltip
+              nzTitle="Like"
+              type="like"
+            ></i>
+            <span class="count like">{{ comment?.numberOfLikes }}</span>
+          </nz-comment-action>
+          <nz-comment-action>
+            <i
+              (click)="dislikeReplyOnNewFeedComment(comment)"
+              [theme]="comment.isLikeClicked == false ? 'twotone' : 'outline'"
+              nz-icon
+              nz-tooltip
+              nzTitle="Dislike"
+              type="dislike"
+            ></i>
+            <span class="count dislike">{{ comment?.numberOfDislikes }}</span>
+          </nz-comment-action>
+          <nz-comment-action>
+            <span (click)="showReplyRelyNewFeedCommentBox(comment)"
+            >Reply to</span
+            >
+          </nz-comment-action>
+        </nz-comment>
+      </ng-template>
+      <!-- end reply new feed comment template -->
+
+      <!-- comment template -->
+      <ng-template #commentTemplateRef let-comment="comment">
+        <!-- new feed comment content -->
+        <nz-comment
+          [nzAuthor]="comment.userProfile.fullName"
+          [nzDatetime]="
+            comment.newFeedCommentCreatedDate | date: 'yyyy-MM-dd HH:mm:ss'
+          "
+        >
+          <nz-avatar
+            [nzSrc]="comment.userProfile.avatar"
+            nz-comment-avatar
+            nzIcon="user"
+          ></nz-avatar>
+          <nz-comment-content>
+            <p>{{ comment.newFeedCommentContent }}</p>
+          </nz-comment-content>
+          <nz-comment-action>
+            <i
+              (click)="likeNewFeedComment(comment)"
+              [theme]="comment.isLikeClicked == true ? 'twotone' : 'outline'"
+              nz-icon
+              nz-tooltip
+              nzTitle="Like"
+              type="like"
+            ></i>
+            <span class="count like">{{ comment?.numberOfLikes }}</span>
+          </nz-comment-action>
+          <nz-comment-action>
+            <i
+              (click)="dislikeNewFeedComment(comment)"
+              [theme]="comment.isLikeClicked == false ? 'twotone' : 'outline'"
+              nz-icon
+              nz-tooltip
+              nzTitle="Dislike"
+              type="dislike"
+            ></i>
+            <span class="count dislike">{{ comment?.numberOfDislikes }}</span>
+          </nz-comment-action>
+          <nz-comment-action>
+            <span (click)="showReplyNewFeedCommentBox(comment)">Reply to</span>
+          </nz-comment-action>
+          <nz-comment-action>
+            <span (click)="viewRepliesOfSelectedNewFeedComment(comment)"
+            >View {{ comment?.numberOfReplies }} replies</span
+            >
+          </nz-comment-action>
+          <!-- end  new feed comment content -->
+
+          <!-- relies of each new feed comment -->
+          <ng-container *ngIf="comment.replies && comment.replies.length">
+            <ng-template [ngForOf]="comment.replies" let-child ngFor>
+              <ng-template
+                [ngTemplateOutletContext]="{ comment: child }"
+                [ngTemplateOutlet]="commentTemplateReplyRef"
+              >
+              </ng-template>
+            </ng-template>
+          </ng-container>
+          <!-- end relies of each new feed comment -->
+
+          <!-- reply box-->
+          <nz-input-group
+            *ngIf="comment.isReplyBoxShown && comment.isReplyBoxShown == true"
+            [ngClass]="{ 'mg-bottom-24': true }"
+            [nzSuffix]="suffixIconMessage"
+            style="width: 100%;"
+          >
+            <input
+                #replyBox
+                (keyup.enter)="
+                replyToNewFeedComment(comment, replyBox.value);
+                replyBox.value = ''
+              "
+                nz-input
+                placeholder="Reply..."
+                type="text"
+            />
+          </nz-input-group>
+          <ng-template #suffixIconMessage>
+            <i nz-icon type="message"></i>
+          </ng-template>
+          <!-- end reply box -->
+        </nz-comment>
+      </ng-template>
+      <!-- end comment template -->
+
+      <div *ngIf="eachNewFeed.replies && eachNewFeed.replies.length">
+        <div *ngFor="let eachNewFeedComment of eachNewFeed.replies">
+          <ng-template
+            [ngTemplateOutletContext]="{ comment: eachNewFeedComment }"
+            [ngTemplateOutlet]="commentTemplateRef"
+          ></ng-template>
+        </div>
+      </div>
+
+      <!-- add new feed comment box-->
+      <nz-input-group
+        *ngIf="
+          eachNewFeed.isReplyBoxShown && eachNewFeed.isReplyBoxShown == true
+        "
+        [ngClass]="{ 'mg-bottom-24': true }"
+        [nzSuffix]="suffixIconMessage"
+        style="width: 100%;"
+      >
+        <input
+            #replyBox
+            (keyup.enter)="
+            addNewFeedComment(eachNewFeed, replyBox.value); replyBox.value = ''
+          "
+            nz-input
+            placeholder="Write your comment..."
+            type="text"
+        />
+      </nz-input-group>
+      <ng-template #suffixIconMessage>
+        <i nz-icon type="message"></i>
+      </ng-template>
+      <!-- end add new feed comment box -->
+    </div>
+  </div>
+  <!-- end new feed content -->
+
+  <!-- pagination -->
+  <div id="pagination">
+    <nz-pagination
+      (nzPageIndexChange)="newFeedPageChange($event)"
+      *ngIf="newFeeds && newFeeds.length"
+      [nzPageIndex]="currentNewFeedsPage"
+      [nzPageSize]="nNewFeedsPerPage"
+      [nzSize]="'small'"
+      [nzTotal]="totalNewFeeds"
+    ></nz-pagination>
+  </div>
+  <!-- end pagination -->
+</div>

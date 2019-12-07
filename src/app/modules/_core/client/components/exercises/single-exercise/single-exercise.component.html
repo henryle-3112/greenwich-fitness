@@ -1,0 +1,64 @@
+<!--suppress ALL -->
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- search box-->
+  <nz-input-group
+    [ngClass]="{ 'mg-bottom-24': true, 'width-50': true }"
+    [nzSuffix]="suffixIconSearch"
+  >
+    <input
+        #searchBox
+        (keyup.enter)="searchExercise(searchBox.value)"
+        nz-input
+        placeholder="Name..."
+        type="text"
+    />
+  </nz-input-group>
+  <ng-template #suffixIconSearch>
+    <i nz-icon type="search"></i>
+  </ng-template>
+  <!-- end search box -->
+
+  <!-- custom list -->
+  <nz-list
+    [ngClass]="{
+      'opacity-loading': isLoadingSpinnerShown,
+      'mg-bottom-24': true
+    }"
+    [nzDataSource]="singleExercisesPerPage"
+    [nzItemLayout]="'horizontal'"
+    [nzRenderItem]="item"
+  >
+    <ng-template #item let-item>
+      <nz-list-item
+        (click)="goToExerciseDetail(item)"
+        class="single-exercise-item"
+      >
+        <nz-list-item-meta
+          [nzTitle]="nzTitle"
+          nzAvatar="{{ item.smallMobileRetinaPictureUrl }}"
+        >
+          <ng-template #nzTitle>
+            <span>{{ item.title }}</span>
+          </ng-template>
+        </nz-list-item-meta>
+      </nz-list-item>
+    </ng-template>
+  </nz-list>
+  <!-- end custom list -->
+
+  <!-- pagination -->
+  <nz-pagination
+    (nzPageIndexChange)="exercisePageChange($event)"
+    [nzPageIndex]="currentSingleExercisesPage"
+    [nzPageSize]="nSingleExercisesPerPage"
+    [nzSize]="'small'"
+    [nzTotal]="totalSingleExercises"
+  ></nz-pagination>
+  <!-- end pagination -->
+</div>

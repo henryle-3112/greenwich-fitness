@@ -1,0 +1,80 @@
+<!--suppress ALL -->
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- What to knnow -->
+  <h3>What to know</h3>
+  <div (click)="goToExerciseVideo()" id="what-to-know">
+    <img
+      alt="{{ selectedSingleExercise?.title }}"
+      id="image-what-to-know"
+      src="{{ selectedSingleExercise?.largeMobileRetinaPictureUrl }}"
+    />
+    <!-- play video -->
+    <div id="play-video">
+      <img
+        alt="Play Video"
+        id="image-play-video"
+        src="./assets/images/ic_play.png"
+      />
+    </div>
+    <!-- title exercise -->
+    <h4 id="exercise-title">{{ selectedSingleExercise?.title }}</h4>
+  </div>
+  <!-- end what to know-->
+
+  <!-- repetitions -->
+  <h3 id="repetitions-title">Repetitions</h3>
+  <div (click)="openModalChangeRepetitions()" id="repetitions">
+    <h4 id="current-repetitions">{{ currentRepetitions }}</h4>
+    <i id="ic-edit-repetitions" nz-icon nzTheme="outline" nzType="edit"></i>
+  </div>
+  <div class="clear-both"></div>
+  <!-- end repetitions-->
+
+  <!-- summary  -->
+  <h3 id="summary-title">Summary</h3>
+  <div id="summary">
+    <img
+      alt=""
+      id="img-summary"
+      src="{{ selectedSingleExercise?.smallMobileRetinaPictureUrl }}"
+    />
+    <h4 id="exercise-repetition-title">
+      {{ currentRepetitions }} x {{ selectedSingleExercise?.title }}
+    </h4>
+  </div>
+  <div class="clear-both"></div>
+  <!-- end summary -->
+
+  <!-- button start -->
+  <button
+    (click)="startTraining()"
+    id="btn-start"
+    nz-button
+    nzBlock
+    nzType="primary"
+  >
+    Start
+  </button>
+  <!-- end button start -->
+
+  <!-- modal change repetitions -->
+  <nz-modal
+    (nzOnCancel)="handleCancelChangeRepetitionsModal()"
+    (nzOnOk)="handleConfirmChangeRepetitionsModal()"
+    [(nzVisible)]="isChangeRepetitionsModalShown"
+    nzTitle="Repetitions"
+  >
+    <nz-radio-group [(ngModel)]="radioRepetitionValue">
+      <label class="radio-repetition" nz-radio nzValue="10">10</label>
+      <label class="radio-repetition" nz-radio nzValue="25">25</label>
+      <label class="radio-repetition" nz-radio nzValue="50">50</label>
+      <label class="radio-repetition" nz-radio nzValue="100">100</label>
+      <label class="radio-repetition" nz-radio nzValue="250">250</label>
+    </nz-radio-group>
+  </nz-modal>
+  <!-- end modal change repetitions -->
+</div>

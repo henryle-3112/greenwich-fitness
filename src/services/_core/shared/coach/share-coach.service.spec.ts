@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { ShareCoachService } from './share-coach.service';
+import {ShareCoachService} from './share-coach.service';
 
 describe('ShareCoachService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

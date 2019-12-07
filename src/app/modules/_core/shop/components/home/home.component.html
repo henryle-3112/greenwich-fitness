@@ -1,0 +1,270 @@
+<!--suppress ALL -->
+<nz-layout
+  [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }"
+  class="height-auto"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- header -->
+  <nz-header ngClass="pd-left-72 header">
+    <div class="logo">
+      <p ngClass="logo-text">
+        Greenwich Fitness
+      </p>
+    </div>
+    <ul class="horizontal-menu" nz-menu nzMode="horizontal" nzTheme="dark">
+      <li
+        (click)="goToCategory(eachProductCategory)"
+        *ngFor="let eachProductCategory of productCategories"
+        nz-menu-item
+      >
+        {{ eachProductCategory.productCategoryName }}
+      </li>
+    </ul>
+    <!-- icon to open dropdown menu -->
+    <div (click)="openDropDownMenu($event)" class="menu-icon">
+      <span>
+        <i nz-icon type="align-right"></i>
+      </span>
+    </div>
+    <!-- end icon to open dropdown menu -->
+
+    <!-- icon to open search modal -->
+    <div (click)="showSearchProductModal()" class="search-icon">
+      <span>
+        <i nz-icon type="search"></i>
+      </span>
+    </div>
+    <!-- end icon to open dropdown menu -->
+
+    <!-- icon shopping cart -->
+    <div (click)="goToShoppingCart()" class="shopping-cart-icon">
+      <span>
+        <i nz-icon type="shopping-cart"></i>
+      </span>
+    </div>
+    <!-- end icon shopping cart -->
+  </nz-header>
+  <!-- end header -->
+
+  <!-- main content -->
+  <nz-content>
+    <!-- col menu -->
+    <div
+      *ngIf="isDropDownMenuOpened"
+      [@fadeInAnimation]
+      class="gutter-row drop-down-menu"
+      nz-col
+      nzLg="24"
+      nzMd="24"
+      nzSm="24"
+      nzXl="24"
+      nzXs="24"
+    >
+      <div
+        class="gutter-box"
+        style="background-color: #fff; min-height: 280px; padding: 24px;"
+      >
+        <h3>Menu</h3>
+        <nz-divider></nz-divider>
+        <ul ngClass="none-border" nz-menu>
+          <a
+            (click)="goToCategory(eachProductCategory)"
+            *ngFor="let eachProductCategory of productCategories"
+            class="link-color"
+          >
+            <li nz-menu-item style="z-index: 2; padding-left: 0;">
+              <span
+              ><span class="nav-text">{{
+                  eachProductCategory.productCategoryName
+                }}</span></span
+              >
+            </li>
+          </a>
+        </ul>
+      </div>
+    </div>
+    <!-- end col menu -->
+
+    <!-- carousel -->
+    <div nz-row nzGutter="0">
+      <div
+        class="gutter-row"
+        nz-col
+        nzLg="24"
+        nzMd="24"
+        nzSm="24"
+        nzXl="24"
+        nzXs="24"
+      >
+        <div class="gutter-box">
+          <nz-carousel [nzAutoPlaySpeed]="1000" [nzEffect]="'fade'" nzAutoPlay>
+            <div
+              *ngFor="let eachProductSlide of productSlides"
+              [ngStyle]="{
+                'background-image':
+                  'url(' + eachProductSlide.productSlideImage + ')'
+              }"
+              class="collection"
+              nz-carousel-content
+            >
+              <h1 class="product-slide-title">
+                {{ eachProductSlide.productSlideTitle | uppercase }}
+              </h1>
+            </div>
+          </nz-carousel>
+        </div>
+      </div>
+    </div>
+    <!-- end carousel -->
+
+    <!-- content -->
+    <router-outlet></router-outlet>
+    <!-- end content -->
+  </nz-content>
+
+  <!-- main content -->
+
+  <!-- footer -->
+  <nz-footer class="footer">
+    <div nz-row nzGutter="0">
+      <!-- product categories footer -->
+      <div
+        class="gutter-row"
+        nz-col
+        nzLg="8"
+        nzMd="8"
+        nzSm="24"
+        nzXl="8"
+        nzXs="24"
+      >
+        <h3 style="color: white; text-align: left;">Product Categories</h3>
+        <ul style="list-style-type: none; padding-left: 0;">
+          <a
+            (click)="goToCategory(eachProductCategory)"
+            *ngFor="let eachProductCategory of productCategoriesSelection"
+          >
+            <li
+              style="z-index: 2; padding-left: 0; text-align: left; color: white; height: 40px; line-height: 40px;"
+            >
+              <span
+              ><span class="nav-text">{{
+                  eachProductCategory.productCategoryName
+                }}</span></span
+              >
+            </li>
+          </a>
+        </ul>
+      </div>
+      <!-- product categories footer-->
+      <!-- product service footer -->
+      <div
+        class="gutter-row service"
+        nz-col
+        nzLg="8"
+        nzMd="8"
+        nzSm="24"
+        nzXl="8"
+        nzXs="24"
+      >
+        <h3 class="footer-title">Services</h3>
+        <ul class="footer-content">
+          <a
+            (click)="goToCategory(eachProductCategory)"
+            *ngFor="let eachProductCategory of notProductCategoriesSelection"
+          >
+            <li
+              style="z-index: 2; padding-left: 0; text-align: left; color: white; height: 40px; line-height: 40px;"
+            >
+              <span
+              ><span class="nav-text">{{
+                  eachProductCategory.productCategoryName
+                }}</span></span
+              >
+            </li>
+          </a>
+        </ul>
+      </div>
+      <!-- end product service footer-->
+      <!-- developer -->
+      <div
+        class="gutter-row"
+        nz-col
+        nzLg="8"
+        nzMd="8"
+        nzSm="24"
+        nzXl="8"
+        nzXs="24"
+      >
+        <h3 class="footer-title">Copyright</h3>
+        <ul class="footer-content">
+          <li
+            style="z-index: 2; padding-left: 0; text-align: left; color: white; height: 40px; line-height: 40px;"
+          >
+            <span
+            ><span class="nav-text"
+            >Greenwich Fitness ©2019 Implement By Henry Le</span
+            ></span
+            >
+          </li>
+        </ul>
+      </div>
+      <!-- end developer-->
+    </div>
+  </nz-footer>
+  <!-- end footer -->
+
+  <!-- modal search -->
+  <nz-modal
+    (nzOnCancel)="handleCancelSearchProductModal()"
+    (nzOnOk)="handleConfirmSearchProductModal()"
+    [(nzVisible)]="isSearchProductModalShown"
+    nzTitle="Search"
+  >
+    <!-- product's category selection -->
+    <h3 class="mg-bottom-24">Product Category:</h3>
+    <nz-select
+      [(ngModel)]="selectedProductCategoryForSearching"
+      class="mg-bottom-24"
+      nzPlaceHolder="Choose Product Category"
+      style="width: 200px;"
+    >
+      <nz-option
+        *ngFor="let eachProductCategory of productCategoriesSelection"
+        nzLabel="{{ eachProductCategory.productCategoryName }}"
+        nzValue="{{ eachProductCategory.id }}"
+      ></nz-option>
+    </nz-select>
+    <!-- end product's category selection -->
+
+    <!-- product's price selection -->
+    <h3 class="mg-bottom-24">Product Price($):</h3>
+    <nz-slider
+      [(ngModel)]="selectedProductPriceRangeForSearching"
+      nzRange
+    ></nz-slider>
+    <!-- end product's price selection -->
+
+    <!-- product's name input -->
+    <h3 class="mg-bottom-24 mg-top-24">Product Name:</h3>
+    <nz-input-group
+      [ngClass]="{ 'mg-bottom-24': true }"
+      [nzSuffix]="suffixIconSearch"
+      style="width: 200px;"
+    >
+      <input
+        [(ngModel)]="selectedProductNameForSearching"
+        nz-input
+        placeholder="Product Name..."
+        type="text"
+      />
+    </nz-input-group>
+    <ng-template #suffixIconSearch>
+      <i nz-icon type="search"></i>
+    </ng-template>
+    <!-- end product's name input -->
+  </nz-modal>
+  <!-- end modal change repetitions -->
+</nz-layout>

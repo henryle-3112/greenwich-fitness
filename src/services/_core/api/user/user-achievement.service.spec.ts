@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { UserAchievementService } from './user-achievement.service';
+import {UserAchievementService} from './user-achievement.service';
 
 describe('UserAchievementService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

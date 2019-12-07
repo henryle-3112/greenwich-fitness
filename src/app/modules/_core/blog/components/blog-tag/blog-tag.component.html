@@ -1,0 +1,66 @@
+<!--suppress ALL -->
+<div [ngClass]="{ 'opacity-loading': isLoadingSpinnerShown }">
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!-- posts -->
+  <div>
+    <div class="title">
+      <h2>Posts For "{{ selectedTag.tagName }}" Tag</h2>
+    </div>
+
+    <div class="clear-both"></div>
+
+    <div
+      [ngClass]="{ 'mg-bottom-24': true }"
+      class="post-tag-list"
+      nz-row
+      nzGutter="16"
+    >
+      <div
+        *ngFor="let eachPostTag of postsByTag; let i = index"
+        [attr.data-index]="i"
+        class="gutter-row"
+        nz-col
+        nzLg="6"
+        nzMd="6"
+        nzSm="24"
+        nzXl="6"
+        nzXs="24"
+      >
+        <div
+          (click)="goToPostDetail(eachPostTag.post)"
+          [ngClass]="{ 'mg-top-24': i >= 4 }"
+          class="gutter-box post-item"
+        >
+          <nz-card [nzCover]="coverTemplate" nzHoverable style="width: 100%;">
+            <nz-card-meta
+              nzDescription="{{ eachPostTag.post.userProfile.fullName }}"
+              nzTitle="{{ eachPostTag.post.postTitle }}"
+            ></nz-card-meta>
+          </nz-card>
+          <ng-template #coverTemplate>
+            <img
+              alt="{{ eachPostTag.post.postTitle }}"
+              src="{{ eachPostTag.post.postImage }}"
+            />
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <div id="pagination">
+      <!-- pagination -->
+      <nz-pagination
+        (nzPageIndexChange)="postsPageChange($event)"
+        *ngIf="postsByTag && postsByTag.length"
+        [nzPageIndex]="currentPostsPage"
+        [nzPageSize]="nPostsPerPage"
+        [nzTotal]="totalPosts"
+      ></nz-pagination>
+      <!-- end pagination -->
+    </div>
+  </div>
+  <!-- end posts -->
+</div>

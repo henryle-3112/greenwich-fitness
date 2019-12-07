@@ -1,15 +1,15 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { Music } from '@gw-models/core';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {Music} from '@gw-models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ShareMusicService {
-  private currentMusicSubject: BehaviorSubject<Music>;
   public currentMusic: Observable<Music>;
-  private currentMusicListSubject: BehaviorSubject<Music[]>;
   public currentMusicList: Observable<Music[]>;
+  private currentMusicSubject: BehaviorSubject<Music>;
+  private currentMusicListSubject: BehaviorSubject<Music[]>;
 
   constructor() {
     this.currentMusicSubject = new BehaviorSubject<Music>(null);

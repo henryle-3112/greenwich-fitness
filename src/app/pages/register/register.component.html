@@ -1,10 +1,10 @@
 <!--suppress ALL -->
 <div
-  nz-row
-  nzType="flex"
-  nzJustify="center"
-  nzAlign="middle"
   [ngClass]="{ 'height-100': true, 'position-relative': true }"
+  nz-row
+  nzAlign="middle"
+  nzJustify="center"
+  nzType="flex"
 >
   <!-- loading component -->
   <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
@@ -12,34 +12,34 @@
 
   <!-- register form -->
   <form
-    nz-form
+    (ngSubmit)="submitForm()"
     [formGroup]="registerForm"
     [ngClass]="{
       'register-form': true,
       'opacity-loading': isLoadingSpinnerShown
     }"
-    (ngSubmit)="submitForm()"
+    nz-form
   >
     <h1 align="center">Register Form</h1>
     <nz-form-item>
       <nz-form-control>
         <nz-upload
+          [nzBeforeUpload]="beforeUpload"
+          [nzShowUploadList]="false"
           class="avatar-uploader"
-          nzName="avatar"
           nzAction=""
           nzListType="picture-card"
-          [nzShowUploadList]="false"
-          [nzBeforeUpload]="beforeUpload"
+          nzName="avatar"
         >
           <ng-container *ngIf="!avatarUrl">
             <i
+              [nzType]="isLoadingSpinnerShown ? 'loading' : 'plus'"
               class="upload-icon"
               nz-icon
-              [nzType]="isLoadingSpinnerShown ? 'loading' : 'plus'"
             ></i>
             <div class="ant-upload-text">Upload</div>
           </ng-container>
-          <img *ngIf="avatarUrl" [src]="avatarUrl" class="avatar" />
+          <img *ngIf="avatarUrl" [src]="avatarUrl" class="avatar"/>
         </nz-upload>
         <span>
           (Click here to upload your avatar!)
@@ -50,11 +50,11 @@
       <nz-form-control>
         <nz-input-group [nzPrefix]="prefixUser">
           <input
-            type="text"
-            nz-input
-            formControlName="fullName"
-            placeholder="Name"
             (blur)="validateName()"
+            formControlName="fullName"
+            nz-input
+            placeholder="Name"
+            type="text"
           />
         </nz-input-group>
         <nz-form-explain
@@ -62,7 +62,7 @@
             registerForm.get('fullName').touched &&
             registerForm.get('fullName').hasError('required')
           "
-          >Please input your full name!
+        >Please input your full name!
         </nz-form-explain>
       </nz-form-control>
     </nz-form-item>
@@ -70,11 +70,11 @@
       <nz-form-control>
         <nz-input-group [nzPrefix]="prefixUser">
           <input
-            type="text"
-            nz-input
-            formControlName="userName"
-            placeholder="Username"
             (blur)="validateEmail()"
+            formControlName="userName"
+            nz-input
+            placeholder="Username"
+            type="text"
           />
         </nz-input-group>
         <nz-form-explain
@@ -83,7 +83,7 @@
             (registerForm.get('userName').hasError('required') ||
               registerForm.get('userName').hasError('invalidEmail'))
           "
-          >Please input your user's name! (e.g. abc@gmail.com)
+        >Please input your user's name! (e.g. abc@gmail.com)
         </nz-form-explain>
       </nz-form-control>
     </nz-form-item>
@@ -91,11 +91,11 @@
       <nz-form-control>
         <nz-input-group [nzPrefix]="prefixLock">
           <input
-            type="password"
-            nz-input
-            formControlName="password"
-            placeholder="Password"
             (blur)="validatePassword()"
+            formControlName="password"
+            nz-input
+            placeholder="Password"
+            type="password"
           />
         </nz-input-group>
         <nz-form-explain
@@ -104,7 +104,7 @@
             (registerForm.get('password').hasError('required') ||
               registerForm.get('password').hasError('invalidPassword'))
           "
-          >Please input your Password!
+        >Please input your Password!
         </nz-form-explain>
       </nz-form-control>
     </nz-form-item>
@@ -112,12 +112,12 @@
       <nz-form-control>
         <nz-input-group [nzPrefix]="prefixLock">
           <input
-            type="password"
-            nz-input
-            formControlName="confirmPassword"
-            placeholder="Confirm Password"
             (blur)="validateConfirmPassword()"
             (keyup)="checkKeyUpValidateConfirmPassword()"
+            formControlName="confirmPassword"
+            nz-input
+            placeholder="Confirm Password"
+            type="password"
           />
         </nz-input-group>
         <nz-form-explain
@@ -126,17 +126,17 @@
             (registerForm.get('confirmPassword').hasError('required') ||
               registerForm.get('confirmPassword').hasError('invalidPassword'))
           "
-          >Please input your confirm password! Your confirm password must be
+        >Please input your confirm password! Your confirm password must be
           equal to your password!
         </nz-form-explain>
       </nz-form-control>
     </nz-form-item>
     <nz-form-item>
       <nz-form-control>
-        <label nz-checkbox formControlName="acceptTermsOfService">
+        <label formControlName="acceptTermsOfService" nz-checkbox>
           <span>Accept Terms of Service</span>
         </label>
-        <button nz-button class="register-form-button" [nzType]="'primary'">
+        <button [nzType]="'primary'" class="register-form-button" nz-button>
           Register
         </button>
       </nz-form-control>

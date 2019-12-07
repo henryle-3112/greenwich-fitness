@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { ShareTrainingService } from './share-training.service';
+import {ShareTrainingService} from './share-training.service';
 
 describe('ShareTrainingService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

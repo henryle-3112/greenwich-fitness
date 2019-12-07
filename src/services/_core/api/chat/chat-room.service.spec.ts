@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { ChatRoomService } from './chat-room.service';
+import {ChatRoomService} from './chat-room.service';
 
 describe('ChatRoomService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

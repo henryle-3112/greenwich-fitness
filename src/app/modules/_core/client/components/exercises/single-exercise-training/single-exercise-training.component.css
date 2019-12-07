@@ -1,0 +1,284 @@
+/* animations */
+@keyframes rotate360deg {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(90deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  75% {
+    transform: rotate(270deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* end animations */
+
+/* count down css */
+#countdown {
+  width: 100%;
+  height: 100%;
+  background-position: center center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+#countdown h1 {
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  font-size: 120px;
+}
+
+/* end count down css */
+
+/* training css */
+#training {
+  width: 100%;
+  height: 100%;
+  background-position: center center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  position: fixed;
+}
+
+/* end training css */
+
+/* actions css */
+.image-action {
+  width: 32px;
+  height: 32px;
+  margin: 12px;
+}
+
+#action-play {
+  float: right;
+}
+
+#action-show-music {
+  float: right;
+}
+
+/* end actions css */
+
+/* time and exercise infor css */
+#current-exercise-time {
+  color: white;
+  font-weight: bold;
+  font-size: 64px;
+  width: 100%;
+  text-align: center;
+  display: block;
+}
+
+#current-exercise {
+  color: white;
+  font-weight: bold;
+  display: block;
+  font-size: 32px;
+  width: 100%;
+  text-align: center;
+}
+
+/* end time and exerise infor css*/
+
+/* button finish css */
+#btn-finish {
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+/* end button finish css */
+
+/* music player css */
+#music-player {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 0;
+}
+
+/* end music player css */
+
+/* footer modal css */
+/*::ng-deep .ant-modal-footer.ng-star-inserted {*/
+/*display: none;*/
+/*}*/
+
+/* end footer modal css */
+
+/* status modal css */
+.line {
+  width: 100%;
+  height: 1px;
+  background: #ccc;
+}
+
+#exercise-title {
+  display: inline;
+  float: left;
+  margin-top: 12px;
+}
+
+#exercise-time {
+  display: inline;
+  float: right;
+  margin-top: 12px;
+}
+
+#user-status {
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+#user-status-image {
+  margin-top: 12px;
+}
+
+.title p {
+  font-weight: bold;
+}
+
+#user-achievement {
+  margin-bottom: 12px;
+}
+
+.avatar {
+  width: 128px;
+  height: 128px;
+}
+
+.upload-icon {
+  font-size: 32px;
+  color: #999;
+}
+
+.ant-upload-text {
+  margin-top: 8px;
+  color: #666;
+}
+
+#status {
+  margin-top: 12px;
+}
+
+/* end status modal css */
+
+/* log modal css */
+#number-of-reps {
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+#current-health {
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+#log {
+  margin-top: 12px;
+}
+
+#grade-current-health {
+  margin-top: 12px;
+}
+
+/* end log modal css */
+
+/* media queries for audio */
+@media (max-width: 320px) {
+  #audio0 {
+    margin: 0;
+    width: 316px;
+  }
+
+  #audio-container {
+    position: absolute;
+    padding: 8px;
+    left: 0;
+    bottom: 50px;
+    background: #001529;
+  }
+}
+
+@media (min-width: 360px) and (max-width: 400px) {
+  #audio0 {
+    width: 360px;
+    margin: 0;
+  }
+
+  #audio-container {
+    position: absolute;
+    padding: 8px;
+    left: 0;
+    bottom: 50px;
+    background: #001529;
+  }
+}
+
+@media (min-width: 400px) and (max-width: 500px) {
+  #audio0 {
+    width: 400px;
+    margin: 0;
+  }
+
+  #audio-container {
+    position: absolute;
+    padding: 8px;
+    left: 0;
+    bottom: 50px;
+    background: #001529;
+  }
+}
+
+@media (min-width: 500px) {
+  #audio0 {
+    width: 500px;
+    margin: 0 auto;
+  }
+
+  #audio-container {
+    position: absolute;
+    border-radius: 8px;
+    padding: 8px;
+    left: 12px;
+    bottom: 50px;
+    background: #001529;
+  }
+}
+
+/* audio css */
+#music-title {
+  padding-left: 12px;
+  width: 500px;
+  margin: 0 auto;
+}
+
+.music-image-detail {
+  width: 32px;
+  border-radius: 50%;
+  animation: rotate360deg 5s infinite 0s linear;
+}
+
+#music-title span {
+  color: #fff;
+  margin-left: 18px;
+}
+
+/* end audio css */

@@ -1,0 +1,75 @@
+<div
+  style="width: 100%; min-height: 280px; background-color: #fff; padding: 24px;"
+>
+  <!-- loading component -->
+  <app-loading *ngIf="isLoadingSpinnerShown"></app-loading>
+  <!-- end loading component -->
+
+  <!--month picker -->
+  <nz-month-picker
+    (ngModelChange)="onMonthChanged($event)"
+    [(ngModel)]="selectedDateToViewRevenue"
+    nzPlaceHolder="Select Month"
+  ></nz-month-picker>
+  <!-- end month picker -->
+
+  <!-- custom list -->
+  <nz-list
+    *ngIf="revenues && revenues.length && !isLoadingSpinnerShown"
+    [nzDataSource]="revenues"
+    [nzItemLayout]="'horizontal'"
+    [nzRenderItem]="item"
+    class="mg-top-24"
+  >
+    <ng-template #item let-item>
+      <nz-list-item>
+        <nz-list-item-meta
+          [nzTitle]="nzTitle"
+          nzAvatar="{{ item.membership.userProfile.avatar }}"
+        >
+          <ng-template #nzTitle>
+            <span
+            >{{ item.membership.userProfile.fullName }} has pay
+              {{ item.sum }}$ for you</span
+            >
+          </ng-template>
+        </nz-list-item-meta>
+      </nz-list-item>
+    </ng-template>
+  </nz-list>
+  <!-- end custom list-->
+
+  <!-- pagination -->
+  <div id="pagination">
+    <nz-pagination
+      (nzPageIndexChange)="revenuesPageChange($event)"
+      *ngIf="revenues && revenues.length && !isLoadingSpinnerShown"
+      [nzPageIndex]="currentRevenuesPage"
+      [nzPageSize]="nRevenuesPerPage"
+      [nzSize]="'small'"
+      [nzTotal]="totalRevenues"
+    ></nz-pagination>
+  </div>
+  <!-- end pagination -->
+
+  <!-- total coach revenue -->
+  <div
+    *ngIf="
+      revenues &&
+      revenues.length &&
+      !isLoadingSpinnerShown &&
+      totalCoachRevenues
+    "
+    id="total-revenue-by-selected-month-and-by-selected-year"
+  >
+    <h3 id="total-revenue-by-selected-month-and-by-selected-year-title">
+      Total Revenue in {{ selectedMonthToViewRevenue }} /{{
+        selectedYearToViewRevenue
+      }}:
+    </h3>
+    <h3 id="total-revenue-by-selected-month-and-by-selected-year-result">
+      {{ totalCoachRevenues }}$
+    </h3>
+  </div>
+  <!-- end total coach revenue-->
+</div>

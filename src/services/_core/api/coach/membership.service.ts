@@ -1,15 +1,15 @@
-import { Injectable } from '@angular/core';
-import { Coach, Membership } from '@gw-models/core';
-import { Observable } from 'rxjs';
-import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {Coach, Membership} from '@gw-models';
+import {Observable} from 'rxjs';
+import {HttpClient, HttpHeaders, HttpResponse} from '@angular/common/http';
 
 const httpFullOptions = {
-  headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+  headers: new HttpHeaders({'Content-Type': 'application/json'}),
   observe: 'response' as 'body'
 };
 
 const httpOptions = {
-  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  headers: new HttpHeaders({'Content-Type': 'application/json'})
 };
 
 @Injectable({

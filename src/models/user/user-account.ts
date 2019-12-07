@@ -1,5 +1,5 @@
-import { UserAccountStatus } from './user-account-status';
-import { UserProfile } from './user-profile';
+import {UserAccountStatus, UserProfile} from '@gw-models';
+
 export class UserAccount {
   userName?: string;
   password?: string;
