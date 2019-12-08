@@ -53,6 +53,7 @@ export class WorkoutDetailComponent implements OnInit {
    * go to workout training componnet
    */
   public startTraining(): void {
+    localStorage.setItem(Config.placeToPlayMusic, 'training');
     this.router.navigate([`/client/workout/training/${this.selectedWorkout.slug}`]);
   }
 

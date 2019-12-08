@@ -1,8 +1,8 @@
-import {Component, OnInit} from '@angular/core';
-import {SingleExercise} from '@gw-models';
-import {ShareSingleExerciseService} from '@gw-services/shared';
-import {Router} from '@angular/router';
-import {Config} from '@gw-config';
+import { Component, OnInit } from '@angular/core';
+import { SingleExercise } from '@gw-models';
+import { ShareSingleExerciseService } from '@gw-services/shared';
+import { Router } from '@angular/router';
+import { Config } from '@gw-config';
 
 @Component({
   selector: 'app-exercise-detail',
@@ -22,7 +22,7 @@ export class ExerciseDetailComponent implements OnInit {
    * @param router - inject Router for routing
    */
   constructor(private shareSingleExercise: ShareSingleExerciseService,
-              private router: Router) {
+    private router: Router) {
   }
 
   /**
@@ -68,6 +68,7 @@ export class ExerciseDetailComponent implements OnInit {
    * go to exercise training fragment
    */
   public startTraining() {
+    localStorage.setItem(Config.placeToPlayMusic, 'training');
     this.router.navigate([`/client/exercise/training/${this.selectedSingleExercise.slug}`]);
   }
 

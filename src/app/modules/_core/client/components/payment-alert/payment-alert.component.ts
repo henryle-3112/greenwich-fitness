@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   ChatRoomService,
   CoachMembershipNotificationService,
@@ -12,8 +12,8 @@ import {
   ProductOrderService,
   ProductPaymentService
 } from '@gw-services/api';
-import {Config} from '@gw-config';
-import {ActivatedRoute, Router} from '@angular/router';
+import { Config } from '@gw-config';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   ChatRoom,
   Coach,
@@ -68,18 +68,18 @@ export class PaymentAlertComponent implements OnInit {
    * @param participantService - inject participantService
    */
   constructor(private paymentService: PaymentService,
-              private notificationService: NotificationService,
-              private productPaymentService: ProductPaymentService,
-              private coachMembershipNotificationService: CoachMembershipNotificationService,
-              private coachPaymentService: CoachPaymentService,
-              private coachRateService: CoachRateService,
-              private membershipService: MembershipService,
-              private router: Router,
-              private route: ActivatedRoute,
-              private productOrderService: ProductOrderService,
-              private productOrderDetailService: ProductOrderDetailService,
-              private chatRoomService: ChatRoomService,
-              private participantService: ParticipantService) {
+    private notificationService: NotificationService,
+    private productPaymentService: ProductPaymentService,
+    private coachMembershipNotificationService: CoachMembershipNotificationService,
+    private coachPaymentService: CoachPaymentService,
+    private coachRateService: CoachRateService,
+    private membershipService: MembershipService,
+    private router: Router,
+    private route: ActivatedRoute,
+    private productOrderService: ProductOrderService,
+    private productOrderDetailService: ProductOrderDetailService,
+    private chatRoomService: ChatRoomService,
+    private participantService: ParticipantService) {
     this.route.queryParams.subscribe(params => {
       this.paymentId = params['paymentId'];
       this.payerId = params['PayerID'];
@@ -167,12 +167,13 @@ ${Config.payerIdParameter}=${this.payerId}`;
     this.paymentService.completePayment(completePaymentUrl)
       .subscribe((response: any) => {
         if (response && response.status.localeCompare('success') === 0) {
+          this.isLoadingSpinnerShown = false;
           this.addMembership();
         } else {
+          this.isLoadingSpinnerShown = false;
           this.isPaymentSuccessfully = false;
           this.removeDataFromLocalStorage();
         }
-        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -193,13 +194,14 @@ ${Config.apiMemberships}`;
     this.membershipService.getMembership(getMembershipUrl)
       .subscribe((selectedMembership: Membership) => {
         if (selectedMembership) {
+          this.isLoadingSpinnerShown = false;
           selectedMembership.status = 1;
           selectedMembership.startDate = new Date();
           this.updateMembership(selectedMembership);
         } else {
+          this.isLoadingSpinnerShown = false;
           this.addMembershipToServer();
         }
-        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -213,8 +215,11 @@ ${Config.apiMemberships}`;
     this.membershipService.updateMembership(updateMembershipUrl, selectedMembership)
       .subscribe((updatedMembership: Membership) => {
         if (updatedMembership) {
+          this.isLoadingSpinnerShown = false;
           this.addCoachPaymentToServer(updatedMembership);
         } else {
+          console.log('updated membersip called');
+          this.isLoadingSpinnerShown = false;
           this.isPaymentSuccessfully = false;
           this.removeDataFromLocalStorage();
         }
@@ -235,12 +240,13 @@ ${Config.apiMemberships}`;
     this.membershipService.addMembership(addMembershipUrl, membership)
       .subscribe((insertedMembership: Membership) => {
         if (insertedMembership) {
+          this.isLoadingSpinnerShown = false;
           this.addCoachPaymentToServer(insertedMembership);
         } else {
+          this.isLoadingSpinnerShown = false;
           this.isPaymentSuccessfully = false;
           this.removeDataFromLocalStorage();
         }
-        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -260,13 +266,14 @@ ${Config.apiMemberships}`;
     this.coachPaymentService.addCoachPayment(addCoachPaymentUrl, coachPayment)
       .subscribe((insertedCoachPayment: CoachPayment) => {
         if (insertedCoachPayment) {
+          this.isLoadingSpinnerShown = false;
           this.updateCoachMembershipNotification();
           this.addChatRoom();
         } else {
+          this.isLoadingSpinnerShown = false;
           this.isPaymentSuccessfully = false;
           this.removeDataFromLocalStorage();
         }
-        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -282,12 +289,13 @@ ${Config.apiMemberships}`;
     this.chatRoomService.addChatRoom(addChatRoomUrl, chatRoom)
       .subscribe((insertedChatRoom: ChatRoom) => {
         if (insertedChatRoom) {
+          this.isLoadingSpinnerShown = false;
           this.addParticipant(insertedChatRoom);
         } else {
+          this.isLoadingSpinnerShown = false;
           this.isPaymentSuccessfully = false;
           this.removeDataFromLocalStorage();
         }
-        this.isLoadingSpinnerShown = false;
       });
   }
 
@@ -305,16 +313,17 @@ ${Config.apiMemberships}`;
     this.participantService.addParticipant(addParticipantUrl, participant)
       .subscribe((insertedParticipant) => {
         if (insertedParticipant) {
+          this.isLoadingSpinnerShown = false;
           this.showCoffetiAnimation();
           this.addNotificationForCoach();
           this.addNotificationForUser();
           this.isPaymentSuccessfully = true;
           this.removeDataFromLocalStorage();
         } else {
+          this.isLoadingSpinnerShown = false;
           this.isPaymentSuccessfully = false;
           this.removeDataFromLocalStorage();
         }
-        this.isLoadingSpinnerShown = false;
       });
   }
 

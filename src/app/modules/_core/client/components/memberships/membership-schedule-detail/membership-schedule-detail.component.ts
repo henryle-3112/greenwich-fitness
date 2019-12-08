@@ -129,11 +129,11 @@ export class MembershipScheduleDetailComponent implements OnInit {
     this.isLoadingSpinnerShown = true;
     const coachStatus = 1;
     const getCoachUrl = `${Config.apiBaseUrl}/
-    ${Config.apiCoachManagementPrefix}/
-    ${Config.apiUsers}/
-    ${selectedUserProfile.id}/
-    ${Config.apiCoaches}?
-    ${Config.statusParameter}=${coachStatus}`;
+${Config.apiCoachManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfile.id}/
+${Config.apiCoaches}?
+${Config.statusParameter}=${coachStatus}`;
     this.coachService.getCoach(getCoachUrl)
       .subscribe(selectedCoach => {
         if (selectedCoach) {
@@ -235,12 +235,12 @@ ${selectedCoachId}?
 ${Config.trainingDateParameter}=${this.currentDate}`;
     this.trainingService.getTrainings(getTrainingsUrl)
       .subscribe(response => {
-        // if (trainings) {
-        //   // init data source for transfer component
-        //   this.initDataSourceForTransferComponent(trainings);
-        // } else {
-        //   this.router.navigate(['/client']);
-        // }
+        if (response) {
+          // init data source for transfer component
+          this.initDataSourceForTransferComponent(response.body);
+        } else {
+          this.router.navigate(['/client']);
+        }
         console.log(response);
         this.isLoadingSpinnerShown = false;
       });

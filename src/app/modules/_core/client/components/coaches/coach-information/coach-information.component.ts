@@ -1,5 +1,5 @@
-import {Component, OnInit} from '@angular/core';
-import {ShareCoachService, ShareUserProfileService} from '@gw-services/shared';
+import { Component, OnInit } from '@angular/core';
+import { ShareCoachService, ShareUserProfileService } from '@gw-services/shared';
 import {
   Coach,
   CoachFeedback,
@@ -18,11 +18,12 @@ import {
   CoachRateService,
   MembershipService,
   ReplyOnCoachFeedbackReactionService,
-  ReplyOnCoachFeedbackService
+  ReplyOnCoachFeedbackService,
+  CoachService
 } from '@gw-services/api';
-import {Router} from '@angular/router';
-import {NzNotificationService} from 'ng-zorro-antd';
-import {Config} from '@gw-config';
+import { Router } from '@angular/router';
+import { NzNotificationService } from 'ng-zorro-antd';
+import { Config } from '@gw-config';
 
 @Component({
   selector: 'app-coach-information',
@@ -44,6 +45,7 @@ export class CoachInformationComponent implements OnInit {
   selectedUserProfile: UserProfile;
   isHireCoachRequestSent: boolean;
   selectedMembership: Membership;
+  isCurrentUserIsCoach: boolean;
   isRelationshipBetweenUserAndCoachExisted: boolean;
 
   /**
@@ -61,16 +63,17 @@ export class CoachInformationComponent implements OnInit {
    * @param notification - inject notification
    */
   constructor(private shareCoachService: ShareCoachService,
-              private membershipService: MembershipService,
-              private coachRateService: CoachRateService,
-              private coachFeedbackService: CoachFeedbackService,
-              private replyOnCoachFeedbackService: ReplyOnCoachFeedbackService,
-              private coachFeedbackReactionService: CoachFeedbackReactionService,
-              private replyOnCoachFeedbackReactionService: ReplyOnCoachFeedbackReactionService,
-              private shareUserProfileService: ShareUserProfileService,
-              private router: Router,
-              private coachMembershipNotificationService: CoachMembershipNotificationService,
-              private notification: NzNotificationService) {
+    private membershipService: MembershipService,
+    private coachRateService: CoachRateService,
+    private coachFeedbackService: CoachFeedbackService,
+    private replyOnCoachFeedbackService: ReplyOnCoachFeedbackService,
+    private coachFeedbackReactionService: CoachFeedbackReactionService,
+    private replyOnCoachFeedbackReactionService: ReplyOnCoachFeedbackReactionService,
+    private shareUserProfileService: ShareUserProfileService,
+    private router: Router,
+    private coachMembershipNotificationService: CoachMembershipNotificationService,
+    private notification: NzNotificationService,
+    private coachService: CoachService) {
   }
 
   ngOnInit() {
@@ -314,11 +317,38 @@ ${Config.apiCoachMembershipNotifications}`;
       .subscribe(selectedUserProfile => {
         if (selectedUserProfile) {
           this.selectedUserProfile = selectedUserProfile;
+          this.checkCurrentUserIsCoach();
         } else {
           this.router.navigate(['/client']);
         }
         this.isLoadingSpinnerShown = false;
       });
+  }
+
+
+  /**
+   * check current user is a coach or not. If yes, current user cannot hire coach.
+   */
+  private checkCurrentUserIsCoach() {
+    this.isLoadingSpinnerShown = true;
+    const selectedUserProfileId = this.selectedUserProfile.id;
+    const coachStatus = 1;
+    const getCoachUrl = `${Config.apiBaseUrl}/
+${Config.apiCoachManagementPrefix}/
+${Config.apiUsers}/
+${selectedUserProfileId}/
+${Config.apiCoaches}?
+${Config.statusParameter}=${coachStatus}`;
+    this.coachService.getCoach(getCoachUrl)
+      .subscribe((selectedCoach: Coach) => {
+        if (selectedCoach) {
+          this.isCurrentUserIsCoach = true;
+        } else {
+          this.isCurrentUserIsCoach = false;
+        }
+        this.isLoadingSpinnerShown = false;
+      });
+
   }
 
   /**
@@ -619,7 +649,7 @@ ${Config.apiReplyOnCoachFeedbackReactions}`;
    * @param replyOnCoachFeedbackReactions - replies on coach's feedback that user liked and disliked
    */
   private showRepliesOnCoachFeedbackUserLikedDisliked(repliesOnCoachFeedback: ReplyOnCoachFeedback[],
-                                                      replyOnCoachFeedbackReactions: ReplyOnCoachFeedbackReaction[]) {
+    replyOnCoachFeedbackReactions: ReplyOnCoachFeedbackReaction[]) {
     for (const eachReplyOnCoachFeedbackReaction of replyOnCoachFeedbackReactions) {
       for (const eachReplyOnCoachFeedback of repliesOnCoachFeedback) {
         if (eachReplyOnCoachFeedbackReaction.replyOnCoachFeedback.id === eachReplyOnCoachFeedback.id) {
@@ -636,7 +666,7 @@ ${Config.apiReplyOnCoachFeedbackReactions}`;
    * @param selectedReplyOnCoachFeedbackReaction - reaction's value that will be set to reply on coach's feedback
    */
   private changeReplyOnCoachFeedbackReactionStatus(selectedReplyOnCoachFeedback: ReplyOnCoachFeedback,
-                                                   selectedReplyOnCoachFeedbackReaction: ReplyOnCoachFeedbackReaction) {
+    selectedReplyOnCoachFeedbackReaction: ReplyOnCoachFeedbackReaction) {
     selectedReplyOnCoachFeedback.isReacted = true;
     if (selectedReplyOnCoachFeedbackReaction.reaction === 1) {
       selectedReplyOnCoachFeedback.isLikeClicked = true;

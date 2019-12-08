@@ -290,7 +290,7 @@ ${Config.pageParameter}=${this.currentTrainingNotificationsPage}`;
     this.coachMembershipNotificationService.getCoachMembershipNotifications(getTrainingNotificationsUrl)
       .subscribe(response => {
         this.coachMembershipNotifications = response.body;
-        this.totalTrainingNotifications = Number(response.headers.get(Config.headerXTotalCount));
+        this.totalTrainingNotifications += Number(response.headers.get(Config.headerXTotalCount));
         this.isLoadingSpinnerShown = false;
       });
   }
@@ -346,10 +346,11 @@ ${Config.pageParameter}=${this.currentUserGiftsPage}`;
         this.totalUserGifts = Number(response.headers.get(Config.headerXTotalCount));
         if (this.userGifts && this.userGifts.length > 0) {
           this.isVoucherModalShown = true;
+          this.isLoadingSpinnerShown = false;
         } else {
+          this.isLoadingSpinnerShown = false;
           this.paymentForCoach();
         }
-        this.isLoadingSpinnerShown = false;
       });
   }
 }

@@ -34,7 +34,7 @@
     <!-- end memberships tab-->
 
     <!-- coaches tab -->
-    <nz-tab nzTitle="Coaches">
+    <nz-tab *ngIf="!selectedCoach" nzTitle="Coaches">
       <app-user-coach></app-user-coach>
     </nz-tab>
     <!-- end coaches tab -->
@@ -46,7 +46,7 @@
     <!-- end revenue tab -->
 
     <!-- coach payment history tab -->
-    <nz-tab nzTitle="Coach Payment History">
+    <nz-tab *ngIf="!selectedCoach" nzTitle="Coach Payment History">
       <app-coach-payment-history></app-coach-payment-history>
     </nz-tab>
     <!-- end coach payment history tab -->

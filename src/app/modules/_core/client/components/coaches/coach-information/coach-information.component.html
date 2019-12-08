@@ -272,7 +272,8 @@
       *ngIf="
         selectedCoach.userProfile.id != selectedUserProfile.id &&
         !isRelationshipBetweenUserAndCoachExisted &&
-        !isHireCoachRequestSent
+        !isHireCoachRequestSent &&
+        !isCurrentUserIsCoach
       "
       [nzType]="'primary'"
       class="hire-coach-btn"

@@ -1,12 +1,12 @@
-import {AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {animate, style, transition, trigger} from '@angular/animations';
-import {Config} from '@gw-config';
-import {FacebookAccount, GoogleAccount, Music, UserAccount, UserProfile} from '@gw-models';
-import {AuthenticationService} from '@gw-services/authentication';
-import {FacebookAccountService, GoogleAccountService, MusicService, UserAccountService} from '@gw-services/api';
-import {ShareMusicService, ShareUserAccountService, ShareUserProfileService} from '@gw-services/shared';
-import {LocalStorageService} from '@gw-services/localStorage';
-import {Router} from '@angular/router';
+import { AfterViewInit, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { animate, style, transition, trigger } from '@angular/animations';
+import { Config } from '@gw-config';
+import { FacebookAccount, GoogleAccount, Music, UserAccount, UserProfile } from '@gw-models';
+import { AuthenticationService } from '@gw-services/authentication';
+import { FacebookAccountService, GoogleAccountService, MusicService, UserAccountService } from '@gw-services/api';
+import { ShareMusicService, ShareUserAccountService, ShareUserProfileService } from '@gw-services/shared';
+import { LocalStorageService } from '@gw-services/localStorage';
+import { Router } from '@angular/router';
 import Plyr from 'plyr';
 
 @Component({
@@ -14,12 +14,12 @@ import Plyr from 'plyr';
   animations: [
     trigger('fadeInAnimation', [
       transition(':enter', [
-        style({opacity: 0}),
-        animate(200, style({opacity: 1}))
+        style({ opacity: 0 }),
+        animate(200, style({ opacity: 1 }))
       ]),
       transition(':leave', [
-        style({opacity: 1}),
-        animate(200, style({opacity: 0}))
+        style({ opacity: 1 }),
+        animate(200, style({ opacity: 0 }))
       ])
 
     ])
@@ -59,21 +59,22 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
    * @param router - inject router
    */
   constructor(private authentication: AuthenticationService,
-              private userAccountService: UserAccountService,
-              private facebookAccountService: FacebookAccountService,
-              private googleAccountService: GoogleAccountService,
-              private shareUserAccountService: ShareUserAccountService,
-              private shareUserProfileService: ShareUserProfileService,
-              private localStorageService: LocalStorageService,
-              private shareMusicService: ShareMusicService,
-              private musicService: MusicService,
-              private router: Router) {
+    private userAccountService: UserAccountService,
+    private facebookAccountService: FacebookAccountService,
+    private googleAccountService: GoogleAccountService,
+    private shareUserAccountService: ShareUserAccountService,
+    private shareUserProfileService: ShareUserProfileService,
+    private localStorageService: LocalStorageService,
+    private shareMusicService: ShareMusicService,
+    private musicService: MusicService,
+    private router: Router) {
   }
 
   /**
    * init data
    */
   ngOnInit(): void {
+    localStorage.setItem(Config.placeToPlayMusic, 'home');
     this.isDropDownMenuOpened = false;
     // apply Plyr to custom audio interface
     this.initMusicPlyr();
@@ -222,9 +223,10 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     this.shareMusicService.currentMusic
       .subscribe(selectedMusic => {
         if (selectedMusic) {
+          console.log(`Music was changed`);
           this.selectedMusic = selectedMusic;
           if (this.selectedMusic) {
-            if (that.musicPlayer) {
+            if (that.musicPlayer && localStorage.getItem(Config.placeToPlayMusic).localeCompare('home') === 0) {
               that.audioContainerNativeElement.style.opacity = 1;
               that.musicPlayer.onended = function () {
                 that.goToNextMusic();

@@ -149,6 +149,7 @@ ${Config.trainingDateParameter}=${trainingDate}`;
     this.trainingService.getTrainings(getTrainingsUrl)
       .subscribe(response => {
         if (response) {
+          console.log(response);
           this.showStatusButtonForEachTraining(response.body);
           this.trainings = response.body;
         } else {

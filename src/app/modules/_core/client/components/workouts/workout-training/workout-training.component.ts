@@ -287,7 +287,7 @@ export class WorkoutTrainingComponent implements OnInit, OnDestroy, AfterViewIni
         this.uploadStatusImage(file);
       }
     });
-  };
+  }
 
   /**
    *
@@ -349,7 +349,7 @@ export class WorkoutTrainingComponent implements OnInit, OnDestroy, AfterViewIni
       .subscribe(selectedMusic => {
         this.selectedMusic = selectedMusic;
         if (this.selectedMusic) {
-          if (that.musicPlayer) {
+          if (that.musicPlayer && localStorage.getItem(Config.placeToPlayMusic).localeCompare('training') === 0) {
             that.audioContainerNativeElement.style.opacity = 1;
             that.musicPlayer.onended = function () {
               that.goToNextMusic();

@@ -1,12 +1,12 @@
-import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {ShareMusicService, ShareSingleExerciseService, ShareTrainingService, ShareUserProfileService} from '@gw-services/shared';
-import {Router} from '@angular/router';
-import {Coffeti, Music, NewFeed, ResponseMessage, SingleExercise, Training, UserAchievement, UserProfile} from '@gw-models';
-import {Config} from '@gw-config';
-import {NzModalService, NzNotificationService} from 'ng-zorro-antd';
-import {MusicService, NewFeedService, TrainingService, UploadImageService, UserAchievementService} from '@gw-services/api';
-import {Observable, Observer} from 'rxjs';
-import {ImageValidator} from '@gw-services/validate';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ShareMusicService, ShareSingleExerciseService, ShareTrainingService, ShareUserProfileService } from '@gw-services/shared';
+import { Router } from '@angular/router';
+import { Coffeti, Music, NewFeed, ResponseMessage, SingleExercise, Training, UserAchievement, UserProfile } from '@gw-models';
+import { Config } from '@gw-config';
+import { NzModalService, NzNotificationService } from 'ng-zorro-antd';
+import { MusicService, NewFeedService, TrainingService, UploadImageService, UserAchievementService } from '@gw-services/api';
+import { Observable, Observer } from 'rxjs';
+import { ImageValidator } from '@gw-services/validate';
 import Plyr from 'plyr';
 
 @Component({
@@ -69,17 +69,17 @@ export class SingleExerciseTrainingComponent implements OnInit, OnDestroy, After
    * @param musicService - inject musicService
    */
   constructor(private shareSingleExercise: ShareSingleExerciseService,
-              private router: Router,
-              private modal: NzModalService,
-              private shareUserProfileService: ShareUserProfileService,
-              private userAchievementService: UserAchievementService,
-              private shareMusicService: ShareMusicService,
-              private trainingService: TrainingService,
-              private uploadImageService: UploadImageService,
-              private notification: NzNotificationService,
-              private newFeedService: NewFeedService,
-              private shareTrainingService: ShareTrainingService,
-              private musicService: MusicService) {
+    private router: Router,
+    private modal: NzModalService,
+    private shareUserProfileService: ShareUserProfileService,
+    private userAchievementService: UserAchievementService,
+    private shareMusicService: ShareMusicService,
+    private trainingService: TrainingService,
+    private uploadImageService: UploadImageService,
+    private notification: NzNotificationService,
+    private newFeedService: NewFeedService,
+    private shareTrainingService: ShareTrainingService,
+    private musicService: MusicService) {
 
   }
 
@@ -256,7 +256,7 @@ export class SingleExerciseTrainingComponent implements OnInit, OnDestroy, After
         this.uploadStatusImage(file);
       }
     });
-  };
+  }
 
   /**
    *
@@ -318,12 +318,12 @@ export class SingleExerciseTrainingComponent implements OnInit, OnDestroy, After
   private getSelectedSingleExercise(): void {
     this.shareSingleExercise
       .currentSingleExercise.subscribe(selectedSingleExercise => {
-      if (selectedSingleExercise) {
-        this.selectedSingleExercise = selectedSingleExercise;
-      } else {
-        this.router.navigate(['/client/exercise']);
-      }
-    });
+        if (selectedSingleExercise) {
+          this.selectedSingleExercise = selectedSingleExercise;
+        } else {
+          this.router.navigate(['/client/exercise']);
+        }
+      });
   }
 
   /**
@@ -347,9 +347,10 @@ export class SingleExerciseTrainingComponent implements OnInit, OnDestroy, After
     const that = this;
     this.shareMusicService.currentMusic
       .subscribe(selectedMusic => {
+        console.log(`Single Exercise Training - Music was changed`);
         this.selectedMusic = selectedMusic;
         if (this.selectedMusic) {
-          if (that.musicPlayer) {
+          if (that.musicPlayer && localStorage.getItem(Config.placeToPlayMusic).localeCompare('training') === 0) {
             that.audioContainerNativeElement.style.opacity = 1;
             that.musicPlayer.onended = function () {
               that.goToNextMusic();

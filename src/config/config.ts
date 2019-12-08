@@ -198,6 +198,7 @@ export enum Config {
 
   // current song position
   currentSongPosition = 'currentSongPosition',
+  placeToPlayMusic = 'placeToPlayMusic',
 
   // selected product's category (for searching)
   selectedProductCategoryForSearching = 'selectedProductCategoryForSearching',
